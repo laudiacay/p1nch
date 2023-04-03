@@ -1,0 +1,9 @@
+{
+  "name": "sequencer",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/laudiacay/p1nch",
+  "author": "binch",
+  "license": "MIT",
+  "private": true
+}
