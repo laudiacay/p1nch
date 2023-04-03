@@ -1,0 +1,36 @@
+Arguments: 
+  /usr/local/Cellar/node/19.6.0/bin/node /Users/laudiacay/.yarn/bin/yarn.js init
+
+PATH: 
+  /Users/laudiacay/.opam/default/bin:/Users/laudiacay/.amplify/bin:/Users/laudiacay/Downloads/google-cloud-sdk/bin:/Users/laudiacay/.yarn/bin:/Users/laudiacay/.config/yarn/global/node_modules/.bin:/Users/laudiacay/opt/anaconda3/bin:/Library/Frameworks/Python.framework/Versions/3.9/bin:/Users/laudiacay/.local/share/solana/install/active_release/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/laudiacay/.cargo/bin:/Users/laudiacay/.local/bin:/Users/laudiacay/Library/Python/3.9/bin:/Users/laudiacay/.local/bin:/Users/laudiacay/Library/Python/3.9/bin:/Users/laudiacay/go/bin:/Users/laudiacay/.foundry/bin:/Users/laudiacay/.zokrates/bin
+
+Yarn version: 
+  1.22.17
+
+Node version: 
+  19.6.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  Error: canceled
+      at Interface.<anonymous> (/Users/laudiacay/.yarn/lib/cli.js:137143:13)
+      at Interface.emit (node:events:512:28)
+      at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1132:18)
+      at ReadStream.onkeypress (node:internal/readline/interface:271:20)
+      at ReadStream.emit (node:events:512:28)
+      at emitKeys (node:internal/readline/utils:357:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+      at ReadStream.emit (node:events:512:28)
+      at addChunk (node:internal/streams/readable:324:12)
+
+npm manifest: 
+  No manifest
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
