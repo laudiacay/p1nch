@@ -18,7 +18,7 @@ include "circuits/common.circom";
 template SMTProcessorWrapper(NLevels) {
 	signal input oldRoot;
   signal output newRoot;
-  signal input siblings[nLevels];
+  signal input siblings[NLevels];
   signal input oldKey;
   // signal input oldValue;
   signal input isOld0;
@@ -27,6 +27,6 @@ template SMTProcessorWrapper(NLevels) {
   signal input fnc[2];
 
 	newRoot <== SMTProcessor(NLevels)(
-		oldRoot, newRoot, siblings, oldKey, 0, isOld0, newKey, 0, fnc
+		oldRoot, siblings, oldKey, 0, isOld0, newKey, 0, fnc
 	);
 }
