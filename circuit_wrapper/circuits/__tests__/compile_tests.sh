@@ -11,7 +11,7 @@ fi
 
 cd ../../
 circom circuits/__tests__/deposit_well_formed_test.circom --r1cs --wasm --sym -l "."
-circom circuits/__tests__/smt_insert_test.circom --r1cs --wasm --sym -l "."
+circom circuits/__tests__/smt_processor_test.circom --r1cs --wasm --sym -l "."
 
 
 # circom <Path> --r1cs --wasm --sym
