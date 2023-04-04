@@ -4,7 +4,7 @@ import cron from 'node-cron';
 import { ethers, Contract } from 'ethers';
 import erc20Abi from './erc20Abi.json';
 
-import { initializeSMTFromRedisBatches, SMT } from './smt';
+import { CircomSMT, initializeSMTFromRedisBatches } from './smt';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -15,7 +15,7 @@ const provider = ethers.getDefaultProvider('rinkeby');
 app.use(express.json());
 
 // Initialize the SMT from Redis batches
-let smt: SMT;
+let smt: CircomSMT;
 initializeSMTFromRedisBatches(redis).then((smt_) => {
   smt = smt_;
 });
