@@ -5,9 +5,8 @@ include "circuits/smt_processor.circom";
 component main {
 	public [
 		oldRoot,
-  	newRoot,
   	oldKey,
 		fnc,
 		newKey
 	]
-} = NewSmtInsert(10); //TODO: how many levels habib? 128 should be gucci
+} = SMTProcessorWrapper(10); //TODO: how many levels habib? 128 should be gucci
