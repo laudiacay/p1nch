@@ -32,3 +32,16 @@ template ItemHasher() {
 
   out <== poseidon.out;
 }
+
+template SwapEvent() {
+  signal input timestamp_start; // Inclusive
+  signal input timestamp_end; // Inclusive
+  signal input tok_in[2];
+  signal input tok_out[2];
+  signal input swap_price; // TODO: price per what???
+
+  signal output out;
+
+  out <== Poseidon(7)(timestamp_start, timestamp_end, tok_in[0], tok_in[1],
+    tok_out[0], tok_out[1], swap_price)
+}

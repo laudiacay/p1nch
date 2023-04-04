@@ -4,7 +4,7 @@ include "circuits/verify_comm_membership.circom";
 
 component main {
 	public [
-		deposit_comm,
+		comm,
 		root
 	]
 } = VerifyCommMembership(10);
