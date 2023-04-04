@@ -1,23 +1,24 @@
 import express, { Request, Response } from "express";
 import Redis from "ioredis";
-import cron from "node-cron";
+//@ts-ignore
+import * as cron from "node-cron";
 import { ethers, Contract } from "ethers";
 import erc20Abi from "./erc20Abi.json";
 
 import { CircomSMT } from "./smt";
 import { configs } from "./configs";
+import { compile_snark } from "./snark_utils";
 
 const app = express();
 const port = process.env.PORT || 3000;
 const redis = new Redis();
 
-const provider = ethers.getDefaultProvider("rinkeby");
+const provider = ethers.getDefaultProvider("goerli");
 
 app.use(express.json());
 
 // Initialize the SMT from Redis batches
 let smt: CircomSMT;
-// TODO: sep const
 
 CircomSMT.new_tree_from_redis(configs.N_LEVELS, redis).then((smt_) => {
   smt = smt_;
@@ -53,7 +54,7 @@ app.post("/sequencer", async (req: Request, res: Response) => {
     // TODO: note that if the ticketKey goes into this batch twice, the second time, it'll fail.
     //       and we will not detect that failure here, because we're checking whether it's in the SMT :)
     //       what's the desired behavior?
-    if (smt.get(data.ticketKey) === BigInt(1)) {
+    if ((await smt.find(data.ticketKey, false)) === null) {
       res.status(500).json({ message: "ticketKey already in SMT" });
     }
 
@@ -98,11 +99,15 @@ cron.schedule("*/5 * * * *", async () => {
     }
 
     // Add item to the Sparse Merkle Tree
-    smt.add(item.ticketKey, BigInt(1));
-    // TODO: this is incorrect, we need to prove that 1. the ticketKey is now in the SMT and 2. the update of the SMT is valid
-    // TODO talk to lev about how to get this out of circom...
-    // the line below just proves that it's in there at all. which it always will be, we always add it in the line before.
-    const smt_mutation_proof = smt.createProof(item.ticketKey);
+    const insert_witness = await smt.insert(item.ticketKey);
+    const { proof: smt_insert_proof, public_signals: smt_insert_pub } =
+      await compile_snark(
+        insert_witness,
+        configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
+        configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+      );
+
+    // TODO: create SNARK proof via SNARKJS
 
     // check that alice authorized her funds.
     const erc20Contract = new Contract(item.erc20ID, erc20Abi, provider);
