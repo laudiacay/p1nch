@@ -2,6 +2,7 @@ pragma circom 2.1.0;
 
 include "circuits/common.circom";
 include "circuit_wrapper/node_modules/circomlib/circuits/comparators.circom";
+include "circuit_wrapper/node_modules/circomlib/circuits/poseidon.circom";
 
 // Use SMT Processor
 // component main = SMTVerifier(10);
