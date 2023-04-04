@@ -16,12 +16,7 @@ interface TreeFindRes {
 }
 
 // Adding leaves up to depth is in https://github.com/iden3/circomlib/blob/master/test/smtverifier.js
-
-export async function initializeSMTFromRedisBatches(
-  redis: Redis
-): Promise<CircomSMT> {}
-
-class CircomSMT {
+export class CircomSMT {
   private n_levels: number;
   private _smt: any;
   private _babyjub: any;
@@ -66,21 +61,23 @@ class CircomSMT {
     // Wait for all promises to finish
     await Promise.all(proms_nested.flat());
   }
-  
 
   public async insert(inp_key: BigIntish, inp_val: BigIntish): Promise<void> {
-    await this._smt.insert(inp_key, inp_val)
+    await this._smt.insert(inp_key, inp_val);
   }
   public async delete(inp_key: BigIntish, inp_val: BigIntish): Promise<void> {
-    await this._smt.delete(inp_key, inp_val)
+    await this._smt.delete(inp_key, inp_val);
   }
   public async update(inp_key: BigIntish, inp_val: BigIntish): Promise<void> {
-    await this._smt.update(inp_key, inp_val)
+    await this._smt.update(inp_key, inp_val);
   }
   public async find(inp_key: BigIntish): Promise<TreeFindRes> {
-    return await this._smt.find(inp_key)
+    const res: TreeFindRes = await this._smt.find(inp_key);
+    let siblings = res.siblings;
+    for (let i = 0; i < siblings.length; i++)
+      siblings[i] = this._smt.F.toObject(siblings[i]);
+    while (siblings.length < this.n_levels) siblings.push(0);
+    res.siblings = siblings;
+    return res;
   }
-  // delete: (inp_key: BigIntish, inp_val: BigIntish) => Promise<void>;
-  // update: (inp_key: BigIntish, inp_val: BigIntish) => Promise<void>;
-  // find: (key: BigIntish) => Promise<TreeFindRes>;
 }
