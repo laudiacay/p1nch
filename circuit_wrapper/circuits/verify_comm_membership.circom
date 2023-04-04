@@ -1,14 +1,13 @@
 pragma circom 2.1.0;
 
 include "circuits/common.circom";
-include "circuit_wrapper/node_modules/circomlib/circuits/poseidon.circom";
-include "circuit_wrapper/node_modules/circomlib/circuits/smt/smtverifier.circom";
+include "node_modules/circomlib/circuits/poseidon.circom";
+include "node_modules/circomlib/circuits/smt/smtverifier.circom";
 
 // Use SMT Processor
 // component main = SMTVerifier(10);
 // TODO: n levels?
 // SMTVerifier(10)
-
 
 template VerifyCommMembership(NLevels) {
 		signal input nullifier;
@@ -24,9 +23,7 @@ template VerifyCommMembership(NLevels) {
 		signal input root;
 	  /**** End Signals ****/
 
-    // TODO: is the bit amount a problem?
-    1 === LessEqThan(252)(swap_amount, deposit_amount); // Check that the swap amont is less than deposit
-
-    deposit_comm === Poseidon(2)([deposit_key, deposit_randomness]);
+    signal _deposit_comm <== Poseidon(2)([deposit_key, deposit_randomness]);
+		deposit_comm === _deposit_comm;
 		SMTVerifier(NLevels)(1, root, siblings, oldKey, oldValue, isOld0, deposit_key, 0, 0);
 }
