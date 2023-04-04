@@ -15,16 +15,18 @@ include "circuits/common.circom";
  * This component checks that we are inserting a **new** leaf into the tree
  * This is done by checking a non membership proof as well as a well formed update proof
  */
-template NewSmtInsert(NLevels) {
-  signal input item_hash; // public
-	signal input old_root; // public
-	signal input new_root; //public
-	signal input siblings[NLevels];
-	// TODO: ?
-	signal input is_old_0;
-	signal input key; // public
+template SMTProcessorWrapper(NLevels) {
+	signal input oldRoot;
+  signal output newRoot;
+  signal input siblings[nLevels];
+  signal input oldKey;
+  // signal input oldValue;
+  signal input isOld0;
+  signal input newKey;
+  // signal input newValue;
+  signal input fnc[2];
 
-	// Check the update
-	signal new_root_out <== SMTProcessor(NLevels)(old_root, siblings, key, 1, is_old_0, key, 1, [1, 0]);
-	new_root === new_root_out;
+	newRoot <== SMTProcessor(NLevels)(
+		oldRoot, newRoot, siblings, oldKey, 0, isOld0, newKey, 0, fnc
+	);
 }
