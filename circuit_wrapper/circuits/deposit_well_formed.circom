@@ -8,19 +8,23 @@ include "circuits/common.circom";
 // SMTVerifier(10)
 
 
-component DepositWellFormed() {
+template DepositWellFormed() {
+    var DEPOSIT_INSTR = 0;
+    var SWAP_INSTR = 1;
 		signal input nullifier;
     signal input randomness;
 
-		signal public input nullifier_comm;
-		signal public input amount;
-    signal public input timestamp;
-    signal public input tok_addr[2];
-    signal public input item_hash;
+	  /**** Public Signals ****/
+		signal input nullifier_comm;
+		signal input amount;
+    signal input timestamp;
+    signal input tok_addr[2];
+    signal input item_hash;
+	  /**** End Signals ****/
 
 
 
-    signal hash <== ItemHasher()(1, timestamp, nullifier, tok_addr[0], tok_addr[1]
-      amount, DEPOSIT_INSTR, 0, 0, 0, randomness);
+    signal hash <== ItemHasher()(1, timestamp, nullifier, tok_addr,
+      amount, DEPOSIT_INSTR, [0, 0, 0], randomness);
     hash === item_hash;
 }
