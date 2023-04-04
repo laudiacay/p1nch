@@ -1,10 +1,8 @@
 pragma circom 2.1.0;
-include "node_modules/circomlib/circuits/bitify.circom";
+include "node_modules/circomlib/circuits/poseidon.circom";
 
-var DEPOSIT_INSTR = 0;
-var SWAP_INSTR = 1;
 
-component ItemHasher() {
+template ItemHasher() {
   signal input active;
   signal input timestamp;
   signal input nullifier;
@@ -17,13 +15,12 @@ component ItemHasher() {
   signal output out;
 
   component poseidon = Poseidon(11);
-  component nullifier_hash = Poseidon(1);
-  nullifier ==> nullifier_hash.inputs[0];
+  signal null_hash <== Poseidon(1)([nullifier]);
 
 
   active ==> poseidon.inputs[0];
   timestamp ==> poseidon.inputs[1];
-  nullifier_hash.out ==> poseidon.inputs[2];
+  null_hash ==> poseidon.inputs[2];
   tok_addr[0] ==> poseidon.inputs[3];
   tok_addr[1] ==> poseidon.inputs[4];
   amount ==> poseidon.inputs[5];
