@@ -1,4 +1,3 @@
-import { poseidon } from "circomlib";
 //@ts-ignore
 import { newMemEmptyTrie, buildBabyjub } from "circomlibjs";
 
@@ -24,7 +23,7 @@ interface TreeInsertRes extends TreeFindRes {
 interface TreeDeleteRes extends TreeFindRes {
   oldRoot: BigIntish;
   oldKey: BigIntish;
-  delKey: BigIntish
+  delKey: BigIntish;
 }
 
 // Adding leaves up to depth is in https://github.com/iden3/circomlib/blob/master/test/smtverifier.js
@@ -74,17 +73,22 @@ export class CircomSMT {
     await Promise.all(proms_nested.flat());
   }
 
-  public async insert(inp_key: BigIntish): Promise<void> {
-    await this._smt.insert(inp_key, 0);
+  public async insert(inp_key: BigIntish) {
+    const tree_insert = await this._smt.insert(inp_key, 0);
+    return {
+      fnc: [1, 0],
+      oldRoot: this._smt.F.toObject(tree_insert.oldRoot),
+      siblings: tree_insert.siblings,
+      oldKey: tree_insert.isOld0 ? 0 : this._smt.F.toObject(tree_insert.oldKey),
+      oldValue: tree_insert.isOld0 ? 0 : this._smt.F.toObject(0),
+      isOld0: tree_insert.isOld0 ? 1 : 0,
+      newKey: this._smt.F.toObject(tree_insert.key),
+      newValue: this._smt.F.toObject(0),
+    };
   }
-  public async delete(inp_key: BigIntish): Promise<void> {
-    await this._smt.delete(inp_key, 0);
-  }
-  public async update(inp_key: BigIntish): Promise<void> {
-    await this._smt.update(inp_key, 0);
-  }
+
   // See Circom's test: https://github.com/iden3/circomlib/blob/master/test/smtverifier.js, for details
-  public async find(inp_key: BigIntish): Promise<TreeFindRes> {
+  public async find(inp_key: BigIntish, inclusion = true) {
     const res: TreeFindRes = await this._smt.find(inp_key);
     let siblings = res.siblings;
     for (let i = 0; i < siblings.length; i++)
@@ -94,19 +98,9 @@ export class CircomSMT {
     while (siblings.length < this.n_levels) siblings.push(0);
     res.key = inp_key;
     res.siblings = siblings;
-    return res;
-  }
-
-  /**
-   *
-   * @param inclusion - true for an inclusion proof, false otherwise
-   */
-  public format_input_arguments_verify(
-    tree_find: TreeFindRes,
-    inclusion = true
-  ) {
+    const tree_find = res;
     if (tree_find.found !== inclusion)
-      throw `The tree find must match inclusion`;
+      return null
     return {
       enabled: 1,
       fnc: inclusion ? 0 : 1,
@@ -122,41 +116,5 @@ export class CircomSMT {
       key: this._smt.toObject(tree_find.key),
       value: 0,
     };
-  }
-
-  public format_input_arguments_insert(tree_insert: TreeInsertRes) {
-    return {
-      fnc: [1, 0],
-      oldRoot: this._smt.F.toObject(tree_insert.oldRoot),
-      siblings: tree_insert.siblings,
-      oldKey: tree_insert.isOld0 ? 0 : this._smt.F.toObject(tree_insert.oldKey),
-      oldValue: tree_insert.isOld0 ? 0 : this._smt.F.toObject(0),
-      isOld0: tree_insert.isOld0 ? 1 : 0,
-      newKey: this._smt.F.toObject(tree_insert.key),
-      newValue: this._smt.F.toObject(0),
-    };
-  }
-
-  public format_input_arguments_delete(
-    tree_delete: TreeDeleteRes,
-  ) {
-    return {
-        fnc: [1,1],
-        oldRoot: this._smt.F.toObject(tree_delete.oldRoot),
-        siblings: tree_delete.siblings,
-        oldKey: tree_delete.isOld0 ? 0 : this._smt.F.toObject(tree_delete.oldKey),
-        oldValue: tree_delete.isOld0 ? 0 : this._smt.F.toObject(0),
-        isOld0: tree_delete.isOld0 ? 1 : 0,
-        newKey: this._smt.F.toObject(tree_delete.delKey),
-        newValue: this._smt.F.toObject(0)
-    }
-  }
-  
-  // IDK if we need this as we never use it...
-  static format_input_arguments_update(
-    tree_find: TreeFindRes,
-    inclusion: number
-  ) {
-    throw "TODO:";
   }
 }
