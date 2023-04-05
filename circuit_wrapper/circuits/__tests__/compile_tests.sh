@@ -9,5 +9,11 @@ else
     wget https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_10.ptau
 fi
 
+cd ../../
+circom circuits/__tests__/verify_swap_test.circom --r1cs --wasm --sym -l "."
+circom circuits/__tests__/deposit_well_formed_test.circom --r1cs --wasm --sym -l "."
+circom circuits/__tests__/smt_processor_test.circom --r1cs --wasm --sym -l "."
+circom circuits/__tests__/verify_comm_memb_test.circom --r1cs --wasm --sym -l "."
+
 
 # circom <Path> --r1cs --wasm --sym
