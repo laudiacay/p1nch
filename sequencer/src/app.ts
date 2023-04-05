@@ -62,9 +62,8 @@ cron.schedule('*/5 * * * *', async () => {
   // Move unprocessed data to a new list and empty the original list
   await redis.rename('unprocessedData', 'oldUnprocessedData');
 
-  // get the new batch num
+  // get the new batch num and redis list name
   const batchNumber = await redis.zcard('batches');
-
   const new_list_name = `batch_${batchNumber}`;
 
   // Process each item in the old batch
