@@ -129,6 +129,12 @@ cron.schedule("*/5 * * * *", async () => {
     await redis.rpush(new_list_name, JSON.stringify(item.ticketKey));
   }
 
+  // run the transactions
+  
+
+  // delete old unprocessed data
+  await redis.del("oldUnprocessedData");
+
   // add the pushed ticket hashes as a batch to Redis
   await redis.rpush("batches", new_list_name);
 });
