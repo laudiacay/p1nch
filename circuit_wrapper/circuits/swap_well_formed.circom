@@ -32,6 +32,7 @@ template SwapWellFormed() {
 	  /**** End Signals ****/
 
     // TODO: is the bit amount a problem?
+    // TODO whole equal not leq
     signal comp_out <== LessEqThan(252)([swap_amount, deposit_amount]); // Check that the swap amont is less than deposit
     comp_out === 1;
 
