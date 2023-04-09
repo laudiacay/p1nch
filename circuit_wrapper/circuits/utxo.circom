@@ -78,6 +78,10 @@ template Swap() {
 
     signal _new_swap_hash <== ItemHasherPK()(1, new_hash_timestamp, received_pk, inp_tok_addr, p2skh_amount, SWAP_INSTR, [out_tok_addr[0], out_tok_addr[1], 0], swap_randomness);
     new_swap_hash === new_swap_hash;
+
+		// Check that the swap amount fits into 120 bits so that we can later do arithmetic on it later
+		Check125Bits()(p2skh_amount);
+		bit_check === 1;
 }
 
 // /**
@@ -178,4 +182,61 @@ template P2SKHMerge() {
   signal _new_hash <== ItemHasherPK()(1, new_timestamp, new_pk, tok_addr,
 		old_amount_1 + old_amount_2, P2SKH_INSTR, [0, 0, 0], new_randomness_2);
 	new_hash === _new_hash;
+}
+
+/**
+ * @brief - Resolve the swap after it occured
+ */
+template SwapResolveToP2SKH() {
+  var P2SKH_INSTR = 0;
+  var SWAP_INSTR = 1;
+
+	signal input sk;
+	signal input swap_randomness;
+	signal input inp_tok_amount;
+	signal input inp_tok[2];
+	signal input out_tok[2];
+	
+	// TODO: precision?
+	signal input price_in;
+	signal input price_out;
+
+	// The swap timestamps that are included. Inclusion is lower bounded: i.e. [swap_event_timestamp_range[0], swap_event_timestamp_range[1])
+	signal input swap_event_timestamp_range[2];
+	signal input swap_event_timestamp;
+
+	signal input p2skh_randomness;
+	signal input pk_out;
+
+	signal input swap_utxo_comm_randomness;
+	signal input swap_event_comm_randomness;
+
+	/*** Public Signals ***/
+	signal input swap_event_comm;
+	signal input out_p2skh_hash;
+	signal input p2skh_timestap;
+	signal input swap_utxo_comm;
+	/*** End Public Signals ***/
+
+  // Check timestamp inclusion range
+	CheckSwapInclusion()(swap_event_timestamp_range, swap_event_timestamp);
+	// Check that the prices fit into 125 bit	
+	Check125Bits()(price_in);
+	Check125Bits()(price_out);
+
+	signal mult <== inp_tok_amount * price_in;
+	signal amount_out <== TokDivision()([mult, price_out]);
+
+  // Check the swap event commitment
+	signal _swap_utxo_hash <== ItemHasherSK()(1, swap_event_timestamp, sk, inp_tok, inp_tok_amount, SWAP_INSTR, [out_tok[0], out_tok[1], 0], swap_randomness);
+	signal _swap_comm <== Poseidon(2)([_swap_utxo_hash, swap_utxo_comm_randomness]);
+	_swap_utxo_comm === swap_utxo_comm;
+
+  // Check the output hash
+	signal _out_p2skh_hash <== ItemHasherPK()(1, p2skh_timestamp, pk_out, out_tok, amount_out, P2SKH_INSTR, [0, 0, 0], p2skh_randomness);
+	_out_p2skh_hash === out_p2skh_hash;
+
+	signal swap_event_hash <== SwapEventHasher()(swap_event_timestamp_range, inp_tok, out_tok, price_in, price_out);
+	signal _swap_event_comm <== Poseidon(2)([swap_event_hash, swap_event_comm_randomness]);
+	_swap_event_comm === swap_event_comm;
 }
