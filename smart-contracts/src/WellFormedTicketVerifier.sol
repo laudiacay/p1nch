@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 // a contract that verifies whether a ticket is well-formed
-contract WellFormedTicketVerifier {
+library WellFormedTicketVerifier {
     // types
     struct Proof {
         uint256[2] a;
@@ -12,7 +12,7 @@ contract WellFormedTicketVerifier {
 
     // public functions
     // assert!(ticket_key = hash(active=true, token, amount, "deposit/swap" ...some other fields...))
-    function wellformedActiveTicketProof(Proof memory proof, address token, uint256 amount, uint256 ticket_key)
+    function wellformedActiveTicketProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_key)
         public
         returns (bool r)
     {
@@ -20,9 +20,15 @@ contract WellFormedTicketVerifier {
     }
 
     // assert!(ticket_key = hash(active=false, token, amount, "deposit/swap" ...some other fields...))
-    // assert!(know preimage of hash(nullifier) in ticket)
     // assert!(all fields of cancelling_ticket_key eq to fields of old_key)
-    function wellformedNullifierProof(Proof memory proof, address token, uint256 amount, uint256 old_key, uint256 cancelling_key)
+    // assert!(know secret key that this is intended for)
+    function well_formed_deactivation_hash_proof(
+        Proof calldata proof,
+        address token,
+        uint256 amount,
+        uint256 commitment_to_old_key,
+        uint256 cancelling_key
+    )
         public
         returns (bool r)
     {
@@ -36,7 +42,7 @@ contract WellFormedTicketVerifier {
     // assert!(amount <= old_note_balance * swap_price
     //         where swap_price == swap_batch[])
     //         where swap_batch[] is the swap batch that the initial deposit got swapped in
-    function wellformedWithdrawProof(Proof memory proof, address token, uint256 amount, uint256 ticket_key)
+    function wellformedburnSwapProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_key)
         public
         returns (bool r)
     {
