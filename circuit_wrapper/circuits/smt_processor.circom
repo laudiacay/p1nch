@@ -25,6 +25,9 @@ template SMTProcessorWrapper(NLevels) {
 	);
 }
 
+/**
+ * Verify membership of a commited to leaf in the tree
+ */
 template VerifyCommMembership(NLevels) {
 		signal input key;
 		signal input randomness;

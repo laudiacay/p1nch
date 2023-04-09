@@ -4,7 +4,7 @@ include "circuits/common.circom";
 include "node_modules/circomlib/circuits/comparators.circom";
 include "node_modules/circomlib/circuits/poseidon.circom";
 
-template Inactive() {
+template Deactivator() {
 	signal input active_randomness;
 	signal input active_timestamp;
 	signal input active_amount;
@@ -15,7 +15,7 @@ template Inactive() {
 	signal input active_tok_inp_addr[2];
 
 	/*** Public Signal ***/
-	signal input inactive_hash;
+	signal input deactive_hash;
 	signal input active_comm;
 	/*** End Public Signals **/
 
@@ -26,20 +26,19 @@ template Inactive() {
   signal _active_comm <== Poseidon(2)([active_hash, p2skh_comm_randomness]);
 	active_comm === _active_comm;
 
-	signal _inactive_hash <== ItemHasherSK()(0, active_timestamp,
+	signal _deactive_hash <== ItemHasherSK()(0, active_timestamp,
 		sk, active_tok_inp_addr,
 		amount, active_instr, active_data,
 		active_randomness);
-	_inactive_hash === inactive_hash;
+	_deactive_hash === deactive_hash;
 }
 
-template P2SKHDeposit() {
+template P2SKHWellFormed() {
     var P2SKH_INSTR = 0;
 		signal input sk;
     signal input randomness;
 
 	  /**** Public Signals ****/
-		signal input sk_comm;
 		signal input amount;
     signal input timestamp;
     signal input tok_addr[2];
