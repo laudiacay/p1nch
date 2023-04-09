@@ -1,5 +1,6 @@
 pragma circom 2.1.0;
 include "node_modules/circomlib/circuits/poseidon.circom";
+include "node_modules/circomlib/circuits/bitify.circom";
 
 // p2skh
 template ItemHasherPK() {
@@ -65,7 +66,9 @@ template ItemHasherSK() {
 }
 
 template SwapEvent() {
+
   signal input timestamp_start; // Inclusive
+
   signal input timestamp_end; // Inclusive
   signal input tok_in[2];
   signal input tok_out[2];
@@ -75,4 +78,15 @@ template SwapEvent() {
 
   out <== Poseidon(7)(timestamp_start, timestamp_end, tok_in[0], tok_in[1],
     tok_out[0], tok_out[1], swap_price)
+}
+
+/**
+ * Check that the bits fit into 252 bits
+ */
+template Check252Bits() {
+  signal input in;
+  component num2bits = Num2Bits_strict();
+  num2bits <== in;
+  num2bits.out[253] == 0;
+  num2bits.out[252] == 0;
 }
