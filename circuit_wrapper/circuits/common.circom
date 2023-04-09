@@ -104,7 +104,7 @@ template Check252Bits() {
 template Check125Bits() {
   signal input in;
   component num2bits = Num2Bits_strict();
-  num2bits <== in;
+  num2bits.in <== in;
   for (var i = 125; i < 254; i++) {
     num2bits.out[i] === 0;
   }
@@ -113,7 +113,7 @@ template Check125Bits() {
 template Check250Bits() {
   signal input in;
   component num2bits = Num2Bits_strict();
-  num2bits <== in;
+  num2bits.in <== in;
   for (var i = 250; i < 254; i++) {
     num2bits.out[i] === 0;
   }
