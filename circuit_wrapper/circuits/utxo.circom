@@ -59,7 +59,6 @@ template Swap() {
 		signal input sk;
     signal input p2skh_randomness;
     signal input p2skh_timestamp;
-    signal input p2skh_amount;
     signal input p2skh_comm_randomness;
 		signal input swap_randomness;
 		signal input received_pk;
@@ -70,6 +69,7 @@ template Swap() {
     signal input new_swap_hash;
     signal input p2skh_comm;
     signal input new_hash_timestamp; // Then, we assume that the new swap timestamp is new_dep + 1
+    signal input p2skh_amount;
 	  /**** End Signals ****/
 
     signal p2skh_hash <== ItemHasherSK()(1, p2skh_timestamp, sk, inp_tok_addr, p2skh_amount, P2SKH_INSTR, [0, 0, 0], p2skh_randomness);
@@ -83,26 +83,6 @@ template Swap() {
 		Check125Bits()(p2skh_amount);
 		bit_check === 1;
 }
-
-// /**
-//  * @brief - A circuit to split or merge p2skh
-//  */
-// template P2SKHSplitMerge() {
-// 	signal input sk;
-// 	signal input split_or_merge; // 0 for split, 1 for merge
-// 	(split_or_merge - 1) * split_or_merge === 0; // check `split_or_merge` is binary
-// 	signal input old_1_comm_randomness;
-// 	signal input old_2_comm_randomness;
-
-// 	/*** Public Signals ***/
-// 	signal input old_1_comm;
-// 	signal input old_2_comm; // If we are splitting and not merging, this is a dummy commitment
-// 	signal input new_1_leaf;
-// 	signal input new_2_leaf; 
-// 	/*** End Public Signals ***/
-
-// 	ItemHasherPK()
-// }
 
 template P2SKHSplit() {
 	var P2SKH_INSTR = 0;

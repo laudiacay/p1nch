@@ -1,13 +1,12 @@
 pragma circom 2.1.0;
 
-include "circuits/p2skh_well_formed.circom";
+include "circuits/utxo.circom";
 
 component main {
 	public [
-		sk_comm,
 		amount,
 		timestamp,
 		tok_addr,
 		item_hash
 	]
-} = P2SKH();
+} = P2SKHWellFormed();
