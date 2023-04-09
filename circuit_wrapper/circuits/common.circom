@@ -65,19 +65,25 @@ template ItemHasherSK() {
   out <== poseidon.out;
 }
 
-template SwapEvent() {
-
-  signal input timestamp_start; // Inclusive
-
-  signal input timestamp_end; // Inclusive
+template SwapEventHasher() {
+  signal input timestamp_range[2]; 
   signal input tok_in[2];
   signal input tok_out[2];
   signal input swap_price; // TODO: price per what???
 
   signal output out;
 
-  out <== Poseidon(7)(timestamp_start, timestamp_end, tok_in[0], tok_in[1],
+  out <== Poseidon(7)(timestamp_range[0], timestamp_range[1], tok_in[0], tok_in[1],
     tok_out[0], tok_out[1], swap_price)
+}
+
+template CheckSwapInclusion() {
+  signal input event_range[2];
+  signal input timestamp_check;
+  signal out_1 <== LessThan(252)(timestamp_check, event_range[1]);
+  out_1 === 1;
+  signal out_2 <== LessThanEq(252)(event_range[0], timestamp_check)
+  out_2 === 1;
 }
 
 /**
@@ -89,4 +95,52 @@ template Check252Bits() {
   num2bits <== in;
   num2bits.out[253] == 0;
   num2bits.out[252] == 0;
+}
+
+/**
+ * Check that the bits fit into 252 bits
+ */
+template Check125Bits() {
+  signal input in;
+  component num2bits = Num2Bits_strict();
+  num2bits <== in;
+  for (var i = 125; i < 254; i++) {
+    num2bits.out[i] === 0;
+  }
+}
+
+template Check250Bits() {
+  signal input in;
+  component num2bits = Num2Bits_strict();
+  num2bits <== in;
+  for (var i = 250; i < 254; i++) {
+    num2bits.out[i] === 0;
+  }
+}
+
+/**
+ * @brief - Divide inp[0] / inp[1] = out
+ *
+ */
+template TokDivision() {
+  signal input inp[2];
+  signal output out;
+
+  out <-- inp[0] \ inp[1];
+  Check250Bits(inp[0]);
+  signal remainder <-- inp[0] % inp[1];
+
+	// Check that 0 <= remainder < inp[1]
+  signal remainder_check_gte <== GreaterEqThan(252)(remainder, 0);
+  remainder_check_gte === 1;
+  signal remainder_check_lt <== LessThan(252)(remainder, inp[1]);
+  remainder_check_lt === 1;
+
+	// Check that 0 <= quotient <= inp[0]
+  signal quot_check_gte <== GreaterEqThan(252)(out, 0);
+  signal quot_check_lt <== LessThanEq(252)(out, inp[0]);
+
+  // Check that out * inp[1] + remainder = inp[0]
+  out * inp[1] + remainder === inp[0];
+
 }
