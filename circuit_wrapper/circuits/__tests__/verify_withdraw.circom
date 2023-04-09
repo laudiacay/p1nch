@@ -5,7 +5,7 @@ include "node_modules/circomlib/circuits/poseidon.circom";
 include "node_modules/circomlib/circuits/smt/smtverifier.circom";
 
 template VerifyWithdraw(NLevels) {
-		signal input nullifier;
+		signal input sk;
 		signal input key;
 		signal input randomness;
 		signal input swap_event_key;
@@ -29,7 +29,7 @@ template VerifyWithdraw(NLevels) {
 	  /**** End Signals ****/
 
 		// TODO: what am I doing here
-    signal _addr_out_sig <== Poseidon(3)([nullifier, addr_out[0], addr_out[1]]);
+    signal _addr_out_sig <== Poseidon(3)([sk, addr_out[0], addr_out[1]]);
 		_addr_out_sig === addr_out_sig;
 
     signal _swap_event_comm <== Poseidon(2)([swap_event_key, swap_event_randomness]);
