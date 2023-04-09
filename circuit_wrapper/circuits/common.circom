@@ -69,12 +69,13 @@ template SwapEventHasher() {
   signal input timestamp_range[2]; 
   signal input tok_in[2];
   signal input tok_out[2];
-  signal input swap_price; // TODO: price per what???
+  signal input price_in; // TODO: price per what???
+  signal input price_out; // TODO: price per what???
 
   signal output out;
 
-  out <== Poseidon(7)(timestamp_range[0], timestamp_range[1], tok_in[0], tok_in[1],
-    tok_out[0], tok_out[1], swap_price)
+  out <== Poseidon(8)([timestamp_range[0], timestamp_range[1], tok_in[0], tok_in[1],
+    tok_out[0], tok_out[1], price_in, price_out]);
 }
 
 template CheckSwapInclusion() {
