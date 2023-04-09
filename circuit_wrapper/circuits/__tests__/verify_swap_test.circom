@@ -7,10 +7,10 @@ component main {
 		swap_amount,
 		inp_tok_addr,
 		out_tok_addr,
-		deposit_hash_inactive,
-		new_deposit_key,
+		p2skh_hash_inactive,
+		new_p2skh_key,
 		new_swap_key,
-		deposit_comm,
-		new_deposit_timestamp
+		p2skh_comm,
+		new_p2skh_timestamp
 	]
 } = SwapWellFormed();
