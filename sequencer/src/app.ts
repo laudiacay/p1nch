@@ -80,9 +80,8 @@ cron.schedule("*/5 * * * *", async () => {
   // Move unprocessed data to a new list and empty the original list
   await redis.rename("unprocessedData", "oldUnprocessedData");
 
-  // get the new batch num
-  const batchNumber = await redis.zcard("batches");
-
+  // get the new batch num and redis list name
+  const batchNumber = await redis.zcard('batches');
   const new_list_name = `batch_${batchNumber}`;
 
   // Process each item in the old batch
@@ -129,6 +128,12 @@ cron.schedule("*/5 * * * *", async () => {
     // put the ticketkey into the new batch in redis
     await redis.rpush(new_list_name, JSON.stringify(item.ticketKey));
   }
+
+  // run the transactions
+  
+
+  // delete old unprocessed data
+  await redis.del("oldUnprocessedData");
 
   // add the pushed ticket hashes as a batch to Redis
   await redis.rpush("batches", new_list_name);
