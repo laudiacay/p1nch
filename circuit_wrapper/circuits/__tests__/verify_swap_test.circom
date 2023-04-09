@@ -13,4 +13,4 @@ component main {
 		p2skh_comm,
 		new_p2skh_timestamp
 	]
-} = SwapWellFormed();
+} = Swap();
