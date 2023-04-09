@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 // a contract that verifies whether an update to the SMT is done right (and not including this ticket already!)
-contract SMTMembershipVerifier {
+library SMTMembershipVerifier {
     // types
     // TODO SHAME! SHAME!. there should be separate types for each proof. SHAME!!
     struct Proof {
@@ -13,18 +13,26 @@ contract SMTMembershipVerifier {
 
     // public functions
     // assert!(ticket_key \in root)
-    function inclusionProof(Proof memory proof, uint256 root, uint256 ticket_key) public returns (bool r) {
+    function inclusionProof(Proof calldata proof, uint256 root, uint256 ticket_hash) public returns (bool r) {
         return true;
     }
-    // assert!(ticket_key \not \in root)
 
-    function exclusionProof(Proof memory proof, uint256 root, uint256 ticket_key) public returns (bool r) {
+    // assert!(ticket_key \not \in root)
+    function exclusionProof(Proof calldata proof, uint256 root, uint256 ticket_hash) public returns (bool r) {
         return true;
     }
+
     // assert!(root_after = root_before \union (ticket_key, 0))
     // assert!(ticket_key \not \in root_before)
+    function updateProof(Proof calldata proof, uint256 root_before, uint256 root_after, uint256 ticket_hash)
+        public
+        returns (bool r)
+    {
+        return true;
+    }
 
-    function updateProof(Proof memory proof, uint256 root_before, uint256 root_after, uint256 ticket_key)
+    // assert!(the commitment to this ticket is in the given root :))
+    function commitmentInclusion(Proof calldata proof, uint256 root, uint256 ticket_key_commitment)
         public
         returns (bool r)
     {
