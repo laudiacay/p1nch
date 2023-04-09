@@ -81,9 +81,9 @@ template SwapEventHasher() {
 template CheckSwapInclusion() {
   signal input event_range[2];
   signal input timestamp_check;
-  signal out_1 <== LessThan(252)(timestamp_check, event_range[1]);
+  signal out_1 <== LessThan(252)([timestamp_check, event_range[1]]);
   out_1 === 1;
-  signal out_2 <== LessThanEq(252)(event_range[0], timestamp_check)
+  signal out_2 <== LessEqThan(252)([event_range[0], timestamp_check]);
   out_2 === 1;
 }
 
@@ -93,9 +93,9 @@ template CheckSwapInclusion() {
 template Check252Bits() {
   signal input in;
   component num2bits = Num2Bits_strict();
-  num2bits <== in;
-  num2bits.out[253] == 0;
-  num2bits.out[252] == 0;
+  num2bits.in <== in;
+  num2bits.out[253] === 0;
+  num2bits.out[252] === 0;
 }
 
 /**
@@ -128,18 +128,20 @@ template TokDivision() {
   signal output out;
 
   out <-- inp[0] \ inp[1];
-  Check250Bits(inp[0]);
+  Check250Bits()(inp[0]);
   signal remainder <-- inp[0] % inp[1];
 
 	// Check that 0 <= remainder < inp[1]
-  signal remainder_check_gte <== GreaterEqThan(252)(remainder, 0);
+  signal remainder_check_gte <== GreaterEqThan(252)([remainder, 0]);
   remainder_check_gte === 1;
-  signal remainder_check_lt <== LessThan(252)(remainder, inp[1]);
+  signal remainder_check_lt <== LessThan(252)([remainder, inp[1]]);
   remainder_check_lt === 1;
 
 	// Check that 0 <= quotient <= inp[0]
-  signal quot_check_gte <== GreaterEqThan(252)(out, 0);
-  signal quot_check_lt <== LessThanEq(252)(out, inp[0]);
+  signal quot_check_gte <== GreaterEqThan(252)([out, 0]);
+  signal quot_check_lt <== LessEqThan(252)([out, inp[0]]);
+  quot_check_gte === 1;
+  quot_check_lt === 1;
 
   // Check that out * inp[1] + remainder = inp[0]
   out * inp[1] + remainder === inp[0];
