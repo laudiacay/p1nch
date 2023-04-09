@@ -10,4 +10,4 @@ component main {
 		tok_addr,
 		item_hash
 	]
-} = P2SKHWellFormed();
+} = P2SKH();
