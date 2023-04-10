@@ -93,15 +93,46 @@ library WellFormedTicketVerifier {
         return true;
     }
 
+    // // assert!(ticket_hash for both new_p2skh tickets = hash(active=true, token, amount, "p2skh" ...some other fields...))
+    // // assert!(ALL FOUR HAVE THE SAME TOKEN OR ARE DUMMIES!!)
+    // // assert!(dummy format = hash("dummy" || some BS randomness for hiding))
+    // // assert!(sum of the amounts of the new_p2skh tickets = sum of the amounts of the old ticket commitments. ensure dummies are counted as ZERO OTHERWISE YOU ARE IN TROUBLE)
+    // function wellFormedP2SKHMergeSplitAdditionInvariantOrDummyProof(
+    //     Proof calldata proof,
+    //     uint256 old_p2skh_ticket_commitment_1,
+    //     uint256 old_p2skh_ticket_commitment_or_dummy_2,
+    //     uint256 new_p2skh_ticket_1,
+    //     uint256 new_p2skh_ticket_or_dummy_2
+    // )
+    //     public
+    //     returns (bool r)
+    // {
+    //     return true;
+    // }
+
     // assert!(ticket_hash for both new_p2skh tickets = hash(active=true, token, amount, "p2skh" ...some other fields...))
-    // assert!(ALL FOUR HAVE THE SAME TOKEN OR ARE DUMMIES!!)
-    // assert!(sum of the amounts of the new_p2skh tickets = sum of the amounts of the old ticket commitments. ensure dummies are counted as ZERO OTHERWISE YOU ARE IN TROUBLE)
-    function wellFormedP2SKHMergeSplitAdditionInvariantOrDummyProof(
+    // assert!(ALL THREE HAVE THE SAME TOKEN!!)
+    // assert!(sum of the amounts of the new_p2skh tickets = amt of old ticket commitment)
+    function wellFormedP2SKHSplitAdditionInvariant(
+        Proof calldata proof,
+        uint256 old_p2skh_ticket_commitment,
+        uint256 new_p2skh_ticket_1,
+        uint256 new_p2skh_ticket_2
+    )
+        public
+        returns (bool r)
+    {
+        return true;
+    }
+
+    // assert!(ticket_hash for new_p2skh ticket = hash(active=true, token, amount, "p2skh" ...some other fields...))
+    // assert!(ALL THREE HAVE THE SAME TOKEN!!)
+    // assert!(sum of the amounts of the new_p2skh ticket = sum of the amounts of the old ticket commitments.)
+    function wellFormedP2SKHMergeAdditionInvariant(
         Proof calldata proof,
         uint256 old_p2skh_ticket_commitment_1,
-        uint256 old_p2skh_ticket_commitment_or_dummy_2,
-        uint256 new_p2skh_ticket_1,
-        uint256 new_p2skh_ticket_or_dummy_2
+        uint256 old_p2skh_ticket_commitment_2,
+        uint256 new_p2skh_ticket
     )
         public
         returns (bool r)
