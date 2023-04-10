@@ -168,7 +168,7 @@ contract Swapper is AccessControl {
         }
     }
 
-    // todo this is arough one
+    // todo this is a rough one
     function updateRoot(BatchPriceSMTVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
         public
         onlyRole(BOT_ROLE)
