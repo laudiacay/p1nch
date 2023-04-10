@@ -56,11 +56,11 @@ contract Pinch is AccessControl {
      */
     function deposit(
         WellFormedTicketVerifier.Proof calldata well_formed_proof,
-        SMTMembershipVerifier.Proof calldata smt_update_proof,
-        IERC20 token,
-        uint256 amount,
         uint256 ticket_key,
-        uint256 new_root
+        SMTMembershipVerifier.Proof calldata smt_update_proof,
+        uint256 new_root,
+        IERC20 token,
+        uint256 amount
     )
         public
         onlyRole(SEQUENCER_ROLE)
@@ -71,7 +71,7 @@ contract Pinch is AccessControl {
         // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         if (
-            !WellFormedTicketVerifier.wellformedActiveTicketProof(well_formed_proof, address(token), amount, ticket_key)
+            !WellFormedTicketVerifier.wellformedDepositTicketProof(well_formed_proof, address(token), amount, ticket_key)
         ) {
             revert("ticket was not well-formed");
         }
@@ -107,22 +107,20 @@ contract Pinch is AccessControl {
      */
     function withdraw(
         WellFormedTicketVerifier.Proof calldata well_formed_deactivator_proof,
-        SMTMembershipVerifier.Proof calldata oldTokenCommitmentInclusionProof,
-        SMTMembershipVerifier.Proof calldata smt_update_proof,
-        IERC20 token,
-        uint256 prior_root,
-        uint256 amount,
-        uint256 old_ticket_hash_commitment,
         uint256 new_deactivator_ticket_hash,
+        SMTMembershipVerifier.Proof calldata oldTokenCommitmentInclusionProof,
+        uint256 old_ticket_hash_commitment,
+        uint256 prior_root,
+        SMTMembershipVerifier.Proof calldata smt_update_proof,
         uint256 new_root,
+        IERC20 token,
+        uint256 amount,
         address recipient
     )
         public
         onlyRole(SEQUENCER_ROLE)
     {
         counter += 1;
-
-        // TODO do i need to put any assertions on the amounts?
 
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
@@ -140,7 +138,7 @@ contract Pinch is AccessControl {
             )
         ) {
             revert(
-                "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments."
+                "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
             );
         }
 
@@ -174,6 +172,104 @@ contract Pinch is AccessControl {
 
         // and update the state root
         utxo_root.setRoot(new_root);
+    }
+
+    // TODO handle if the swap (or other operation) fails!
+    function setup_swap (
+        WellFormedTicketVerifier.Proof calldata well_formed_deactivator_proof,
+        uint256 new_deactivator_ticket_hash,
+        SMTMembershipVerifier.Proof calldata oldTokenCommitmentInclusionProof,
+        uint256 prior_root_for_commitment_inclusion,
+        uint256 old_ticket_hash_commitment,
+        SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
+        uint256 root_after_adding_deactivator,
+        WellFormedTicketVerifier.Proof calldata well_formed_new_swap_ticket_proof,
+        uint256 new_swap_ticket_key,
+        SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
+        uint256 root_after_adding_new_swap_ticket,
+        IERC20 token,
+        IERC20 destination_token,
+        uint256 amount
+    ) public
+        onlyRole(SEQUENCER_ROLE)
+    {
+        counter += 2;
+        assert(amount > 0);
+        assert(token != destination_token);
+        
+        // Check the proof that the nullfier is well-formed and valid and new etc
+        // check proof that the commitment
+        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
+        // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
+        // assert!(spending permissioning is okay/knowledge of recipient secret key)
+        if (
+            !WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
+                well_formed_deactivator_proof,
+                address(token),
+                amount,
+                old_ticket_hash_commitment,
+                new_deactivator_ticket_hash
+            )
+        ) {
+            revert(
+                "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+            );
+        }
+
+        // assert!(committed old ticket is in the provided tree root)
+        if (
+            !SMTMembershipVerifier.commitmentInclusion(
+                oldTokenCommitmentInclusionProof, prior_root_for_commitment_inclusion, old_ticket_hash_commitment
+            )
+        ) {
+            revert("the commitment to the old ticket wasn't in that tree root.");
+        }
+
+        // and check that that provided tree root is a recent historical commitment- valid :)
+        if (!utxo_root.checkMembership(prior_root_for_commitment_inclusion)) {
+            revert("the tree root you proved stuff against isn't one we have on file");
+        }
+
+        // check our modification of the SMT (done by the sequencer) is valid (for the deactivator)
+        if (
+            !SMTMembershipVerifier.updateProof(
+                smt_update_deactivator_proof, utxo_root.getCurrent(), root_after_adding_deactivator, new_deactivator_ticket_hash
+            )
+        ) {
+            revert("you didn't modify the SMT correctly to add your deactivator.");
+        }
+
+        // check validity and well-formedness of the new swap ticket versus the old ticket's hash commitment and the provided arguments.
+        // TODO does new_swap_ticket_key and old_ticket_hash_commitment need to be provided as arguments?
+        if (
+            !WellFormedTicketVerifier.wellFormedSwapTicketProof(
+                well_formed_new_swap_ticket_proof,
+                address(token),
+                address(destination_token),
+                amount,
+                new_swap_ticket_key,
+                old_ticket_hash_commitment
+            )
+        ) {
+            revert("the new swap ticket wasn't well formed.");
+        }
+
+        // check our modification of the SMT (done by the sequencer) is valid (for the new swap ticket)
+        if (
+            !SMTMembershipVerifier.updateProof(
+                smt_update_new_swap_ticket_proof, root_after_adding_deactivator, root_after_adding_new_swap_ticket, new_swap_ticket_key
+            )
+        ) {
+            revert("you didn't modify the SMT correctly to add your new swap ticket.");
+        }
+
+        // update SMT root to add both tickets
+        utxo_root.setRoot(root_after_adding_new_swap_ticket);
+
+        // schedule the swap :)
+        // TODO is this cast safe on amount?
+        swapper.addTransaction(address(token), address(destination_token), uint128(amount));
     }
 
     //     /**
