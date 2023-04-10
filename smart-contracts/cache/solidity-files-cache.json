@@ -39,6 +39,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -78,6 +79,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -126,6 +128,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -177,6 +180,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -219,6 +223,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -260,6 +265,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -305,6 +311,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -344,6 +351,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -383,6 +391,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -424,6 +433,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -463,6 +473,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -507,6 +518,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -548,6 +560,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -590,6 +603,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -646,6 +660,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -688,6 +703,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -727,6 +743,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -766,6 +783,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -805,6 +823,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -852,6 +871,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -891,6 +911,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -930,6 +951,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -969,6 +991,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1011,6 +1034,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1052,6 +1076,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1091,6 +1116,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1130,6 +1156,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1142,7 +1169,7 @@
       }
     },
     "script/Counter.s.sol": {
-      "lastModificationDate": 1681056896549,
+      "lastModificationDate": 1681116572763,
       "contentHash": "0705c52104730a78aef4aa6694175c81",
       "sourceName": "script/Counter.s.sol",
       "solcConfig": {
@@ -1169,6 +1196,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1194,7 +1222,7 @@
       }
     },
     "src/BatchPriceSMTRootUpdateVerifier.sol": {
-      "lastModificationDate": 1681056896549,
+      "lastModificationDate": 1681116572763,
       "contentHash": "e370298985ea0e73f53fd953cd6249df",
       "sourceName": "src/BatchPriceSMTRootUpdateVerifier.sol",
       "solcConfig": {
@@ -1221,6 +1249,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1233,7 +1262,7 @@
       }
     },
     "src/HistoricalRoots.sol": {
-      "lastModificationDate": 1681056896549,
+      "lastModificationDate": 1681116572763,
       "contentHash": "9e768d8c00278e717f9859b069d6ad27",
       "sourceName": "src/HistoricalRoots.sol",
       "solcConfig": {
@@ -1260,6 +1289,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1281,8 +1311,8 @@
       }
     },
     "src/Pinch.sol": {
-      "lastModificationDate": 1681056896552,
-      "contentHash": "d53746fe1517388efe49e0be7d6b8c88",
+      "lastModificationDate": 1681117185929,
+      "contentHash": "62d40f30177c331f53decc194625b9b3",
       "sourceName": "src/Pinch.sol",
       "solcConfig": {
         "settings": {
@@ -1308,6 +1338,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1335,7 +1366,7 @@
       }
     },
     "src/SMTMembershipVerifier.sol": {
-      "lastModificationDate": 1681056896549,
+      "lastModificationDate": 1681116572763,
       "contentHash": "48f5b8494060d0907006f8e48f495d7a",
       "sourceName": "src/SMTMembershipVerifier.sol",
       "solcConfig": {
@@ -1362,6 +1393,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1374,8 +1406,8 @@
       }
     },
     "src/Swapper.sol": {
-      "lastModificationDate": 1681056896549,
-      "contentHash": "60df77215e09f9c6e777e729e8e84a66",
+      "lastModificationDate": 1681116582557,
+      "contentHash": "373704a38ce6e684bff2be12d4bda761",
       "sourceName": "src/Swapper.sol",
       "solcConfig": {
         "settings": {
@@ -1401,6 +1433,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1424,8 +1457,8 @@
       }
     },
     "src/WellFormedTicketVerifier.sol": {
-      "lastModificationDate": 1681056896549,
-      "contentHash": "9d584a8dccac8b80601a6c389d7a506a",
+      "lastModificationDate": 1681117137393,
+      "contentHash": "67fb63c00b77b6ad0acd74e731c99cc0",
       "sourceName": "src/WellFormedTicketVerifier.sol",
       "solcConfig": {
         "settings": {
@@ -1451,6 +1484,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },
@@ -1463,7 +1497,7 @@
       }
     },
     "test/Pinch.t.sol": {
-      "lastModificationDate": 1681056896549,
+      "lastModificationDate": 1681116572763,
       "contentHash": "385990403259e9566e34fd7374118715",
       "sourceName": "test/Pinch.t.sol",
       "solcConfig": {
@@ -1490,6 +1524,7 @@
             }
           },
           "evmVersion": "london",
+          "viaIR": true,
           "libraries": {}
         }
       },

@@ -6,6 +6,7 @@ import "openzeppelin-contracts/access/AccessControl.sol";
 
 import "./BatchPriceSMTRootUpdateVerifier.sol";
 
+// TODO handle if the swap (or other operation) fails!
 contract Swapper is AccessControl {
     bytes32 public constant STATE_ADMIN_ROLE = keccak256("STATE_ADMIN_ROLE");
     bytes32 public constant BOT_ROLE = keccak256("BOT_ROLE");
@@ -52,6 +53,7 @@ contract Swapper is AccessControl {
         mapping(uint256 => uint256) prices;
     }
 
+    // TODO i hereby invite you to put some thought into making the bot permissionless
     constructor(address governance_owner, address bot) {
         // TODO check this
         _grantRole(DEFAULT_ADMIN_ROLE, governance_owner);
@@ -125,8 +127,8 @@ contract Swapper is AccessControl {
                 // Swap tokenA for tokenB
                 uint256 amount_token1 = uint256(swap_amount);
 
+                // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
                 IERC20(pair.token1).transferFrom(address(this), address(this), amount_token1);
-                // Add your swapping logic here, e.g., using a DEX or an aggregator
 
                 // TODO make this 1 into the right price
                 last_and_needs_entry_to_root.prices[pairid] = 1;
@@ -135,8 +137,8 @@ contract Swapper is AccessControl {
                 // TODO this is a bug you cannot know the negative swap amount can you??? seems bad. seems pretty wrong to me. fix me
                 uint256 amount_token2 = uint256(-swap_amount);
 
+                // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
                 IERC20(pair.token2).transferFrom(address(this), address(this), amount_token2);
-                // Add your swapping logic here, e.g., using a DEX or an aggregator
 
                 // TODO make this 1 into the right price
                 last_and_needs_entry_to_root.prices[pairid] = 1;

@@ -12,7 +12,7 @@ library WellFormedTicketVerifier {
 
     // public functions
     // assert!(ticket_key = hash(active=true, token, amount, "deposit/swap" ...some other fields...))
-    function wellformedActiveTicketProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_key)
+    function wellformedDepositTicketProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_key)
         public
         returns (bool r)
     {
@@ -35,17 +35,26 @@ library WellFormedTicketVerifier {
         return true;
     }
 
-    // assert!(ticket_key = hash(token, amount, "withdraw" ...some other fields...))
-    // assert!(ticket_key \in root)
-    // assert!(new_withdraw_commit \not\in root)
-    // assert!(new_root = old_root \union (, 0)
-    // assert!(amount <= old_note_balance * swap_price
-    //         where swap_price == swap_batch[])
-    //         where swap_batch[] is the swap batch that the initial deposit got swapped in
-    function wellformedburnSwapProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_key)
+    // assert!(ticket_key = hash(active=true, token, amount, "initSwap" ...some other fields...))
+    // assert!(ticket.source = source, ticket.amount = amount, ticket.dest=dest)
+    // assert!(old_ticket_hash_commitment = hash(old_ticket_key) = hash(hash(old_ticket)))
+    // assert!(old_ticket.token = source, old_ticket.amount = amount)
+    function wellFormedSwapTicketProof(Proof calldata proof, address source, address dest, uint256 amount, uint256 ticket_key, uint256 old_ticket_hash_commitment)
         public
         returns (bool r)
     {
         return true;
     }
+
+    // // assert!(ticket_key = hash(token, amount, "withdraw" ...some other fields...))
+    // // assert!(new_root = old_root \union (, 0)
+    // // assert!(amount <= old_note_balance * swap_price
+    // //         where swap_price == swap_batch[])
+    // //         where swap_batch[] is the swap batch that the initial deposit got swapped in
+    // function wellformedburnSwapProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_key)
+    //     public
+    //     returns (bool r)
+    // {
+    //     return true;
+    // }
 }
