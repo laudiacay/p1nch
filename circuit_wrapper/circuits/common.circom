@@ -7,28 +7,26 @@ template ItemHasherPK() {
   signal input active;
   signal input timestamp;
   signal input pk;
-  signal input tok_addr[2]; // We need 2 signals. One for the upper 128 bits, one for the lower
+  signal input tok_addr; // We need 2 signals. One for the upper 128 bits, one for the lower
   signal input amount;
   signal input instr;
-  signal input data[3];
+  signal input data[2];
   signal input randomness;
 
   signal output out;
 
-  component poseidon = Poseidon(11);
+  component poseidon = Poseidon(9);
 
 
   active ==> poseidon.inputs[0];
   timestamp ==> poseidon.inputs[1];
   pk ==> poseidon.inputs[2];
-  tok_addr[0] ==> poseidon.inputs[3];
-  tok_addr[1] ==> poseidon.inputs[4];
-  amount ==> poseidon.inputs[5];
-  instr ==> poseidon.inputs[6];
-  data[0] ==> poseidon.inputs[7];
-  data[1] ==> poseidon.inputs[8];
-  data[2] ==> poseidon.inputs[9];
-  randomness ==> poseidon.inputs[10];
+  tok_addr ==> poseidon.inputs[3];
+  amount ==> poseidon.inputs[4];
+  instr ==> poseidon.inputs[5];
+  data[0] ==> poseidon.inputs[6];
+  data[1] ==> poseidon.inputs[7];
+  randomness ==> poseidon.inputs[8];
 
   out <== poseidon.out;
 }
@@ -39,43 +37,41 @@ template ItemHasherSK() {
   signal input active;
   signal input timestamp;
   signal input sk;
-  signal input tok_addr[2]; // We need 2 signals. One for the upper 128 bits, one for the lower
+  signal input tok_addr;
   signal input amount;
   signal input instr;
-  signal input data[3];
+  signal input data[2];
   signal input randomness;
 
   signal output out;
 
-  component poseidon = Poseidon(11);
+  component poseidon = Poseidon(9);
   signal pk <== Poseidon(1)([sk]);
 
   active ==> poseidon.inputs[0];
   timestamp ==> poseidon.inputs[1];
   pk ==> poseidon.inputs[2];
-  tok_addr[0] ==> poseidon.inputs[3];
-  tok_addr[1] ==> poseidon.inputs[4];
-  amount ==> poseidon.inputs[5];
-  instr ==> poseidon.inputs[6];
-  data[0] ==> poseidon.inputs[7];
-  data[1] ==> poseidon.inputs[8];
-  data[2] ==> poseidon.inputs[9];
-  randomness ==> poseidon.inputs[10];
+  tok_addr ==> poseidon.inputs[3];
+  amount ==> poseidon.inputs[4];
+  instr ==> poseidon.inputs[5];
+  data[0] ==> poseidon.inputs[6];
+  data[1] ==> poseidon.inputs[7];
+  randomness ==> poseidon.inputs[8];
 
   out <== poseidon.out;
 }
 
 template SwapEventHasher() {
   signal input timestamp_range[2]; 
-  signal input tok_in[2];
-  signal input tok_out[2];
+  signal input tok_in;
+  signal input tok_out;
   signal input price_in; // TODO: price per what???
   signal input price_out; // TODO: price per what???
 
   signal output out;
 
-  out <== Poseidon(8)([timestamp_range[0], timestamp_range[1], tok_in[0], tok_in[1],
-    tok_out[0], tok_out[1], price_in, price_out]);
+  out <== Poseidon(6)([timestamp_range[0], timestamp_range[1], tok_in,
+    tok_out, price_in, price_out]);
 }
 
 template CheckSwapInclusion() {
