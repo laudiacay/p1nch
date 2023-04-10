@@ -24,3 +24,13 @@ jobs:
         run: forge fmt --check
       - name: make sure it compiles
         run: forge build --via-ir
+     - name: and make sure it compiles without errors
+        run: |
+          output=$(forge build --via-ir 2>&1)
+          echo "$output"
+          if echo "$output" | grep -q "warning"; then
+            echo "Error: 'warning' found in the output"
+            exit 1
+          else
+            echo "No 'warning' found in the output"
+          fi
