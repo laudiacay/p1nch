@@ -13,14 +13,14 @@ library SMTMembershipVerifier {
 
     // public functions
     // assert!(ticket_key \in root)
-    function inclusionProof(Proof calldata proof, uint256 root, uint256 ticket_hash) public returns (bool r) {
-        return true;
-    }
+    // function inclusionProof(Proof calldata proof, uint256 root, uint256 ticket_hash) public returns (bool r) {
+    //     return true;
+    // }
 
-    // assert!(ticket_key \not \in root)
-    function exclusionProof(Proof calldata proof, uint256 root, uint256 ticket_hash) public returns (bool r) {
-        return true;
-    }
+    // // assert!(ticket_key \not \in root)
+    // function exclusionProof(Proof calldata proof, uint256 root, uint256 ticket_hash) public returns (bool r) {
+    //     return true;
+    // }
 
     // assert!(root_after = root_before \union (ticket_key, 0))
     // assert!(ticket_key \not \in root_before)
