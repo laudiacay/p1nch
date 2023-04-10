@@ -34,13 +34,17 @@ contract Swapper is AccessControl {
     // and that the given token was swapped in that batch_num at that swap price
     HistoricalRoots batch_swap_root;
 
-    // this is a list that registers when batches are swapped- any swap UTXO timestamp in between these is in the latter batch
+    // this is a list that registers when batches are swapped
     uint256[] batch_swap_timestamps;
+
+    // this is the current batch number
+    uint256 current_batch_number;
 
     SwapData current;
     SwapData last_and_needs_entry_to_root;
 
     struct SwapData {
+        uint256 batchNumber;
         // a mapping that says how much of each vault should be net swapped into another token in this batch.
         // negative means you're getting more of first token
         // positive means you're getting more of second token
@@ -60,6 +64,9 @@ contract Swapper is AccessControl {
         _grantRole(DEFAULT_ADMIN_ROLE, governance_owner);
         _grantRole(STATE_ADMIN_ROLE, msg.sender);
         _grantRole(BOT_ROLE, bot);
+        current.batchNumber = 0;
+        current_batch_number = 0;
+        batch_swap_root = new HistoricalRoots();
     }
 
     function emptySwapData(SwapData storage data) internal {
@@ -94,9 +101,9 @@ contract Swapper is AccessControl {
         emptySwapData(current);
     }
 
-    // pure function that just returns the most recent batch swap timestamp
-    function getMostRecentBatchSwapTimestamp() public view returns (uint256) {
-        return batch_swap_timestamps[batch_swap_timestamps.length - 1];
+    // pure function that just returns the current batch number
+    function getBatchNumber() public view returns (uint256) {
+        return current_batch_number;
     }
 
     function addTransaction(address from, address to, uint128 amount) public onlyRole(STATE_ADMIN_ROLE) {
@@ -122,7 +129,11 @@ contract Swapper is AccessControl {
             swapDataIsEmpty(last_and_needs_entry_to_root),
             "last_and_needs_entry_to_root is not empty, you need to call updateRoot to get the last root into the SMT before you perform a swap batch."
         );
+        // setup for the next batch!
         copyCurrentToLastAndClearCurrent();
+        current_batch_number += 1;
+        current.batchNumber = current_batch_number;
+        batch_swap_timestamps.push(block.timestamp);
 
         // Perform swaps for last_and_needs_entry_to_root
         uint256 num_swaps = last_and_needs_entry_to_root.swap_tokens.length;
@@ -155,7 +166,6 @@ contract Swapper is AccessControl {
             }
             // TODO what happens if you had zero that needs to swap? do you need a price on that? what's that mean?
         }
-        batch_swap_timestamps.push(block.timestamp);
     }
 
     // todo this is arough one
@@ -186,7 +196,7 @@ contract Swapper is AccessControl {
             // validate that it's a valid proof
             uint256 lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[i - 1];
             require(
-                BatchPriceSMTVerifier.updateProof(updateProofs[i], lastRoot, newRoots[i], lastBatchTimestamp, currentBatchTimestamp, pair.token1, pair.token2, price),
+                BatchPriceSMTVerifier.updateProof(updateProofs[i], lastRoot, newRoots[i], last_and_needs_entry_to_root.batchNumber, pair.token1, pair.token2, price),
                 "you did not update the prices right :(, check your proofs"
             );
         }

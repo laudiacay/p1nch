@@ -26,8 +26,7 @@ library BatchPriceSMTVerifier {
         Proof calldata proof,
         uint256 old_root,
         uint256 new_root,
-        uint256 last_timestamp,
-        uint256 current_timestamp,
+        uint256 swap_batch_number,
         address token_a,
         address token_b,
         uint256 price
@@ -38,6 +37,7 @@ library BatchPriceSMTVerifier {
         return true;
     }
 
+    // assert!(new p2skh ticket is well-formed)
     // assert!(the price inside this new ticket is listed in the SMT at this price window for these tokens)
     // assert!(the new ticket hash contains a price equal to the swap-ticket-commitment price times the swap token amount)
     // assert!(the swap ticket commitment contains a price and timestamp that are INSIDE the proposed provided swap window)
