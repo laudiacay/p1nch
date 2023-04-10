@@ -52,7 +52,7 @@ library WellFormedTicketVerifier {
     }
 
     // assert!(ticket_hash = hash(active=true, token, amount, "initSwap" ...some other fields...))
-    // assert!(ticket.source = source, ticket.amount = amount, ticket.dest=dest)
+    // assert!(ticket.source = source, ticket.timestamp=timestamp, ticket.amount = amount, ticket.dest=dest)
     // assert!(old_ticket_hash_commitment = hash(old_ticket_hash) = hash(hash(old_ticket)))
     // assert!(old_ticket.token = source, old_ticket.amount = amount)
     function wellFormedSwapTicketProof(
@@ -60,6 +60,7 @@ library WellFormedTicketVerifier {
         address source,
         address dest,
         uint256 amount,
+        uint256 timestamp,
         uint256 ticket_hash,
         uint256 old_ticket_hash_commitment
     )
@@ -67,15 +68,15 @@ library WellFormedTicketVerifier {
         returns (bool r)
     {}
 
-    // // assert!(ticket_hash = hash(token, amount, "withdraw" ...some other fields...))
-    // // assert!(new_root = old_root \union (, 0)
-    // // assert!(amount <= old_note_balance * swap_price
-    // //         where swap_price == swap_batch[])
-    // //         where swap_batch[] is the swap batch that the initial deposit got swapped in
-    // function wellformedburnSwapProof(Proof calldata proof, address token, uint256 amount, uint256 ticket_hash)
-    //     public
-    //     returns (bool r)
-    // {
-    //     return true;
-    // }
+    // prove the deactivator is well formed versus the old swap ticket
+    function wellformedSwapDeactivatorProof(
+        Proof calldata proof,
+        uint256 old_swap_ticket_commit,
+        uint256 new_spent_swap_deactivator_ticket
+    )
+        public
+        returns (bool r)
+    {
+        return true;
+    }
 }
