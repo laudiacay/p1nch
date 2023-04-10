@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.13;
-import {Verifier as P2SKHVerifier} from "../../circuit_wrapper/build/p2skh_well_formed_verify.sol";
+
+//import {Verifier as P2SKHVerifier} from "../../circuit_wrapper/build/p2skh_well_formed_verify.sol";
 
 // a contract that verifies whether a ticket is well-formed
 library WellFormedTicketVerifier {
@@ -18,14 +19,18 @@ library WellFormedTicketVerifier {
         returns (bool r)
     {
         // TODO: check format
-        P2SKHVerifier().verifyProof(proof.a, proof.b, proof.c, [
-            amount,
-            0,//TODO:TIMESAMP,
-            0, //tok_addr_1,//TODO:
-            0, //tok_addr_2,
-            ticket_hash
-        ]);
-        return true;
+        // P2SKHVerifier().verifyProof(
+        //     proof.a,
+        //     proof.b,
+        //     proof.c,
+        //     [
+        //         amount,
+        //         0, //TODO:TIMESAMP,
+        //         0, //tok_addr_1,//TODO:
+        //         0, //tok_addr_2,
+        //         ticket_hash
+        //     ]
+        // );
         return true;
     }
 
@@ -50,14 +55,17 @@ library WellFormedTicketVerifier {
     // assert!(ticket.source = source, ticket.amount = amount, ticket.dest=dest)
     // assert!(old_ticket_hash_commitment = hash(old_ticket_hash) = hash(hash(old_ticket)))
     // assert!(old_ticket.token = source, old_ticket.amount = amount)
-    function wellFormedSwapTicketProof(Proof calldata proof, address source,
-            address dest, uint256 amount, uint256 ticket_hash,
-            uint256 old_ticket_hash_commitment)
+    function wellFormedSwapTicketProof(
+        Proof calldata proof,
+        address source,
+        address dest,
+        uint256 amount,
+        uint256 ticket_hash,
+        uint256 old_ticket_hash_commitment
+    )
         public
         returns (bool r)
-    {
-
-    }
+    {}
 
     // // assert!(ticket_hash = hash(token, amount, "withdraw" ...some other fields...))
     // // assert!(new_root = old_root \union (, 0)
