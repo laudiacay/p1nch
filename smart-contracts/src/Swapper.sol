@@ -196,7 +196,15 @@ contract Swapper is AccessControl {
             // validate that it's a valid proof
             uint256 lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[i - 1];
             require(
-                BatchPriceSMTVerifier.updateProof(updateProofs[i], lastRoot, newRoots[i], last_and_needs_entry_to_root.batchNumber, pair.token1, pair.token2, price),
+                BatchPriceSMTVerifier.updateProof(
+                    updateProofs[i],
+                    lastRoot,
+                    newRoots[i],
+                    last_and_needs_entry_to_root.batchNumber,
+                    pair.token1,
+                    pair.token2,
+                    price
+                ),
                 "you did not update the prices right :(, check your proofs"
             );
         }
