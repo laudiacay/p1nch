@@ -1311,8 +1311,8 @@
       }
     },
     "src/Pinch.sol": {
-      "lastModificationDate": 1681117185929,
-      "contentHash": "62d40f30177c331f53decc194625b9b3",
+      "lastModificationDate": 1681131444525,
+      "contentHash": "b44f6f68d5685d49d307c15dfaf99e95",
       "sourceName": "src/Pinch.sol",
       "solcConfig": {
         "settings": {
@@ -1366,8 +1366,8 @@
       }
     },
     "src/SMTMembershipVerifier.sol": {
-      "lastModificationDate": 1681116572763,
-      "contentHash": "48f5b8494060d0907006f8e48f495d7a",
+      "lastModificationDate": 1681131349786,
+      "contentHash": "1323ec4ff2eb297821ba770e5c313743",
       "sourceName": "src/SMTMembershipVerifier.sol",
       "solcConfig": {
         "settings": {
@@ -1457,8 +1457,8 @@
       }
     },
     "src/WellFormedTicketVerifier.sol": {
-      "lastModificationDate": 1681117137393,
-      "contentHash": "67fb63c00b77b6ad0acd74e731c99cc0",
+      "lastModificationDate": 1681131322341,
+      "contentHash": "201f14f902ea55163e5f65ebb9b1fab1",
       "sourceName": "src/WellFormedTicketVerifier.sol",
       "solcConfig": {
         "settings": {
@@ -1497,7 +1497,7 @@
       }
     },
     "test/Pinch.t.sol": {
-      "lastModificationDate": 1681116572763,
+      "lastModificationDate": 1681131033641,
       "contentHash": "385990403259e9566e34fd7374118715",
       "sourceName": "test/Pinch.t.sol",
       "solcConfig": {

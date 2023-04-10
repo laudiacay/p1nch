@@ -70,23 +70,21 @@ contract Pinch is AccessControl {
         // Check the proof of the well formed key
         // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
-        if (
-            !WellFormedTicketVerifier.wellformed_p2skh_proof(well_formed_proof, address(token), amount, ticket_hash)
-        ) {
-            revert("ticket was not well-formed");
-        }
+        require(
+            WellFormedTicketVerifier.wellformed_p2skh_proof(well_formed_proof, address(token), amount, ticket_hash),
+            "Well-formed proof failed"
+        );
 
         // Check the smt update proof
         // assert!(ticket_hash \not\in utxo_hash_smt_root)
         // assert!(ticket_hash \in new_root (and update is done correctly))
-        if (!SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_hash)) {
-            revert("SMT modification was not valid");
-        }
+        require(
+            SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_hash),
+            "SMT update proof failed"
+        );
 
         // Perform ERC 20 Approved Transfer
-        if (!token.transferFrom(msg.sender, address(this), amount)) {
-            revert("ERC20 transfer failed");
-        }
+        require(token.transferFrom(msg.sender, address(this), amount), "ERC20 transfer failed");
 
         // Update the root
         utxo_root.setRoot(new_root);
@@ -128,54 +126,47 @@ contract Pinch is AccessControl {
         // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
-        if (
-            !WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
+        require(
+            WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
                 well_formed_deactivator_proof,
                 address(token),
                 amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
-            )
-        ) {
-            revert(
-                "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
-            );
-        }
+            ),
+            "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+        );
 
         // assert!(committed old ticket is in the provided tree root)
-        if (
-            !SMTMembershipVerifier.commitmentInclusion(
+        require(
+            SMTMembershipVerifier.commitmentInclusion(
                 oldTokenCommitmentInclusionProof, prior_root, old_ticket_hash_commitment
-            )
-        ) {
-            revert("the commitment to the old ticket wasn't in that tree root.");
-        }
+            ),
+            "the commitment to the old ticket wasn't in that tree root."
+        );
 
         // and check that that provided tree root is a recent historical commitment- valid :)
-        if (!utxo_root.checkMembership(prior_root)) {
-            revert("the tree root you proved stuff against isn't one we have on file");
-        }
+        require(
+            utxo_root.checkMembership(prior_root), "the tree root you proved stuff against isn't one we have on file"
+        );
 
         // check our modification of the SMT (done by the sequencer) is valid
-        if (
-            !SMTMembershipVerifier.updateProof(
+        require(
+            SMTMembershipVerifier.updateProof(
                 smt_update_proof, utxo_root.getCurrent(), new_root, new_deactivator_ticket_hash
-            )
-        ) {
-            revert("you didn't modify the SMT correctly to add your deactivator.");
-        }
+            ),
+            "the SMT modification was not valid"
+        );
 
         // transfer
-        if (!token.transferFrom(address(this), recipient, amount)) {
-            revert("ERC20 transfer failed");
-        }
+        require(token.transferFrom(address(this), recipient, amount), "ERC20 transfer failed");
 
         // and update the state root
         utxo_root.setRoot(new_root);
     }
 
     // TODO handle if the swap (or other operation) fails!
-    function setup_swap (
+    function setup_swap(
         WellFormedTicketVerifier.Proof calldata well_formed_deactivator_proof,
         uint256 new_deactivator_ticket_hash,
         SMTMembershipVerifier.Proof calldata oldTokenCommitmentInclusionProof,
@@ -190,79 +181,80 @@ contract Pinch is AccessControl {
         IERC20 token,
         IERC20 destination_token,
         uint256 amount
-    ) public
+    )
+        public
         onlyRole(SEQUENCER_ROLE)
     {
         counter += 2;
-        assert(amount > 0);
-        assert(token != destination_token);
-        
+        require(amount > 0);
+        require(token != destination_token);
+
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
         // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
-        if (
-            !WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
+        require(
+            WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
                 well_formed_deactivator_proof,
                 address(token),
                 amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
-            )
-        ) {
-            revert(
-                "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
-            );
-        }
+            ),
+            "deactivator wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+        );
 
         // assert!(committed old ticket is in the provided tree root)
-        if (
-            !SMTMembershipVerifier.commitmentInclusion(
+        require(
+            SMTMembershipVerifier.commitmentInclusion(
                 oldTokenCommitmentInclusionProof, prior_root_for_commitment_inclusion, old_ticket_hash_commitment
-            )
-        ) {
-            revert("the commitment to the old ticket wasn't in that tree root.");
-        }
+            ),
+            "the commitment to the old ticket wasn't in that tree root."
+        );
 
         // and check that that provided tree root is a recent historical commitment- valid :)
-        if (!utxo_root.checkMembership(prior_root_for_commitment_inclusion)) {
-            revert("the tree root you proved stuff against isn't one we have on file");
-        }
+        require(
+            utxo_root.checkMembership(prior_root_for_commitment_inclusion),
+            "the tree root you proved stuff against isn't one we have on file"
+        );
 
         // check our modification of the SMT (done by the sequencer) is valid (for the deactivator)
-        if (
-            !SMTMembershipVerifier.updateProof(
-                smt_update_deactivator_proof, utxo_root.getCurrent(), root_after_adding_deactivator, new_deactivator_ticket_hash
-            )
-        ) {
-            revert("you didn't modify the SMT correctly to add your deactivator.");
-        }
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_deactivator_proof,
+                utxo_root.getCurrent(),
+                root_after_adding_deactivator,
+                new_deactivator_ticket_hash
+            ),
+            "you didn't modify the SMT correctly to add your deactivator."
+        );
 
         // check validity and well-formedness of the new swap ticket versus the old ticket's hash commitment and the provided arguments.
         // TODO does new_swap_ticket_hash and old_ticket_hash_commitment need to be provided as arguments?
-        if (
-            !WellFormedTicketVerifier.wellFormedSwapTicketProof(
+        require(
+            WellFormedTicketVerifier.wellFormedSwapTicketProof(
                 well_formed_new_swap_ticket_proof,
                 address(token),
                 address(destination_token),
                 amount,
                 new_swap_ticket_hash,
                 old_ticket_hash_commitment
-            )
-        ) {
-            revert("the new swap ticket wasn't well formed.");
-        }
+            ),
+            "the new swap ticket wasn't well formed."
+        );
 
         // check our modification of the SMT (done by the sequencer) is valid (for the new swap ticket)
-        if (
-            !SMTMembershipVerifier.updateProof(
-                smt_update_new_swap_ticket_proof, root_after_adding_deactivator, root_after_adding_new_swap_ticket, new_swap_ticket_hash
-            )
-        ) {
-            revert("you didn't modify the SMT correctly to add your new swap ticket.");
-        }
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_new_swap_ticket_proof,
+                root_after_adding_deactivator,
+                root_after_adding_new_swap_ticket,
+                new_swap_ticket_hash
+            ),
+            "you didn't modify the SMT correctly to add your new swap ticket."
+        );
 
         // update SMT root to add both tickets
         utxo_root.setRoot(root_after_adding_new_swap_ticket);
