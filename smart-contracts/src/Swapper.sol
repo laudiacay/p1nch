@@ -4,7 +4,8 @@ pragma solidity ^0.8.13;
 import "openzeppelin-contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/access/AccessControl.sol";
 
-import "./BatchPriceSMTRootUpdateVerifier.sol";
+import "./BatchPriceSMTVerifier.sol";
+import "./HistoricalRoots.sol";
 
 // TODO handle if the swap (or other operation) fails!
 contract Swapper is AccessControl {
@@ -25,13 +26,13 @@ contract Swapper is AccessControl {
     }
 
     // this contains the swap batch info. it is an SMT that contains:
-    // (timestamp_of_prior_batch, timestamp_of_current_batch, batch_num, token1, token2, token1_price_in_token2) => 0
+    // (timestamp_of_prior_batch, timestamp_of_current_batch, token1, token2, token1_price_in_token2) => 0
     // why does it contain timestamp_of_prior_batch? make sure that timestamp of swap ticket was actually inside the bounds
     // why does it contain timestamp_of_current_batch? same reason.
     // users can look up the price of a token in a given batch and present it to the contract
     // the contract will verify the proof that the given swap UTXO *was* executed in that batch_num (per its timestamp)
     // and that the given token was swapped in that batch_num at that swap price
-    uint256 batch_swap_root;
+    HistoricalRoots batch_swap_root;
 
     // this is a list that registers when batches are swapped- any swap UTXO timestamp in between these is in the latter batch
     uint256[] batch_swap_timestamps;
@@ -74,6 +75,10 @@ contract Swapper is AccessControl {
         return data.swap_tokens.length == 0;
     }
 
+    function checkHistoricalRoot(uint256 swap_root) public view returns (bool) {
+        return batch_swap_root.checkMembership(swap_root);
+    }
+
     // TODO should be onlyOwner?? idk?- idk.
     function copyCurrentToLastAndClearCurrent() internal {
         require(swapDataIsEmpty(last_and_needs_entry_to_root), "last_and_needs_entry_to_root is not empty");
@@ -87,6 +92,11 @@ contract Swapper is AccessControl {
         }
 
         emptySwapData(current);
+    }
+
+    // pure function that just returns the most recent batch swap timestamp
+    function getMostRecentBatchSwapTimestamp() public view returns (uint256) {
+        return batch_swap_timestamps[batch_swap_timestamps.length - 1];
     }
 
     function addTransaction(address from, address to, uint128 amount) public onlyRole(STATE_ADMIN_ROLE) {
@@ -145,10 +155,11 @@ contract Swapper is AccessControl {
             }
             // TODO what happens if you had zero that needs to swap? do you need a price on that? what's that mean?
         }
+        batch_swap_timestamps.push(block.timestamp);
     }
 
-    // todo rough one
-    function updateRoot(BatchPriceSMTRootUpdateVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
+    // todo this is arough one
+    function updateRoot(BatchPriceSMTVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
         public
         onlyRole(BOT_ROLE)
     {
@@ -163,6 +174,9 @@ contract Swapper is AccessControl {
                 && newRoots.length == last_and_needs_entry_to_root.swap_tokens.length,
             "updateProofs and newRoots must be the same length as num of swap pairs"
         );
+        // get the last and current batch timestamps (last two entries in the batch_swap_timestamps array)
+        uint256 lastBatchTimestamp = batch_swap_timestamps[batch_swap_timestamps.length - 2];
+        uint256 currentBatchTimestamp = batch_swap_timestamps[batch_swap_timestamps.length - 1];
 
         // iterate over pairs
         for (uint256 i = 0; i < last_and_needs_entry_to_root.swap_tokens.length; i++) {
@@ -170,14 +184,14 @@ contract Swapper is AccessControl {
             uint256 pairid = pairHash(pair);
             uint256 price = last_and_needs_entry_to_root.prices[pairid];
             // validate that it's a valid proof
-            uint256 lastRoot = i == 0 ? batch_swap_root : newRoots[i - 1];
+            uint256 lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[i - 1];
             require(
-                BatchPriceSMTRootUpdateVerifier.updateProof(updateProofs[i], lastRoot, newRoots[i], price),
+                BatchPriceSMTVerifier.updateProof(updateProofs[i], lastRoot, newRoots[i], lastBatchTimestamp, currentBatchTimestamp, pair.token1, pair.token2, price),
                 "you did not update the prices right :(, check your proofs"
             );
         }
 
         emptySwapData(last_and_needs_entry_to_root);
-        batch_swap_root = newRoots[newRoots.length - 1];
+        batch_swap_root.setRoot(newRoots[newRoots.length - 1]);
     }
 }
