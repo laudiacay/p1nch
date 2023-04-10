@@ -176,7 +176,7 @@ contract Pinch is AccessControl {
         uint256 root_after_adding_deactivator,
         WellFormedTicketVerifier.Proof calldata well_formed_new_swap_ticket_proof,
         uint256 new_swap_ticket_hash,
-        uint256 swap_generation_timestamp,
+        uint256 swap_batch_number,
         SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
         uint256 root_after_adding_new_swap_ticket,
         IERC20 token,
@@ -190,11 +190,10 @@ contract Pinch is AccessControl {
         require(amount > 0);
         require(token != destination_token);
 
-        // check that the swap generation timestamp is within this swap epoch and in the past(!!). if it's not, you have to reprove with a commitment to a new timestamp... :|
+        // check the swap batch number
         require(
-            swap_generation_timestamp >= swapper.getMostRecentBatchSwapTimestamp()
-                && swap_generation_timestamp <= block.timestamp,
-            "swap generation timestamp is before the start of the current swap epoch"
+            swap_batch_number == swapper.getBatchNumber(),
+            "wrong swap batch number"
         );
 
         // Check the proof that the nullfier is well-formed and valid and new etc
@@ -247,7 +246,7 @@ contract Pinch is AccessControl {
                 address(token),
                 address(destination_token),
                 amount,
-                swap_generation_timestamp,
+                swap_batch_number,
                 new_swap_ticket_hash,
                 old_ticket_hash_commitment
             ),

@@ -60,7 +60,7 @@ library WellFormedTicketVerifier {
         address source,
         address dest,
         uint256 amount,
-        uint256 timestamp,
+        uint256 batchNumber,
         uint256 ticket_hash,
         uint256 old_ticket_hash_commitment
     )
