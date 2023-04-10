@@ -47,16 +47,16 @@ contract Pinch is AccessControl {
     /**
      * @notice Deposit tokens into the SMT
      *
-     * @param well_formed_proof A proof that verifies ticket_key is well-formed relative to the token, amount, and "p2skh transaction"
-     * @param smt_update_proof A proof that demonstrates the insertion of a KV pair ticket_key = True and that ticket_key is not previously in the proof
+     * @param well_formed_proof A proof that verifies ticket_hash is well-formed relative to the token, amount, and "p2skh transaction"
+     * @param smt_update_proof A proof that demonstrates the insertion of a KV pair ticket_hash = True and that ticket_hash is not previously in the proof
      * @param token The token to be deposited (IERC20 compatible)
      * @param amount The amount of tokens to be deposited
-     * @param ticket_key The key associated with the deposit ticket
+     * @param ticket_hash The key associated with the deposit ticket
      * @param new_root The new SMT root after deposit
      */
     function deposit(
         WellFormedTicketVerifier.Proof calldata well_formed_proof,
-        uint256 ticket_key,
+        uint256 ticket_hash,
         SMTMembershipVerifier.Proof calldata smt_update_proof,
         uint256 new_root,
         IERC20 token,
@@ -68,18 +68,18 @@ contract Pinch is AccessControl {
         counter += 1;
 
         // Check the proof of the well formed key
-        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         if (
-            !WellFormedTicketVerifier.wellformedDepositTicketProof(well_formed_proof, address(token), amount, ticket_key)
+            !WellFormedTicketVerifier.wellformed_p2skh_proof(well_formed_proof, address(token), amount, ticket_hash)
         ) {
             revert("ticket was not well-formed");
         }
 
         // Check the smt update proof
-        // assert!(ticket_key \not\in utxo_hash_smt_root)
-        // assert!(ticket_key \in new_root (and update is done correctly))
-        if (!SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_key)) {
+        // assert!(ticket_hash \not\in utxo_hash_smt_root)
+        // assert!(ticket_hash \in new_root (and update is done correctly))
+        if (!SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_hash)) {
             revert("SMT modification was not valid");
         }
 
@@ -124,7 +124,7 @@ contract Pinch is AccessControl {
 
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
-        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
@@ -184,7 +184,7 @@ contract Pinch is AccessControl {
         SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
         uint256 root_after_adding_deactivator,
         WellFormedTicketVerifier.Proof calldata well_formed_new_swap_ticket_proof,
-        uint256 new_swap_ticket_key,
+        uint256 new_swap_ticket_hash,
         SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
         uint256 root_after_adding_new_swap_ticket,
         IERC20 token,
@@ -199,7 +199,7 @@ contract Pinch is AccessControl {
         
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
-        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
@@ -241,14 +241,14 @@ contract Pinch is AccessControl {
         }
 
         // check validity and well-formedness of the new swap ticket versus the old ticket's hash commitment and the provided arguments.
-        // TODO does new_swap_ticket_key and old_ticket_hash_commitment need to be provided as arguments?
+        // TODO does new_swap_ticket_hash and old_ticket_hash_commitment need to be provided as arguments?
         if (
             !WellFormedTicketVerifier.wellFormedSwapTicketProof(
                 well_formed_new_swap_ticket_proof,
                 address(token),
                 address(destination_token),
                 amount,
-                new_swap_ticket_key,
+                new_swap_ticket_hash,
                 old_ticket_hash_commitment
             )
         ) {
@@ -258,7 +258,7 @@ contract Pinch is AccessControl {
         // check our modification of the SMT (done by the sequencer) is valid (for the new swap ticket)
         if (
             !SMTMembershipVerifier.updateProof(
-                smt_update_new_swap_ticket_proof, root_after_adding_deactivator, root_after_adding_new_swap_ticket, new_swap_ticket_key
+                smt_update_new_swap_ticket_proof, root_after_adding_deactivator, root_after_adding_new_swap_ticket, new_swap_ticket_hash
             )
         ) {
             revert("you didn't modify the SMT correctly to add your new swap ticket.");
@@ -274,19 +274,19 @@ contract Pinch is AccessControl {
 
     //     /**
     //      * TODO clean up and correct these parameters
-    //      * @param old_key_comm - A commitment to the old ticket key. This is used in the proof of the old_ticket_key_canceling
-    //      * @param old_ticket_key_proof - A proof that the old ticket is in one of the past SMT
+    //      * @param old_key_comm - A commitment to the old ticket key. This is used in the proof of the old_ticket_hash_canceling
+    //      * @param old_ticket_hash_proof - A proof that the old ticket is in one of the past SMT
     //      * @param update_proof - Checks that canceling ticket is **not** in the SMT and then appends it to the SMT
-    //      * @param canceling_ticket_key - The old deposit key but now with active set to false and fresh randomness
-    //      * @param new_ticket_key_1 - The first new ticket key which is split from the old ticket
-    //      * @param new_ticket_key_2 - The second ticket key which is split from the new. If null just set to 0 (i.e. the old ticket is converted to just 1 new ticket)
+    //      * @param canceling_ticket_hash - The old deposit key but now with active set to false and fresh randomness
+    //      * @param new_ticket_hash_1 - The first new ticket key which is split from the old ticket
+    //      * @param new_ticket_hash_2 - The second ticket key which is split from the new. If null just set to 0 (i.e. the old ticket is converted to just 1 new ticket)
     //      * @param new_ticket_proof - A proof showing that the 2 new tickets are well formed, i.e. the sum of the token amounts in the new tickets equal the old one and that the same token is used
     //      * and that the destination tokens and amounts match
     //      */
     //     function setup_swap(
     //         uint256 old_key_comm, // note this is JUST A COMMITMENT to the ticket hash- you should not present the actual ticket hash
-    //         uint256 canceling_ticket_key,
-    //         uint256 new_ticket_key_1,
+    //         uint256 canceling_ticket_hash,
+    //         uint256 new_ticket_hash_1,
     //         address source_token,
     //         address destination_token,
     //         uint256 amount,
@@ -297,7 +297,7 @@ contract Pinch is AccessControl {
     //     )
     //         public
     //     {
-    //         assert(new_ticket_key_1 != 0);
+    //         assert(new_ticket_hash_1 != 0);
     //         counter += 2;
     //         assert(amount > 0);
     //         assert(source_token != destination_token);
@@ -310,24 +310,24 @@ contract Pinch is AccessControl {
     //         // first: check old ticket key and its cancellation
 
     //         // assert!(old_key_comm \in some prior valid utxo_hash_smt_root)
-    //         if (!SMTMembershipVerifier.inclusionProof(proof.old_ticket_key_proof, provided_root, old_key_comm)) {
+    //         if (!SMTMembershipVerifier.inclusionProof(proof.old_ticket_hash_proof, provided_root, old_key_comm)) {
     //             revert("old ticket key was not in the SMT");
     //         }
 
     //         utxo_root.checkMembership(provided_root);
 
-    //         // assert!(canceling_ticket_key \notin utxo_hash_smt_root)
-    //         // assert!(canceling_ticket_key \in new_utxo_root (and update is correct))
+    //         // assert!(canceling_ticket_hash \notin utxo_hash_smt_root)
+    //         // assert!(canceling_ticket_hash \in new_utxo_root (and update is correct))
     //         if (
     //             !SMTMembershipVerifier.update_proof(
-    //                 smt_update_proof_deactivator, current_root, new_root, canceling_ticket_key
+    //                 smt_update_proof_deactivator, current_root, new_root, canceling_ticket_hash
     //             )
     //         ) {
     //             revert("cancelling key SMT modification was not valid");
     //         }
 
-    //         // assert!(canceling_ticket_key.active = 0, all other fields same as old_ticket_key)
-    //         // assert!(we know preimage of deactivator hash of old_ticket_key)
+    //         // assert!(canceling_ticket_hash.active = 0, all other fields same as old_ticket_hash)
+    //         // assert!(we know preimage of deactivator hash of old_ticket_hash)
     //         if (
     //             !WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
     //                 proof, token, amount, old_key_comm, cancelling_key
@@ -337,11 +337,11 @@ contract Pinch is AccessControl {
     //         }
 
     //         // validate new ticketx internally
-    //         // assert!(new_ticket_key_1.active == 1)
-    //         // assert!(new_ticket_key_1.timestamp == ???????)
+    //         // assert!(new_ticket_hash_1.active == 1)
+    //         // assert!(new_ticket_hash_1.timestamp == ???????)
     //         if (!WellFormedTicketVerifier.wellformedActiveSwapTicketProof()) {}
-    //         // assert!(new_ticket_key_1.active == new_ticket_key_2.active == 1)
-    //         // assert!(new_ticket_key_1.timestamp == new_ticket_key_2.timestamp == ???????)
+    //         // assert!(new_ticket_hash_1.active == new_ticket_hash_2.active == 1)
+    //         // assert!(new_ticket_hash_1.timestamp == new_ticket_hash_2.timestamp == ???????)
 
     //         // validate new tickets versus other values
     //         // assert!(new_ticket_1.value == old_ticket.value)
@@ -350,16 +350,16 @@ contract Pinch is AccessControl {
     //         // assert!(new_ticket_1.destination_token == destination_token)
     //         // assert!(new_ticket_1.amount == amount)
     //         // validate the state update with new tickets
-    //         // assert!(new_ticket_key_1 \in new_utxo_root (and update is correct))
-    //         // assert!(new_ticket_key_1 is well-formed)
+    //         // assert!(new_ticket_hash_1 \in new_utxo_root (and update is correct))
+    //         // assert!(new_ticket_hash_1 is well-formed)
     //         if (
     //             !SwapVerifier.proof(
     //                 proof,
     //                 utxo_hash_smt_root,
     //                 old_key_comm,
-    //                 canceling_ticket_key,
-    //                 new_ticket_key_1,
-    //                 new_ticket_key_2,
+    //                 canceling_ticket_hash,
+    //                 new_ticket_hash_1,
+    //                 new_ticket_hash_2,
     //                 source_token,
     //                 destination_token,
     //                 amount,
