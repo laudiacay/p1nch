@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.13;
 
-//import {Verifier as P2SKHVerifier} from "../../circuit_wrapper/build/p2skh_well_formed_verify.sol";
+import {Verifier as P2SKHWellFormedVerify} from "@circuits/p2skh_well_formed_verify.sol";
 
 // a contract that verifies whether a ticket is well-formed
 library WellFormedTicketVerifier {
@@ -18,6 +18,16 @@ library WellFormedTicketVerifier {
         public
         returns (bool r)
     {
+        P2SKHWellFormedVerify verif = new P2SKHWellFormedVerify();
+        return verif.verifyProof(
+            proof.a,
+            proof.b,
+            proof.c,
+            [
+                amount,
+                0, // TODO: timestamp
+
+            ]);
         // TODO: check format
         // P2SKHVerifier().verifyProof(
         //     proof.a,
