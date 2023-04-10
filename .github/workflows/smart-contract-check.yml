@@ -1,6 +1,6 @@
 on: [push]
 
-name: test
+name: smart contract checks (linter, compilation, eventually tests...) 
 
 jobs:
   check:
