@@ -26,7 +26,8 @@ library WellFormedTicketVerifier {
             [
                 amount,
                 0, // TODO: timestamp
-
+                uint160(token),
+                ticket_hash
             ]);
         // TODO: check format
         // P2SKHVerifier().verifyProof(
