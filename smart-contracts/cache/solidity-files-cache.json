@@ -1221,10 +1221,10 @@
         }
       }
     },
-    "src/BatchPriceSMTRootUpdateVerifier.sol": {
-      "lastModificationDate": 1681116572763,
-      "contentHash": "e370298985ea0e73f53fd953cd6249df",
-      "sourceName": "src/BatchPriceSMTRootUpdateVerifier.sol",
+    "src/BatchPriceSMTVerifier.sol": {
+      "lastModificationDate": 1681139561791,
+      "contentHash": "06192fa78962a84dd0d5fbfbe67769c0",
+      "sourceName": "src/BatchPriceSMTVerifier.sol",
       "solcConfig": {
         "settings": {
           "optimizer": {
@@ -1256,8 +1256,8 @@
       "imports": [],
       "versionRequirement": "^0.8.13",
       "artifacts": {
-        "BatchPriceSMTRootUpdateVerifier": {
-          "0.8.17+commit.8df45f5f.Darwin.appleclang": "BatchPriceSMTRootUpdateVerifier.sol/BatchPriceSMTRootUpdateVerifier.json"
+        "BatchPriceSMTVerifier": {
+          "0.8.17+commit.8df45f5f.Darwin.appleclang": "BatchPriceSMTVerifier.sol/BatchPriceSMTVerifier.json"
         }
       }
     },
@@ -1311,8 +1311,8 @@
       }
     },
     "src/Pinch.sol": {
-      "lastModificationDate": 1681131476426,
-      "contentHash": "86ec0c25213b52f24f6780e0da37cd8f",
+      "lastModificationDate": 1681139087190,
+      "contentHash": "1dac277db852730d37c565777f3a48d9",
       "sourceName": "src/Pinch.sol",
       "solcConfig": {
         "settings": {
@@ -1352,7 +1352,7 @@
         "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
         "lib/openzeppelin-contracts/contracts/utils/math/Math.sol",
         "lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol",
-        "src/BatchPriceSMTRootUpdateVerifier.sol",
+        "src/BatchPriceSMTVerifier.sol",
         "src/HistoricalRoots.sol",
         "src/SMTMembershipVerifier.sol",
         "src/Swapper.sol",
@@ -1406,8 +1406,8 @@
       }
     },
     "src/Swapper.sol": {
-      "lastModificationDate": 1681116582557,
-      "contentHash": "373704a38ce6e684bff2be12d4bda761",
+      "lastModificationDate": 1681139537156,
+      "contentHash": "d2c98aeef24ef10d52792b0e3bba0ed3",
       "sourceName": "src/Swapper.sol",
       "solcConfig": {
         "settings": {
@@ -1447,7 +1447,8 @@
         "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
         "lib/openzeppelin-contracts/contracts/utils/math/Math.sol",
         "lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol",
-        "src/BatchPriceSMTRootUpdateVerifier.sol"
+        "src/BatchPriceSMTVerifier.sol",
+        "src/HistoricalRoots.sol"
       ],
       "versionRequirement": "^0.8.13",
       "artifacts": {
@@ -1457,8 +1458,8 @@
       }
     },
     "src/WellFormedTicketVerifier.sol": {
-      "lastModificationDate": 1681131322341,
-      "contentHash": "201f14f902ea55163e5f65ebb9b1fab1",
+      "lastModificationDate": 1681139132186,
+      "contentHash": "ce3398eb702d85155cb880994699ee37",
       "sourceName": "src/WellFormedTicketVerifier.sol",
       "solcConfig": {
         "settings": {
@@ -1497,7 +1498,7 @@
       }
     },
     "test/Pinch.t.sol": {
-      "lastModificationDate": 1681131476425,
+      "lastModificationDate": 1681138950703,
       "contentHash": "385990403259e9566e34fd7374118715",
       "sourceName": "test/Pinch.t.sol",
       "solcConfig": {
@@ -1555,7 +1556,7 @@
         "lib/openzeppelin-contracts/contracts/utils/introspection/IERC165.sol",
         "lib/openzeppelin-contracts/contracts/utils/math/Math.sol",
         "lib/openzeppelin-contracts/contracts/utils/math/SignedMath.sol",
-        "src/BatchPriceSMTRootUpdateVerifier.sol",
+        "src/BatchPriceSMTVerifier.sol",
         "src/HistoricalRoots.sol",
         "src/Pinch.sol",
         "src/SMTMembershipVerifier.sol",

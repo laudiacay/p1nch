@@ -176,6 +176,7 @@ contract Pinch is AccessControl {
         uint256 root_after_adding_deactivator,
         WellFormedTicketVerifier.Proof calldata well_formed_new_swap_ticket_proof,
         uint256 new_swap_ticket_hash,
+        uint256 swap_generation_timestamp,
         SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
         uint256 root_after_adding_new_swap_ticket,
         IERC20 token,
@@ -188,6 +189,13 @@ contract Pinch is AccessControl {
         counter += 2;
         require(amount > 0);
         require(token != destination_token);
+
+        // check that the swap generation timestamp is within this swap epoch and in the past(!!). if it's not, you have to reprove with a commitment to a new timestamp... :|
+        require(
+            swap_generation_timestamp >= swapper.getMostRecentBatchSwapTimestamp()
+                && swap_generation_timestamp <= block.timestamp,
+            "swap generation timestamp is before the start of the current swap epoch"
+        );
 
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
@@ -239,6 +247,7 @@ contract Pinch is AccessControl {
                 address(token),
                 address(destination_token),
                 amount,
+                swap_generation_timestamp,
                 new_swap_ticket_hash,
                 old_ticket_hash_commitment
             ),
@@ -262,5 +271,98 @@ contract Pinch is AccessControl {
         // schedule the swap :)
         // TODO is this cast safe on amount?
         swapper.addTransaction(address(token), address(destination_token), uint128(amount));
+    }
+
+    function burnSwapToP2SKH(
+        WellFormedTicketVerifier.Proof calldata well_formed_spent_swap_deactivator_proof,
+        uint256 new_spent_swap_deactivator_ticket,
+        uint256 old_swap_hash_commitment,
+        SMTMembershipVerifier.Proof calldata oldSwapCommitmentInclusionProof,
+        uint256 prior_root_for_commitment_inclusion,
+        SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
+        uint256 root_after_adding_deactivator,
+        BatchPriceSMTVerifier.Proof calldata price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
+        uint256 new_p2skh_ticket_hash,
+        uint256 prior_price_root_for_deactivator_amount,
+        uint256 priceDataCommitment,
+        SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_proof,
+        uint256 root_after_adding_new_p2skh_ticket
+    )
+        public
+        onlyRole(SEQUENCER_ROLE)
+    {
+        counter += 2;
+
+        // need to prove:
+        // 1. the deactivator is well formed versus the old swap ticket
+        // 2. the old swap ticket is in the provided tree root, which is a recent historical commitment
+        // 3. updating to add the deactivator is done correctly
+        // 4. the swap ticket was swapped (and thus has a price in the price smt). and, the new p2skh ticket is well formed (and matches the deactivator and price SMT in amount, currency, and swap amount)
+        // 5. updating to add the new p2skh ticket is done correctly
+
+        // 1. the deactivator is well formed versus the old swap ticket
+        require(
+            WellFormedTicketVerifier.wellformedSwapDeactivatorProof(
+                well_formed_spent_swap_deactivator_proof, old_swap_hash_commitment, new_spent_swap_deactivator_ticket
+            ),
+            "deactivator wasn't well formed either in itself, or against your commitment to its swap ticket, or against your call arguments, or your babyjub key."
+        );
+
+        // 2. the old swap ticket is in the provided tree root, which is a recent historical commitment
+        require(
+            SMTMembershipVerifier.commitmentInclusion(
+                oldSwapCommitmentInclusionProof, prior_root_for_commitment_inclusion, old_swap_hash_commitment
+            ),
+            "the commitment to the old ticket wasn't in that tree root."
+        );
+
+        require(
+            utxo_root.checkMembership(prior_root_for_commitment_inclusion),
+            "the SMT root you proved stuff against isn't one we have on file"
+        );
+
+        // 3. updating to add the deactivator is done correctly
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_deactivator_proof,
+                utxo_root.getCurrent(),
+                root_after_adding_deactivator,
+                new_spent_swap_deactivator_ticket
+            ),
+            "you didn't modify the SMT correctly to add your deactivator."
+        );
+
+        // 4. the swap ticket was swapped (and thus has a price in the price smt). and, the new p2skh ticket is well formed (and matches the deactivator and price SMT in amount, currency, and swap amount)
+        // make sure they presented a valid historical price smt root
+        require(
+            swapper.checkHistoricalRoot(prior_price_root_for_deactivator_amount),
+            "the price SMT root you proved stuff against isn't one we have on file"
+        );
+
+        // check well-formedness of the new p2skh ticket.
+        // make sure the price is correct and performs a correct conversion at the listed price in the SMT for the given batch
+        require(
+            BatchPriceSMTVerifier.checkPriceSwap(
+                price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
+                prior_price_root_for_deactivator_amount,
+                priceDataCommitment,
+                old_swap_hash_commitment,
+                new_p2skh_ticket_hash
+            )
+        );
+
+        // 5. updating to add the new p2skh ticket is done correctly
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_new_p2skh_ticket_proof,
+                root_after_adding_deactivator,
+                root_after_adding_new_p2skh_ticket,
+                new_p2skh_ticket_hash
+            ),
+            "you didn't modify the SMT correctly to add your new p2skh ticket."
+        );
+
+        // update SMT root to add both tickets
+        utxo_root.setRoot(root_after_adding_new_p2skh_ticket);
     }
 }
