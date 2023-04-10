@@ -9,6 +9,7 @@ import { CircomSMT } from "./smt";
 import { configs } from "./configs";
 import { compile_snark } from "./snark_utils";
 
+import { defaultRoute } from "./routes";
 const app = express();
 const port = process.env.PORT || 3000;
 const redis = new Redis();
@@ -27,6 +28,9 @@ CircomSMT.new_tree_from_redis(configs.N_LEVELS, redis).then((smt_) => {
 // initializeSMTFromRedisBatches(redis).then((smt_) => {
 //   smt = smt_;
 // });
+
+// routes
+app.use("/", defaultRoute);
 
 // Users submit zk proofs to /sequencer
 app.post("/sequencer", async (req: Request, res: Response) => {
@@ -81,7 +85,7 @@ cron.schedule("*/5 * * * *", async () => {
   await redis.rename("unprocessedData", "oldUnprocessedData");
 
   // get the new batch num and redis list name
-  const batchNumber = await redis.zcard('batches');
+  const batchNumber = await redis.zcard("batches");
   const new_list_name = `batch_${batchNumber}`;
 
   // Process each item in the old batch
@@ -130,7 +134,6 @@ cron.schedule("*/5 * * * *", async () => {
   }
 
   // run the transactions
-  
 
   // delete old unprocessed data
   await redis.del("oldUnprocessedData");
