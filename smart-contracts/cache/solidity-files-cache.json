@@ -12,6 +12,50 @@
     ]
   },
   "files": {
+    "circuit_build/comm_memb_verify.sol": {
+      "lastModificationDate": 1681149154277,
+      "contentHash": "f748d75c5c1432afc061d677b6735384",
+      "sourceName": "circuit_build/comm_memb_verify.sol",
+      "solcConfig": {
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "metadata": {
+            "bytecodeHash": "ipfs",
+            "appendCBOR": true
+          },
+          "outputSelection": {
+            "*": {
+              "": [
+                "ast"
+              ],
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ]
+            }
+          },
+          "evmVersion": "london",
+          "viaIR": true,
+          "libraries": {}
+        }
+      },
+      "imports": [],
+      "versionRequirement": "^0.8.13",
+      "artifacts": {
+        "Pairing": {
+          "0.8.19+commit.7dd6d404.Linux.gcc": "comm_memb_verify.sol/Pairing.json"
+        },
+        "Verifier": {
+          "0.8.19+commit.7dd6d404.Linux.gcc": "comm_memb_verify.sol/Verifier.json"
+        }
+      }
+    },
     "circuit_build/smt_processor_verify.sol": {
       "lastModificationDate": 1681148330361,
       "contentHash": "45e761cb5e534f39af1f45b6ab5dfe74",
@@ -1419,6 +1463,7 @@
         }
       },
       "imports": [
+        "circuit_build/comm_memb_verify.sol",
         "circuit_build/smt_processor_verify.sol",
         "lib/openzeppelin-contracts/contracts/access/AccessControl.sol",
         "lib/openzeppelin-contracts/contracts/access/IAccessControl.sol",
@@ -1443,8 +1488,8 @@
       }
     },
     "src/SMTMembershipVerifier.sol": {
-      "lastModificationDate": 1681149090574,
-      "contentHash": "135c6b33a0871242f10d00616c371916",
+      "lastModificationDate": 1681149176833,
+      "contentHash": "babd6e6e07e5f58d693106311a72f11b",
       "sourceName": "src/SMTMembershipVerifier.sol",
       "solcConfig": {
         "settings": {
@@ -1476,6 +1521,7 @@
         }
       },
       "imports": [
+        "circuit_build/comm_memb_verify.sol",
         "circuit_build/smt_processor_verify.sol"
       ],
       "versionRequirement": "^0.8.13",
@@ -1613,6 +1659,7 @@
         }
       },
       "imports": [
+        "circuit_build/comm_memb_verify.sol",
         "circuit_build/smt_processor_verify.sol",
         "lib/forge-std/lib/ds-test/src/test.sol",
         "lib/forge-std/src/Base.sol",
