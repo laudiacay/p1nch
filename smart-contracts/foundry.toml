@@ -1,7 +1,7 @@
 [profile.default]
 src = 'src'
 out = 'out'
-libs = ['lib']
+libs = ['lib', "circuit_build"]
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
 # forge build --via -ir

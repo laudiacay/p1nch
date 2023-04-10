@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.13;
 
-//import {Verifier as SMTProcessorVerifier} from "../../circuit_wrapper/build/smt_processor_verify.sol";
+import {Verifier as SMTProcessorVerifier} from "@circuits/smt_processor_verify.sol";
 //import {Verifier as CommMembVerify} from "../../circuit_wrapper/build/comm_memb_verify.sol";
 
 // a contract that verifies whether an update to the SMT is done right (and not including this ticket already!)
@@ -31,17 +31,17 @@ library SMTMembershipVerifier {
         public
         returns (bool r)
     {
-        // // TODO: should this be a
-        // SMTProcessorVerifier smt_proc_verifier = SMTProcessorVerifier();
-        // // A dummy value for the proof as there is no "old key" in an insert
-        // uint256 old_key_dummy = 0;
-        // // Specify that the proof should check that we are doing an **insert**
-        // // I.e. the key did not exist before in the tree
-        // uint256 fn_0 = 1;
-        // uint256 fn_1 = 0;
-        // uint256[6] memory inputValues = [root_before, old_key_dummy, fn_0, fn_1, ticket_hash, root_after];
+        // TODO: should this be a
+        SMTProcessorVerifier smt_proc_verifier = new SMTProcessorVerifier();
+        // A dummy value for the proof as there is no "old key" in an insert
+        uint256 old_key_dummy = 0;
+        // Specify that the proof should check that we are doing an **insert**
+        // I.e. the key did not exist before in the tree
+        uint256 fn_0 = 1;
+        uint256 fn_1 = 0;
+        uint256[6] memory inputValues = [root_before, old_key_dummy, fn_0, fn_1, ticket_hash, root_after];
 
-        // return smt_proc_verifier.verifyProof(proof.a, proof.b, proof.c, inputValues);
+        return smt_proc_verifier.verifyProof(proof.a, proof.b, proof.c, inputValues);
         return true;
     }
 
