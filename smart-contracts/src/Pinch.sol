@@ -47,16 +47,16 @@ contract Pinch is AccessControl {
     /**
      * @notice Deposit tokens into the SMT
      *
-     * @param well_formed_proof A proof that verifies ticket_key is well-formed relative to the token, amount, and "p2skh transaction"
-     * @param smt_update_proof A proof that demonstrates the insertion of a KV pair ticket_key = True and that ticket_key is not previously in the proof
+     * @param well_formed_proof A proof that verifies ticket_hash is well-formed relative to the token, amount, and "p2skh transaction"
+     * @param smt_update_proof A proof that demonstrates the insertion of a KV pair ticket_hash = True and that ticket_hash is not previously in the proof
      * @param token The token to be deposited (IERC20 compatible)
      * @param amount The amount of tokens to be deposited
-     * @param ticket_key The key associated with the deposit ticket
+     * @param ticket_hash The key associated with the deposit ticket
      * @param new_root The new SMT root after deposit
      */
     function deposit(
         WellFormedTicketVerifier.Proof calldata well_formed_proof,
-        uint256 ticket_key,
+        uint256 ticket_hash,
         SMTMembershipVerifier.Proof calldata smt_update_proof,
         uint256 new_root,
         IERC20 token,
@@ -68,18 +68,18 @@ contract Pinch is AccessControl {
         counter += 1;
 
         // Check the proof of the well formed key
-        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         if (
-            !WellFormedTicketVerifier.wellformedDepositTicketProof(well_formed_proof, address(token), amount, ticket_key)
+            !WellFormedTicketVerifier.wellformed_p2skh_proof(well_formed_proof, address(token), amount, ticket_hash)
         ) {
             revert("ticket was not well-formed");
         }
 
         // Check the smt update proof
-        // assert!(ticket_key \not\in utxo_hash_smt_root)
-        // assert!(ticket_key \in new_root (and update is done correctly))
-        if (!SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_key)) {
+        // assert!(ticket_hash \not\in utxo_hash_smt_root)
+        // assert!(ticket_hash \in new_root (and update is done correctly))
+        if (!SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_hash)) {
             revert("SMT modification was not valid");
         }
 
@@ -124,7 +124,7 @@ contract Pinch is AccessControl {
 
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
-        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
@@ -184,7 +184,7 @@ contract Pinch is AccessControl {
         SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
         uint256 root_after_adding_deactivator,
         WellFormedTicketVerifier.Proof calldata well_formed_new_swap_ticket_proof,
-        uint256 new_swap_ticket_key,
+        uint256 new_swap_ticket_hash,
         SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
         uint256 root_after_adding_new_swap_ticket,
         IERC20 token,
@@ -199,7 +199,7 @@ contract Pinch is AccessControl {
         
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
-        // assert!(ticket_key = hash(token, amount, "p2skh" ...some other fields...))
+        // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.active = false && ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
@@ -241,14 +241,14 @@ contract Pinch is AccessControl {
         }
 
         // check validity and well-formedness of the new swap ticket versus the old ticket's hash commitment and the provided arguments.
-        // TODO does new_swap_ticket_key and old_ticket_hash_commitment need to be provided as arguments?
+        // TODO does new_swap_ticket_hash and old_ticket_hash_commitment need to be provided as arguments?
         if (
             !WellFormedTicketVerifier.wellFormedSwapTicketProof(
                 well_formed_new_swap_ticket_proof,
                 address(token),
                 address(destination_token),
                 amount,
-                new_swap_ticket_key,
+                new_swap_ticket_hash,
                 old_ticket_hash_commitment
             )
         ) {
@@ -258,7 +258,7 @@ contract Pinch is AccessControl {
         // check our modification of the SMT (done by the sequencer) is valid (for the new swap ticket)
         if (
             !SMTMembershipVerifier.updateProof(
-                smt_update_new_swap_ticket_proof, root_after_adding_deactivator, root_after_adding_new_swap_ticket, new_swap_ticket_key
+                smt_update_new_swap_ticket_proof, root_after_adding_deactivator, root_after_adding_new_swap_ticket, new_swap_ticket_hash
             )
         ) {
             revert("you didn't modify the SMT correctly to add your new swap ticket.");
