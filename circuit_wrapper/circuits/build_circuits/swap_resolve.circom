@@ -6,7 +6,6 @@ component main {
 	public [
 		swap_event_comm,
 		out_p2skh_hash,
-		p2skh_timestamp,
 		swap_utxo_comm
 	]
 } = SwapResolveToP2SKH();
