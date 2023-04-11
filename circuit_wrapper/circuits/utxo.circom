@@ -169,8 +169,7 @@ template SwapResolveToP2SKH() {
 	signal input out_tok;
 	
 	// TODO: precision?
-	signal input price_in;
-	signal input price_out;
+	signal input price;
 
 	signal input swap_event_batch_index;
 
@@ -190,8 +189,7 @@ template SwapResolveToP2SKH() {
 	Check125Bits()(price_in);
 	Check125Bits()(price_out);
 
-	signal mult <== inp_tok_amount * price_in;
-	signal amount_out <== TokDivision()([mult, price_out]);
+	signal amount_out <== inp_tok_amount * price;
 
   // Check the swap event commitment
 	signal _swap_utxo_hash <== ItemHasherSK()(1, sk, inp_tok, inp_tok_amount, SWAP_INSTR, [out_tok, swap_event_batch_index], swap_randomness);

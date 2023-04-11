@@ -82,7 +82,7 @@ template Check252Bits() {
 }
 
 /**
- * Check that the bits fit into 252 bits
+ * Check that the bits fit into 125 bits
  */
 template Check125Bits() {
   signal input in;
