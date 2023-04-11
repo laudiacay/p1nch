@@ -29,6 +29,7 @@ library WellFormedTicketVerifier {
                 uint160(token),
                 ticket_hash
             ]);
+            // TODO: batch num
         // TODO: check format
         // P2SKHVerifier().verifyProof(
         //     proof.a,
