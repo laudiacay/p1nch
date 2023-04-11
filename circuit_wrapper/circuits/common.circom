@@ -61,13 +61,13 @@ template SwapEventHasher() {
   signal input batch_index;
   signal input tok_in;
   signal input tok_out;
-  signal input price_in; // TODO: price per what???
-  signal input price_out; // TODO: price per what???
+  signal input swap_total_in; // TODO: price per what???
+  signal input swap_total_out; // TODO: price per what???
 
   signal output out;
 
   out <== Poseidon(5)([batch_index, tok_in,
-    tok_out, price_in, price_out]);
+    tok_out, swap_total_in, swap_total_out]);
 }
 
 /**

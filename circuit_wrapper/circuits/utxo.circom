@@ -169,7 +169,8 @@ template SwapResolveToP2SKH() {
 	signal input out_tok;
 	
 	// TODO: precision?
-	signal input price;
+	signal input swap_total_in;
+	signal input swap_total_out;
 
 	signal input swap_event_batch_index;
 
@@ -186,10 +187,12 @@ template SwapResolveToP2SKH() {
 	/*** End Public Signals ***/
 
 	// Check that the prices fit into 125 bit	
-	Check125Bits()(price_in);
-	Check125Bits()(price_out);
+	Check125Bits()(swap_total_in);
+	Check125Bits()(swap_total_out);
 
-	signal amount_out <== inp_tok_amount * price;
+//  TODO: add more precision???
+	signal mult_temp <== inp_tok_amount * swap_total_out;
+	signal amount_out <== TokDivision()([mult_temp, swap_total_in]);
 
   // Check the swap event commitment
 	signal _swap_utxo_hash <== ItemHasherSK()(1, sk, inp_tok, inp_tok_amount, SWAP_INSTR, [out_tok, swap_event_batch_index], swap_randomness);
@@ -200,7 +203,7 @@ template SwapResolveToP2SKH() {
 	signal _out_p2skh_hash <== ItemHasherPK()(1, pk_out, out_tok, amount_out, P2SKH_INSTR, [0, 0], p2skh_randomness);
 	_out_p2skh_hash === out_p2skh_hash;
 
-	signal swap_event_hash <== SwapEventHasher()(swap_event_batch_index, inp_tok, out_tok, price_in, price_out);
+	signal swap_event_hash <== SwapEventHasher()(swap_event_batch_index, inp_tok, out_tok, swap_total_in, swap_total_out);
 	signal _swap_event_comm <== Poseidon(2)([swap_event_hash, swap_event_comm_randomness]);
 	_swap_event_comm === swap_event_comm;
 }
