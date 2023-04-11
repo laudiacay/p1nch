@@ -6,7 +6,6 @@ include "node_modules/circomlib/circuits/poseidon.circom";
 
 template Deactivator() {
 	signal input active_randomness;
-	signal input active_timestamp;
 	signal input active_amount;
 	signal input active_comm_randomness;
 	signal input sk;
@@ -19,14 +18,14 @@ template Deactivator() {
 	signal input active_comm;
 	/*** End Public Signals **/
 
-  signal active_hash <== ItemHasherSK()(1, active_timestamp,
+  signal active_hash <== ItemHasherSK()(1,
 		sk, active_tok_inp_addr,
 		active_amount, active_instr, active_data,
 		active_randomness);
   signal _active_comm <== Poseidon(2)([active_hash, active_comm_randomness]);
 	active_comm === _active_comm;
 
-	signal _deactive_hash <== ItemHasherSK()(0, active_timestamp,
+	signal _deactive_hash <== ItemHasherSK()(0,
 		sk, active_tok_inp_addr,
 		active_amount, active_instr, active_data,
 		active_randomness);
@@ -40,12 +39,11 @@ template P2SKHWellFormed() {
 
 	  /**** Public Signals ****/
 		signal input amount;
-    signal input timestamp;
     signal input tok_addr[2];
     signal input item_hash;
 	  /**** End Signals ****/
 
-    signal hash <== ItemHasherSK()(1, timestamp, sk, tok_addr,
+    signal hash <== ItemHasherSK()(1, sk, tok_addr,
       amount, P2SKH_INSTR, [0, 0, 0], randomness);
     hash === item_hash;
 }
@@ -68,15 +66,15 @@ template Swap() {
     signal input out_tok_addr[2];
     signal input new_swap_hash;
     signal input p2skh_comm;
-    signal input new_hash_timestamp; // Then, we assume that the new swap timestamp is new_dep + 1
+    signal input target_swap_batch;
     signal input p2skh_amount;
 	  /**** End Signals ****/
 
-    signal p2skh_hash <== ItemHasherSK()(1, p2skh_timestamp, sk, inp_tok_addr, p2skh_amount, P2SKH_INSTR, [0, 0, 0], p2skh_randomness);
+    signal p2skh_hash <== ItemHasherSK()(1, sk, inp_tok_addr, p2skh_amount, P2SKH_INSTR, [0, 0, 0], p2skh_randomness);
     signal _p2skh_comm <== Poseidon(2)([p2skh_hash, p2skh_comm_randomness]);
     _p2skh_comm === p2skh_comm;
 
-    signal _new_swap_hash <== ItemHasherPK()(1, new_hash_timestamp, received_pk, inp_tok_addr, p2skh_amount, SWAP_INSTR, [out_tok_addr[0], out_tok_addr[1], 0], swap_randomness);
+    signal _new_swap_hash <== ItemHasherPK()(1, received_pk, inp_tok_addr, p2skh_amount, SWAP_INSTR, [out_tok_addr[0], out_tok_addr[1], target_swap_batch], swap_randomness);
     new_swap_hash === new_swap_hash;
 
 		// Check that the swap amount fits into 120 bits so that we can later do arithmetic on it later
@@ -104,7 +102,7 @@ template P2SKHSplit() {
 	signal input new_hash_2;
 	/**** End Public Inputes ***/
 
-  signal old_hash <== ItemHasherSK()(1, old_timestamp, sk, tok_addr,
+  signal old_hash <== ItemHasherSK()(1, sk, tok_addr,
 		old_amount, P2SKH_INSTR, [0, 0, 0], old_randomness);
 	signal _old_comm <== Poseidon(2)([old_hash, old_comm_randomness]);
 	old_comm === _old_comm;
@@ -115,11 +113,11 @@ template P2SKHSplit() {
 	signal amount_check <== LessEqThan(252)([new_amount_1, old_amount]);
 	amount_check === 1;
 
-  signal _new_hash_1 <== ItemHasherPK()(1, new_timestamp_1, new_pk_1, tok_addr,
+  signal _new_hash_1 <== ItemHasherPK()(1, new_pk_1, tok_addr,
 		new_amount_1, P2SKH_INSTR, [0, 0, 0], new_randomness_1);
 	_new_hash_1 === new_hash_1;
 
-  signal _new_hash_2 <== ItemHasherPK()(1, new_timestamp_1 + 1, new_pk_2, tok_addr,
+  signal _new_hash_2 <== ItemHasherPK()(1, new_pk_2, tok_addr,
 		old_amount - new_amount_1, P2SKH_INSTR, [0, 0, 0], new_randomness_2);
 	_new_hash_2 === new_hash_2;
 }
@@ -148,17 +146,17 @@ template P2SKHMerge() {
 	signal input new_hash;
 	/**** End Public Inputes ***/
 
-  signal old_hash_1 <== ItemHasherSK()(1, old_timestamp_1, sk_1, tok_addr,
+  signal old_hash_1 <== ItemHasherSK()(1, sk_1, tok_addr,
 		old_amount_1, P2SKH_INSTR, [0, 0, 0], old_randomness_1);
 	signal _old_comm_1 <== Poseidon(2)([old_hash_1, old_comm_randomness_1]);
 	old_comm_1 === _old_comm_1;
 
-  signal old_hash_2 <== ItemHasherSK()(1, old_timestamp_2, sk_2, tok_addr,
+  signal old_hash_2 <== ItemHasherSK()(1, sk_2, tok_addr,
 		old_amount_2, P2SKH_INSTR, [0, 0, 0], old_randomness_2);
 	signal _old_comm_2 <== Poseidon(2)([old_hash_2, old_comm_randomness_2]);
 	old_comm_2 === _old_comm_2;
 
-  signal _new_hash <== ItemHasherPK()(1, new_timestamp, new_pk, tok_addr,
+  signal _new_hash <== ItemHasherPK()(1, new_pk, tok_addr,
 		old_amount_1 + old_amount_2, P2SKH_INSTR, [0, 0, 0], new_randomness);
 	new_hash === _new_hash;
 }
@@ -178,12 +176,10 @@ template SwapResolveToP2SKH() {
 	signal input p2skh_timestamp;
 	
 	// TODO: precision?
-	signal input price_in;
-	signal input price_out;
+	signal input price;
 
-	// The swap timestamps that are included. Inclusion is lower bounded: i.e. [swap_event_timestamp_range[0], swap_event_timestamp_range[1])
-	signal input swap_event_timestamp_range[2];
-	signal input swap_event_timestamp;
+	// the swap batch that this was processed under (allegedly)
+	signal input alleged_swap_batch;
 
 	signal input p2skh_randomness;
 	signal input pk_out;
@@ -198,25 +194,23 @@ template SwapResolveToP2SKH() {
 	signal input swap_utxo_comm;
 	/*** End Public Signals ***/
 
-  // Check timestamp inclusion range
-	CheckSwapInclusion()(swap_event_timestamp_range, swap_event_timestamp);
-	// Check that the prices fit into 125 bit	
-	Check125Bits()(price_in);
-	Check125Bits()(price_out);
+	// check equi
+	
+	// Check that the price fits into 125 bit	
+	Check125Bits()(price);
 
-	signal mult <== inp_tok_amount * price_in;
-	signal amount_out <== TokDivision()([mult, price_out]);
+	signal amount_out <== inp_tok_amount * price;
 
   // Check the swap event commitment
-	signal _swap_utxo_hash <== ItemHasherSK()(1, swap_event_timestamp, sk, inp_tok, inp_tok_amount, SWAP_INSTR, [out_tok[0], out_tok[1], 0], swap_randomness);
+	signal _swap_utxo_hash <== ItemHasherSK()(1, sk, inp_tok, inp_tok_amount, SWAP_INSTR, [out_tok[0], out_tok[1], alleged_swap_batch], swap_randomness);
 	signal _swap_utxo_comm <== Poseidon(2)([_swap_utxo_hash, swap_utxo_comm_randomness]);
 	_swap_utxo_comm === swap_utxo_comm;
 
   // Check the output hash
-	signal _out_p2skh_hash <== ItemHasherPK()(1, p2skh_timestamp, pk_out, out_tok, amount_out, P2SKH_INSTR, [0, 0, 0], p2skh_randomness);
+	signal _out_p2skh_hash <== ItemHasherPK()(1, pk_out, out_tok, amount_out, P2SKH_INSTR, [0, 0, 0], p2skh_randomness);
 	_out_p2skh_hash === out_p2skh_hash;
 
-	signal swap_event_hash <== SwapEventHasher()(swap_event_timestamp_range, inp_tok, out_tok, price_in, price_out);
+	signal swap_event_hash <== SwapEventHasher()(alleged_swap_batch, inp_tok, out_tok, price);
 	signal _swap_event_comm <== Poseidon(2)([swap_event_hash, swap_event_comm_randomness]);
 	_swap_event_comm === swap_event_comm;
 }
