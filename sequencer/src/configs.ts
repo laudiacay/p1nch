@@ -1,3 +1,4 @@
+// TODO: testnet configs vs mainnet configs
 export const configs = {
   N_LEVELS: 254,
   paths: {
@@ -10,4 +11,8 @@ export const configs = {
     SMT_VERIFIER_DEPOSIT_WASM_PATH: "TODO:",
     SMT_VERIFIER_DEPOSIT_ZKEY: "TODO:",
   },
+  addresses: {
+    ONE_INCH_ROUTER_ADDR: "TODO:",
+    
+  }
 };
