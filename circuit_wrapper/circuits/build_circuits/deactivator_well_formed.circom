@@ -7,4 +7,4 @@ component main {
 		deactive_hash,
 		active_comm
 	]
-} = P2SKHWellFormed();
+} = Deactivator();
