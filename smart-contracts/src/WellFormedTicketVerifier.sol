@@ -25,25 +25,9 @@ library WellFormedTicketVerifier {
             proof.c,
             [
                 amount,
-                0, // TODO: timestamp
                 uint160(token),
                 ticket_hash
             ]);
-            // TODO: batch num
-        // TODO: check format
-        // P2SKHVerifier().verifyProof(
-        //     proof.a,
-        //     proof.b,
-        //     proof.c,
-        //     [
-        //         amount,
-        //         0, //TODO:TIMESAMP,
-        //         0, //tok_addr_1,//TODO:
-        //         0, //tok_addr_2,
-        //         ticket_hash
-        //     ]
-        // );
-        return true;
     }
 
     // assert!(ticket_hash = hash(active=false, token, amount, "deposit/swap" ...some other fields...))
@@ -52,14 +36,15 @@ library WellFormedTicketVerifier {
     // TODO: remove?
     function well_formed_deactivation_hash_proof(
         Proof calldata proof,
-        address token,
-        uint256 amount,
+        // address token,
+        // uint256 amount,
         uint256 commitment_to_old_key,
         uint256 cancelling_key
     )
         public
         returns (bool r)
     {
+
         return true;
     }
 
