@@ -5,7 +5,6 @@ include "node_modules/circomlib/circuits/bitify.circom";
 // p2skh
 template ItemHasherPK() {
   signal input active;
-  signal input timestamp;
   signal input pk;
   signal input tok_addr[2]; // We need 2 signals. One for the upper 128 bits, one for the lower
   signal input amount;
@@ -15,20 +14,19 @@ template ItemHasherPK() {
 
   signal output out;
 
-  component poseidon = Poseidon(11);
+  component poseidon = Poseidon(10);
 
 
   active ==> poseidon.inputs[0];
-  timestamp ==> poseidon.inputs[1];
-  pk ==> poseidon.inputs[2];
-  tok_addr[0] ==> poseidon.inputs[3];
-  tok_addr[1] ==> poseidon.inputs[4];
-  amount ==> poseidon.inputs[5];
-  instr ==> poseidon.inputs[6];
-  data[0] ==> poseidon.inputs[7];
-  data[1] ==> poseidon.inputs[8];
-  data[2] ==> poseidon.inputs[9];
-  randomness ==> poseidon.inputs[10];
+  pk ==> poseidon.inputs[1];
+  tok_addr[0] ==> poseidon.inputs[2];
+  tok_addr[1] ==> poseidon.inputs[3];
+  amount ==> poseidon.inputs[4];
+  instr ==> poseidon.inputs[5];
+  data[0] ==> poseidon.inputs[6];
+  data[1] ==> poseidon.inputs[7];
+  data[2] ==> poseidon.inputs[8];
+  randomness ==> poseidon.inputs[9];
 
   out <== poseidon.out;
 }
@@ -37,7 +35,6 @@ template ItemHasherPK() {
 
 template ItemHasherSK() {
   signal input active;
-  signal input timestamp;
   signal input sk;
   signal input tok_addr[2]; // We need 2 signals. One for the upper 128 bits, one for the lower
   signal input amount;
@@ -47,45 +44,43 @@ template ItemHasherSK() {
 
   signal output out;
 
-  component poseidon = Poseidon(11);
+  component poseidon = Poseidon(10);
   signal pk <== Poseidon(1)([sk]);
 
   active ==> poseidon.inputs[0];
-  timestamp ==> poseidon.inputs[1];
-  pk ==> poseidon.inputs[2];
-  tok_addr[0] ==> poseidon.inputs[3];
-  tok_addr[1] ==> poseidon.inputs[4];
-  amount ==> poseidon.inputs[5];
-  instr ==> poseidon.inputs[6];
-  data[0] ==> poseidon.inputs[7];
-  data[1] ==> poseidon.inputs[8];
-  data[2] ==> poseidon.inputs[9];
-  randomness ==> poseidon.inputs[10];
+  pk ==> poseidon.inputs[1];
+  tok_addr[0] ==> poseidon.inputs[2];
+  tok_addr[1] ==> poseidon.inputs[3];
+  amount ==> poseidon.inputs[4];
+  instr ==> poseidon.inputs[5];
+  data[0] ==> poseidon.inputs[6];
+  data[1] ==> poseidon.inputs[7];
+  data[2] ==> poseidon.inputs[8];
+  randomness ==> poseidon.inputs[9];
 
   out <== poseidon.out;
 }
 
 template SwapEventHasher() {
-  signal input timestamp_range[2]; 
+  signal input batch_num; 
   signal input tok_in[2];
   signal input tok_out[2];
-  signal input price_in; // TODO: price per what???
-  signal input price_out; // TODO: price per what???
+  signal input price; 
 
   signal output out;
 
-  out <== Poseidon(8)([timestamp_range[0], timestamp_range[1], tok_in[0], tok_in[1],
-    tok_out[0], tok_out[1], price_in, price_out]);
+  out <== Poseidon(6)([batch_num, tok_in[0], tok_in[1],
+    tok_out[0], tok_out[1], price]);
 }
 
-template CheckSwapInclusion() {
-  signal input event_range[2];
-  signal input timestamp_check;
-  signal out_1 <== LessThan(252)([timestamp_check, event_range[1]]);
-  out_1 === 1;
-  signal out_2 <== LessEqThan(252)([event_range[0], timestamp_check]);
-  out_2 === 1;
-}
+// template CheckSwapInclusion() {
+//   signal input event_range[2];
+//   signal input timestamp_check;
+//   signal out_1 <== LessThan(252)([timestamp_check, event_range[1]]);
+//   out_1 === 1;
+//   signal out_2 <== LessEqThan(252)([event_range[0], timestamp_check]);
+//   out_2 === 1;
+// }
 
 /**
  * Check that the bits fit into 252 bits
