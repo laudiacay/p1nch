@@ -5,7 +5,6 @@ include "circuits/utxo.circom";
 component main {
 	public [
 		amount,
-		timestamp,
 		tok_addr,
 		item_hash
 	]

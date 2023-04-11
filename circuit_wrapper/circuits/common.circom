@@ -5,7 +5,6 @@ include "node_modules/circomlib/circuits/bitify.circom";
 // p2skh
 template ItemHasherPK() {
   signal input active;
-  signal input timestamp;
   signal input pk;
   signal input tok_addr; // We need 2 signals. One for the upper 128 bits, one for the lower
   signal input amount;
@@ -15,18 +14,17 @@ template ItemHasherPK() {
 
   signal output out;
 
-  component poseidon = Poseidon(9);
+  component poseidon = Poseidon(8);
 
 
   active ==> poseidon.inputs[0];
-  timestamp ==> poseidon.inputs[1];
-  pk ==> poseidon.inputs[2];
-  tok_addr ==> poseidon.inputs[3];
-  amount ==> poseidon.inputs[4];
-  instr ==> poseidon.inputs[5];
-  data[0] ==> poseidon.inputs[6];
-  data[1] ==> poseidon.inputs[7];
-  randomness ==> poseidon.inputs[8];
+  pk ==> poseidon.inputs[1];
+  tok_addr ==> poseidon.inputs[2];
+  amount ==> poseidon.inputs[3];
+  instr ==> poseidon.inputs[4];
+  data[0] ==> poseidon.inputs[5];
+  data[1] ==> poseidon.inputs[6];
+  randomness ==> poseidon.inputs[7];
 
   out <== poseidon.out;
 }
@@ -35,7 +33,6 @@ template ItemHasherPK() {
 
 template ItemHasherSK() {
   signal input active;
-  signal input timestamp;
   signal input sk;
   signal input tok_addr;
   signal input amount;
@@ -45,24 +42,23 @@ template ItemHasherSK() {
 
   signal output out;
 
-  component poseidon = Poseidon(9);
+  component poseidon = Poseidon(8);
   signal pk <== Poseidon(1)([sk]);
 
   active ==> poseidon.inputs[0];
-  timestamp ==> poseidon.inputs[1];
-  pk ==> poseidon.inputs[2];
-  tok_addr ==> poseidon.inputs[3];
-  amount ==> poseidon.inputs[4];
-  instr ==> poseidon.inputs[5];
-  data[0] ==> poseidon.inputs[6];
-  data[1] ==> poseidon.inputs[7];
-  randomness ==> poseidon.inputs[8];
+  pk ==> poseidon.inputs[1];
+  tok_addr ==> poseidon.inputs[2];
+  amount ==> poseidon.inputs[3];
+  instr ==> poseidon.inputs[4];
+  data[0] ==> poseidon.inputs[5];
+  data[1] ==> poseidon.inputs[6];
+  randomness ==> poseidon.inputs[7];
 
   out <== poseidon.out;
 }
 
 template SwapEventHasher() {
-  signal input timestamp_range[2]; 
+  signal input batch_index;
   signal input tok_in;
   signal input tok_out;
   signal input price_in; // TODO: price per what???
@@ -70,17 +66,8 @@ template SwapEventHasher() {
 
   signal output out;
 
-  out <== Poseidon(6)([timestamp_range[0], timestamp_range[1], tok_in,
+  out <== Poseidon(5)([batch_index, tok_in,
     tok_out, price_in, price_out]);
-}
-
-template CheckSwapInclusion() {
-  signal input event_range[2];
-  signal input timestamp_check;
-  signal out_1 <== LessThan(252)([timestamp_check, event_range[1]]);
-  out_1 === 1;
-  signal out_2 <== LessEqThan(252)([event_range[0], timestamp_check]);
-  out_2 === 1;
 }
 
 /**
