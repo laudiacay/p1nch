@@ -496,7 +496,7 @@ contract Pinch is AccessControl {
         // we need to prove:
         // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
         // 2. they are updated correctly in the SMT :)
-        // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means: addition invariant 
+        // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means: addition invariant
         // 4. they are also updated correctly in the SMT :)
 
         // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
@@ -524,10 +524,7 @@ contract Pinch is AccessControl {
         // check addition invariant o_O
         require(
             WellFormedTicketVerifier.wellFormedP2SKHSplitAdditionInvariant(
-                well_formed_new_p2skh_tickets_proof,
-                old_p2skh_ticket_commitment,
-                new_p2skh_ticket_1,
-                new_p2skh_ticket_2
+                well_formed_new_p2skh_tickets_proof, old_p2skh_ticket_commitment, new_p2skh_ticket_1, new_p2skh_ticket_2
             ),
             "either the new p2skh tickets weren't well formed, or their tokens were not all the same as the old commitments, or... spooky... the addition invariant failed... were you trying to steal funds?"
         );
@@ -557,7 +554,6 @@ contract Pinch is AccessControl {
         utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket_2);
     }
 
-
     function mergeP2SKH(
         WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_1,
         WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_2,
@@ -582,7 +578,7 @@ contract Pinch is AccessControl {
         // we need to prove:
         // 1. the deactivator hash are well formed vs the old p2skh ticket commitments
         // 2. they are updated correctly in the SMT :)
-        // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means: addition invariant 
+        // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means: addition invariant
         // 4. they are also updated correctly in the SMT :)
 
         // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
@@ -625,7 +621,6 @@ contract Pinch is AccessControl {
             "you didn't modify the SMT correctly to add your deactivator 2."
         );
 
-
         // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means:
         // check addition invariant o_O
         require(
@@ -648,7 +643,7 @@ contract Pinch is AccessControl {
             ),
             "you didn't modify the SMT correctly to add your new p2skh ticket."
         );
-        
+
         utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket);
     }
 }
