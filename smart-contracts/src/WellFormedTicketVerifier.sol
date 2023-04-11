@@ -14,7 +14,7 @@ library WellFormedTicketVerifier {
 
     // public functions
     // assert!(ticket_hash = hash(active=true, token, amount, "deposit/swap" ...some other fields...))
-    function wellformed_p2skh_proof(Proof calldata proof, address token, uint256 amount, uint256 ticket_hash)
+    function wellFormedP2SKHproof(Proof calldata proof, address token, uint256 amount, uint256 ticket_hash)
         public
         returns (bool r)
     {
@@ -34,7 +34,7 @@ library WellFormedTicketVerifier {
     // assert!(all fields of cancelling_ticket_hash eq to fields of old_key)
     // assert!(know secret key that this is intended for)
     // TODO: remove?
-    function well_formed_deactivation_hash_proof(
+    function wellFormedP2SKHDeactivatorProof(
         Proof calldata proof,
         // address token,
         // uint256 amount,
@@ -70,6 +70,66 @@ library WellFormedTicketVerifier {
         Proof calldata proof,
         uint256 old_swap_ticket_commit,
         uint256 new_spent_swap_deactivator_ticket
+    )
+        public
+        returns (bool r)
+    {
+        return true;
+    }
+
+    // checks p2skh deactivation proof. same as the SNARK above,
+    // but also will accept on an input of hash("dummy" || some BS randomness for hiding), if the ticket is a commitment(hash("dummy" || some BS randomness for hiding)))
+    function wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+        Proof calldata proof,
+        uint256 old_swap_ticket_commit,
+        uint256 new_spent_swap_deactivator_ticket
+    )
+        public
+        returns (bool r)
+    {
+        return true;
+    }
+
+    // // assert!(ticket_hash for both new_p2skh tickets = hash(active=true, token, amount, "p2skh" ...some other fields...))
+    // // assert!(ALL FOUR HAVE THE SAME TOKEN OR ARE DUMMIES!!)
+    // // assert!(dummy format = hash("dummy" || some BS randomness for hiding))
+    // // assert!(sum of the amounts of the new_p2skh tickets = sum of the amounts of the old ticket commitments. ensure dummies are counted as ZERO OTHERWISE YOU ARE IN TROUBLE)
+    // function wellFormedP2SKHMergeSplitAdditionInvariantOrDummyProof(
+    //     Proof calldata proof,
+    //     uint256 old_p2skh_ticket_commitment_1,
+    //     uint256 old_p2skh_ticket_commitment_or_dummy_2,
+    //     uint256 new_p2skh_ticket_1,
+    //     uint256 new_p2skh_ticket_or_dummy_2
+    // )
+    //     public
+    //     returns (bool r)
+    // {
+    //     return true;
+    // }
+
+    // assert!(ticket_hash for both new_p2skh tickets = hash(active=true, token, amount, "p2skh" ...some other fields...))
+    // assert!(ALL THREE HAVE THE SAME TOKEN!!)
+    // assert!(sum of the amounts of the new_p2skh tickets = amt of old ticket commitment)
+    function wellFormedP2SKHSplitAdditionInvariant(
+        Proof calldata proof,
+        uint256 old_p2skh_ticket_commitment,
+        uint256 new_p2skh_ticket_1,
+        uint256 new_p2skh_ticket_2
+    )
+        public
+        returns (bool r)
+    {
+        return true;
+    }
+
+    // assert!(ticket_hash for new_p2skh ticket = hash(active=true, token, amount, "p2skh" ...some other fields...))
+    // assert!(ALL THREE HAVE THE SAME TOKEN!!)
+    // assert!(sum of the amounts of the new_p2skh ticket = sum of the amounts of the old ticket commitments.)
+    function wellFormedP2SKHMergeAdditionInvariant(
+        Proof calldata proof,
+        uint256 old_p2skh_ticket_commitment_1,
+        uint256 old_p2skh_ticket_commitment_2,
+        uint256 new_p2skh_ticket
     )
         public
         returns (bool r)

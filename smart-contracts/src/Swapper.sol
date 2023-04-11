@@ -12,10 +12,20 @@ contract Swapper is AccessControl {
     bytes32 public constant STATE_ADMIN_ROLE = keccak256("STATE_ADMIN_ROLE");
     bytes32 public constant BOT_ROLE = keccak256("BOT_ROLE");
 
-    // always sorted.
+    // always sorted
     struct Pair {
         address token1;
         address token2;
+    }
+
+    struct PairTargetAmounts {
+        uint256 token1_to_token2_amount;
+        uint256 token2_to_token1_amount;
+    }
+
+    struct PairPrices {
+        uint256 token1_price_in_token2;
+        uint256 token2_price_in_token1;
     }
 
     // batch swap update proof
@@ -26,9 +36,7 @@ contract Swapper is AccessControl {
     }
 
     // this contains the swap batch info. it is an SMT that contains:
-    // (timestamp_of_prior_batch, timestamp_of_current_batch, token1, token2, token1_price_in_token2) => 0
-    // why does it contain timestamp_of_prior_batch? make sure that timestamp of swap ticket was actually inside the bounds
-    // why does it contain timestamp_of_current_batch? same reason.
+    // (batch_num, token1, token2, token1_price_in_token2) => 0
     // users can look up the price of a token in a given batch and present it to the contract
     // the contract will verify the proof that the given swap UTXO *was* executed in that batch_num (per its timestamp)
     // and that the given token was swapped in that batch_num at that swap price
@@ -46,16 +54,15 @@ contract Swapper is AccessControl {
     struct SwapData {
         uint256 batchNumber;
         // a mapping that says how much of each vault should be net swapped into another token in this batch.
-        // negative means you're getting more of first token
-        // positive means you're getting more of second token
-        // get the first half of the mapping from pairHash
-        mapping(uint256 => int256) swap_amounts;
+        // get the first half of the mapping from pairHash.
+        // first entry in output is amount that goes from A to B, second entry is B to A. need to track separately because exchange rate is yet unknown.
+        mapping(uint256 => PairTargetAmounts) swap_amounts;
         // list of pairs in the current batch :)
         Pair[] swap_tokens;
         // prices... price of one tokenA in tokenB denomination
         // empty until swap happens.
         // get the first half of the mapping from pairHash
-        mapping(uint256 => uint256) prices;
+        mapping(uint256 => PairPrices) prices;
     }
 
     // TODO i hereby invite you to put some thought into making the bot permissionless
@@ -106,16 +113,15 @@ contract Swapper is AccessControl {
         return current_batch_number;
     }
 
-    function addTransaction(address from, address to, uint128 amount) public onlyRole(STATE_ADMIN_ROLE) {
+    function addTransaction(address from, address to, uint256 amount) public onlyRole(STATE_ADMIN_ROLE) {
         address token_a = from >= to ? from : to;
         address token_b = from < to ? from : to;
 
         uint256 pairid = pairHash(Pair({token1: token_a, token2: token_b}));
-
         if (token_a == from) {
-            current.swap_amounts[pairid] += int256(uint256(amount));
+            current.swap_amounts[pairid].token1_to_token2_amount += amount;
         } else {
-            current.swap_amounts[pairid] -= int256(uint256(amount)); // TODO BUG WRONG!!!!
+            current.swap_amounts[pairid].token2_to_token1_amount += amount;
         }
     }
 
@@ -138,37 +144,38 @@ contract Swapper is AccessControl {
         // Perform swaps for last_and_needs_entry_to_root
         uint256 num_swaps = last_and_needs_entry_to_root.swap_tokens.length;
         for (uint256 i = 0; i < num_swaps; i++) {
-            // TODO hmm "pair storage pair"? optimize me
-            Pair storage pair = last_and_needs_entry_to_root.swap_tokens[i];
+            Pair memory pair = last_and_needs_entry_to_root.swap_tokens[i];
             uint256 pairid = pairHash(pair);
-            int256 swap_amount = last_and_needs_entry_to_root.swap_amounts[pairid];
+
+            // TODO: one day, you should do an internal matching step to make sure that you're satisfying demand first from within your own pools.
+            // but not yet.
+            PairTargetAmounts memory swap_amounts = last_and_needs_entry_to_root.swap_amounts[pairid];
 
             // Perform the swap with ERC20 tokens owned by the contract
-            if (swap_amount > 0) {
+            if (swap_amounts.token1_to_token2_amount > 0) {
                 // Swap tokenA for tokenB
-                uint256 amount_token1 = uint256(swap_amount);
-
                 // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
-                IERC20(pair.token1).transferFrom(address(this), address(this), amount_token1);
+                IERC20(pair.token1).transferFrom(address(this), address(this), swap_amounts.token1_to_token2_amount);
 
                 // TODO make this 1 into the right price
-                last_and_needs_entry_to_root.prices[pairid] = 1;
-            } else if (swap_amount < 0) {
+                // TODO is this the right direction? token1_price_in_token2 or token2_price_in_token1?
+                last_and_needs_entry_to_root.prices[pairid].token1_price_in_token2 = 1;
+            } 
+            if (swap_amounts.token2_to_token1_amount > 0) {
                 // Swap tokenB for tokenA
-                // TODO this is a bug you cannot know the negative swap amount can you??? seems bad. seems pretty wrong to me. fix me
-                uint256 amount_token2 = uint256(-swap_amount);
 
                 // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
-                IERC20(pair.token2).transferFrom(address(this), address(this), amount_token2);
+                IERC20(pair.token2).transferFrom(address(this), address(this), swap_amounts.token2_to_token1_amount);
 
                 // TODO make this 1 into the right price
-                last_and_needs_entry_to_root.prices[pairid] = 1;
+                // TODO is this the right direction? token1_price_in_token2 or token2_price_in_token1?    
+                last_and_needs_entry_to_root.prices[pairid].token2_price_in_token1 = 1;
             }
             // TODO what happens if you had zero that needs to swap? do you need a price on that? what's that mean?
         }
     }
 
-    // todo this is arough one
+    // todo this is a rough one
     function updateRoot(BatchPriceSMTVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
         public
         onlyRole(BOT_ROLE)
@@ -180,23 +187,47 @@ contract Swapper is AccessControl {
 
         // check lengths of proofs and newRoots
         require(
-            updateProofs.length == last_and_needs_entry_to_root.swap_tokens.length
-                && newRoots.length == last_and_needs_entry_to_root.swap_tokens.length,
-            "updateProofs and newRoots must be the same length as num of swap pairs"
+            updateProofs.length == last_and_needs_entry_to_root.swap_tokens.length * 2
+                && newRoots.length == last_and_needs_entry_to_root.swap_tokens.length * 2,
+            "updateProofs and newRoots must be 2*the same length as num of swap pairs"
         );
         // get the last and current batch timestamps (last two entries in the batch_swap_timestamps array)
         uint256 lastBatchTimestamp = batch_swap_timestamps[batch_swap_timestamps.length - 2];
         uint256 currentBatchTimestamp = batch_swap_timestamps[batch_swap_timestamps.length - 1];
 
+        uint256 lastRoot = 0;
+
         // iterate over pairs
         for (uint256 i = 0; i < last_and_needs_entry_to_root.swap_tokens.length; i++) {
-            Pair storage pair = last_and_needs_entry_to_root.swap_tokens[i];
+            Pair memory pair = last_and_needs_entry_to_root.swap_tokens[i];
             uint256 pairid = pairHash(pair);
-            uint256 price = last_and_needs_entry_to_root.prices[pairid];
+            PairPrices memory prices = last_and_needs_entry_to_root.prices[pairid];
             // validate that it's a valid proof
-            uint256 lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[i - 1];
+            lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[2*i];
             require(
-                BatchPriceSMTVerifier.updateProof(updateProofs[i], lastRoot, newRoots[i], last_and_needs_entry_to_root.batchNumber, pair.token1, pair.token2, price),
+                BatchPriceSMTVerifier.updateProof(
+                    updateProofs[i*2],
+                    lastRoot,
+                    newRoots[i*2],
+                    last_and_needs_entry_to_root.batchNumber,
+                    pair.token1,
+                    pair.token2,
+                    prices.token1_price_in_token2
+                ),
+                "you did not update the prices right :(, check your proofs"
+            );
+
+            lastRoot = newRoots[2*i];
+            require(
+                BatchPriceSMTVerifier.updateProof(
+                    updateProofs[2*i + 1],
+                    lastRoot,
+                    newRoots[2*i + 1],
+                    last_and_needs_entry_to_root.batchNumber,
+                    pair.token1,
+                    pair.token2,
+                    prices.token1_price_in_token2
+                ),
                 "you did not update the prices right :(, check your proofs"
             );
         }
