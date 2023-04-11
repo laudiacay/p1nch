@@ -129,8 +129,8 @@ contract Pinch is AccessControl {
         require(
             WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
                 well_formed_deactivator_proof,
-                address(token),
-                amount,
+                // address(token),
+                // amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
             ),
@@ -205,8 +205,8 @@ contract Pinch is AccessControl {
         require(
             WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
                 well_formed_deactivator_proof,
-                address(token),
-                amount,
+                // address(token),
+                // amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
             ),
