@@ -16,8 +16,8 @@ contract SwapProxy {
     struct SwapDescription {
         address srcToken;
         address dstToken;
-        address srcReceiver;
-        address dstReceiver;
+        // address srcReceiver;
+        // address dstReceiver;
         uint256 amount;
         uint256 minReturnAmount;
         uint160 priceLimit;

@@ -5,7 +5,7 @@ import {Verifier as SwapResolveVerif} from "@circuits/swap_resolve_verify.sol";
 import {Verifier as SwapWellFormedVerify} from "@circuits/swap_start_verify.sol";
 
 // this contains the swap batch info. it is an SMT that contains:
-// (timestamp_of_prior_batch, timestamp_of_current_batch, token1, token2, token_src_amount_in) => 0
+// (timestamp_of_prior_batch, timestamp_of_current_batch, token_src, token_dest, token_src_amount_in) => 0
 // why does it contain timestamp_of_prior_batch? make sure that timestamp of swap ticket was actually inside the bounds
 // why does it contain timestamp_of_current_batch? same reason.
 // users can look up the price of a token in a given batch and present it to the contract
