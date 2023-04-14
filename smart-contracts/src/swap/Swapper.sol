@@ -3,19 +3,21 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
 import "./SwapProofVerifier.sol";
+import "./SwapProxy.sol";
 import "../HistoricalRoots.sol";
 
 // TODO handle if the swap (or other operation) fails!
-contract Swapper is AccessControl {
+contract Swapper is AccessControl, SwapProxy {
     bytes32 public constant STATE_ADMIN_ROLE = keccak256("STATE_ADMIN_ROLE");
     bytes32 public constant BOT_ROLE = keccak256("BOT_ROLE");
 
     // always sorted
     struct Pair {
-        address token1;
-        address token2;
+        address token_src;
+        address token_dest;
     }
 
     struct PairTokenAmount {
@@ -31,7 +33,7 @@ contract Swapper is AccessControl {
     }
 
     // this contains the swap batch info. it is an SMT that contains:
-    // (batch_num, token1, token2, token_src_amount_in) => 0
+    // (batch_num, token_src, token_dest, token_src_amount_in) => 0
     // users can look up the price of a token in a given batch and present it to the contract
     // the contract will verify the proof that the given swap UTXO *was* executed in that batch_num (per its timestamp)
     // and that the given token was swapped in that batch_num at that swap price
@@ -61,7 +63,11 @@ contract Swapper is AccessControl {
     }
 
     // TODO i hereby invite you to put some thought into making the bot permissionless
-    constructor(address governance_owner, address bot) {
+    constructor(
+        address governance_owner,
+        address bot,
+        address swap_router
+    ) SwapProxy(ISwapRouter(swap_router)) {
         // TODO check this
         _grantRole(DEFAULT_ADMIN_ROLE, governance_owner);
         _grantRole(STATE_ADMIN_ROLE, msg.sender);
@@ -80,7 +86,9 @@ contract Swapper is AccessControl {
         delete data.swap_tokens;
     }
 
-    function swapDataIsEmpty(SwapData storage data) internal view returns (bool) {
+    function swapDataIsEmpty(
+        SwapData storage data
+    ) internal view returns (bool) {
         return data.swap_tokens.length == 0;
     }
 
@@ -90,14 +98,20 @@ contract Swapper is AccessControl {
 
     // TODO should be onlyOwner?? idk?- idk.
     function copyCurrentToLastAndClearCurrent() internal {
-        require(swapDataIsEmpty(last_and_needs_entry_to_root), "last_and_needs_entry_to_root is not empty");
+        require(
+            swapDataIsEmpty(last_and_needs_entry_to_root),
+            "last_and_needs_entry_to_root is not empty"
+        );
 
         // Copy current to last_and_needs_entry_to_root
         last_and_needs_entry_to_root.swap_tokens = current.swap_tokens;
         for (uint256 i = 0; i < current.swap_tokens.length; i++) {
             uint256 pairId = pairHash(current.swap_tokens[i]);
-            last_and_needs_entry_to_root.swap_amounts[pairId] = current.swap_amounts[pairId];
-            last_and_needs_entry_to_root.prices[pairId] = current.prices[pairId];
+            last_and_needs_entry_to_root.swap_amounts[pairId] = current
+                .swap_amounts[pairId];
+            last_and_needs_entry_to_root.prices[pairId] = current.prices[
+                pairId
+            ];
         }
 
         emptySwapData(current);
@@ -108,20 +122,20 @@ contract Swapper is AccessControl {
         return current_batch_number;
     }
 
-    function addTransaction(address from, address to, uint256 amount) public onlyRole(STATE_ADMIN_ROLE) {
-        address token_a = from >= to ? from : to;
-        address token_b = from < to ? from : to;
-
-        uint256 pairid = pairHash(Pair({token1: token_a, token2: token_b}));
-        if (token_a == from) {
-            current.swap_amounts[pairid].token_src_amount_in += amount;
-        } else {
-            current.swap_amounts[pairid].token_dest_amount_out += amount;
-        }
+    function addTransaction(
+        address from,
+        address to,
+        uint256 amount
+    ) public onlyRole(STATE_ADMIN_ROLE) {
+        uint256 pairid = pairHash(Pair({token_src: from, token_dest: to}));
+        current.swap_amounts[pairid].token_src_amount_in += amount;
     }
 
     function pairHash(Pair memory pair) internal pure returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(pair.token1, pair.token2)));
+        return
+            uint256(
+                keccak256(abi.encodePacked(pair.token_src, pair.token_dest))
+            );
     }
 
     function doSwap() public onlyRole(BOT_ROLE) {
@@ -144,38 +158,39 @@ contract Swapper is AccessControl {
 
             // TODO: one day, you should do an internal matching step to make sure that you're satisfying demand first from within your own pools.
             // but not yet.
-            PairTokenAmount memory swap_amounts = last_and_needs_entry_to_root.swap_amounts[pairid];
+            PairTokenAmount memory swap_amounts = last_and_needs_entry_to_root
+                .swap_amounts[pairid];
 
             // Perform the swap with ERC20 tokens owned by the contract
-            if (swap_amounts.token_src_amount_in > 0) {
-                // Swap tokenA for tokenB
-                // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
-                IERC20(pair.token1).transferFrom(address(this), address(this), swap_amounts.token_src_amount_in);
+            // TODO: SAFE TRANSFER FROM EVERYWHERE!!!!!!
+            // IERC20(pair.token_src).transferFrom(address(this), address(this), swap_amounts.token_src_amount_in);
+            super.swap(
+                SwapProxy.SwapDescription({
+                    srcToken: pair.token_src,
+                    dstToken: pair.token_dest,
+                    amount: swap_amounts.token_src_amount_in,
+                    minReturnAmount: 0, // TODO: min return amounts
+                    priceLimit: 0 // TODO: min return amount
+                })
+            );
+            // TODO:
 
-                // TODO make this 1 into the right price
-                // TODO is this the right direction? token_src_amount_in or token_dest_amount_out?
-                last_and_needs_entry_to_root.prices[pairid].token_src_amount_in = 1;
-            } 
+            // We do not need this...
+            // last_and_needs_entry_to_root.prices[pairid].token_src_amount_in = 1;
+            // TODO make this 1 into the right price
+            // TODO is this the right direction? token_src_amount_in or token_dest_amount_out?
+            // last_and_needs_entry_to_root.prices[pairid].token_src_amount_in = 1;
+            // What do this mean???
             // TODO: I think this broken
-            if (swap_amounts.token_dest_amount_out > 0) {
-                // Swap tokenB for tokenA
-
-                // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
-                IERC20(pair.token2).transferFrom(address(this), address(this), swap_amounts.token_dest_amount_out);
-
-                // TODO make this 1 into the right price
-                // TODO is this the right direction? token_src_amount_in or token_dest_amount_out?    
-                last_and_needs_entry_to_root.prices[pairid].token_dest_amount_out = 1;
-            }
             // TODO what happens if you had zero that needs to swap? do you need a price on that? what's that mean?
         }
     }
 
     // todo this is a rough one
-    function updateRoot(SwapProofVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
-        public
-        onlyRole(BOT_ROLE)
-    {
+    function updateRoot(
+        SwapProofVerifier.Proof[] calldata updateProofs,
+        uint256[] calldata newRoots
+    ) public onlyRole(BOT_ROLE) {
         require(
             !swapDataIsEmpty(last_and_needs_entry_to_root),
             "last_and_needs_entry_to_root is empty, you need to call doSwap to get the last batch into the SMT before you update the root."
@@ -183,46 +198,58 @@ contract Swapper is AccessControl {
 
         // check lengths of proofs and newRoots
         require(
-            updateProofs.length == last_and_needs_entry_to_root.swap_tokens.length * 2
-                && newRoots.length == last_and_needs_entry_to_root.swap_tokens.length * 2,
+            updateProofs.length ==
+                last_and_needs_entry_to_root.swap_tokens.length * 2 &&
+                newRoots.length ==
+                last_and_needs_entry_to_root.swap_tokens.length * 2,
             "updateProofs and newRoots must be 2*the same length as num of swap pairs"
         );
         // get the last and current batch timestamps (last two entries in the batch_swap_timestamps array)
-        uint256 lastBatchTimestamp = batch_swap_timestamps[batch_swap_timestamps.length - 2];
-        uint256 currentBatchTimestamp = batch_swap_timestamps[batch_swap_timestamps.length - 1];
+        uint256 lastBatchTimestamp = batch_swap_timestamps[
+            batch_swap_timestamps.length - 2
+        ];
+        uint256 currentBatchTimestamp = batch_swap_timestamps[
+            batch_swap_timestamps.length - 1
+        ];
 
         uint256 lastRoot = 0;
 
         // iterate over pairs
-        for (uint256 i = 0; i < last_and_needs_entry_to_root.swap_tokens.length; i++) {
+        for (
+            uint256 i = 0;
+            i < last_and_needs_entry_to_root.swap_tokens.length;
+            i++
+        ) {
             Pair memory pair = last_and_needs_entry_to_root.swap_tokens[i];
             uint256 pairid = pairHash(pair);
-            PairTokenAmount memory prices = last_and_needs_entry_to_root.prices[pairid];
+            PairTokenAmount memory prices = last_and_needs_entry_to_root.prices[
+                pairid
+            ];
             // validate that it's a valid proof
-            lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[2*i];
+            lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[2 * i];
             require(
                 SwapProofVerifier.updateProof(
-                    updateProofs[i*2],
+                    updateProofs[i * 2],
                     lastRoot,
-                    newRoots[i*2],
+                    newRoots[i * 2],
                     last_and_needs_entry_to_root.batchNumber,
-                    pair.token1,
-                    pair.token2,
+                    pair.token_src,
+                    pair.token_dest,
                     prices.token_src_amount_in,
                     1 // TODO: fix
                 ),
                 "you did not update the prices right :(, check your proofs"
             );
 
-            lastRoot = newRoots[2*i];
+            lastRoot = newRoots[2 * i];
             require(
                 SwapProofVerifier.updateProof(
-                    updateProofs[2*i + 1],
+                    updateProofs[2 * i + 1],
                     lastRoot,
-                    newRoots[2*i + 1],
+                    newRoots[2 * i + 1],
                     last_and_needs_entry_to_root.batchNumber,
-                    pair.token1,
-                    pair.token2,
+                    pair.token_src,
+                    pair.token_dest,
                     prices.token_src_amount_in,
                     1 // TODO: fix
                 ),
