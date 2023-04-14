@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.13;
 
-import "openzeppelin-contracts/token/ERC20/IERC20.sol";
-import "openzeppelin-contracts/access/AccessControl.sol";
+import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
 import "./SMTMembershipVerifier.sol";
 import "./WellFormedTicketVerifier.sol";
-import "./Swapper.sol";
+import "./swap/Swapper.sol";
+import "./swap/SwapProofVerifier.sol";
 import "./HistoricalRoots.sol";
 
 contract Pinch is AccessControl {
@@ -127,10 +128,10 @@ contract Pinch is AccessControl {
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
         require(
-            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorProof(
+            WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_deactivator_proof,
-                address(token),
-                amount,
+                // address(token),
+                // amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
             ),
@@ -200,10 +201,10 @@ contract Pinch is AccessControl {
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
         require(
-            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorProof(
+            WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_deactivator_proof,
-                address(token),
-                amount,
+                // address(token),
+                // amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
             ),
@@ -238,7 +239,7 @@ contract Pinch is AccessControl {
         // check validity and well-formedness of the new swap ticket versus the old ticket's hash commitment and the provided arguments.
         // TODO does new_swap_ticket_hash and old_ticket_hash_commitment need to be provided as arguments?
         require(
-            WellFormedTicketVerifier.wellFormedSwapTicketProof(
+            SwapProofVerifier.wellFormedSwapTicketProof(
                 well_formed_new_swap_ticket_proof,
                 address(token),
                 address(destination_token),
@@ -277,10 +278,10 @@ contract Pinch is AccessControl {
         uint256 prior_root_for_commitment_inclusion,
         SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
         uint256 root_after_adding_deactivator,
-        BatchPriceSMTVerifier.Proof calldata price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
+        SwapProofVerifier.Proof calldata price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
         uint256 new_p2skh_ticket_hash,
         uint256 prior_price_root_for_deactivator_amount,
-        uint256 priceDataCommitment,
+        uint256 swap_event_commitment,
         SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_proof,
         uint256 root_after_adding_new_p2skh_ticket
     )
@@ -298,7 +299,7 @@ contract Pinch is AccessControl {
 
         // 1. the deactivator is well formed versus the old swap ticket
         require(
-            WellFormedTicketVerifier.wellformedSwapDeactivatorProof(
+            WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_spent_swap_deactivator_proof, old_swap_hash_commitment, new_spent_swap_deactivator_ticket
             ),
             "deactivator wasn't well formed either in itself, or against your commitment to its swap ticket, or against your call arguments, or your babyjub key."
@@ -338,10 +339,9 @@ contract Pinch is AccessControl {
         // check well-formedness of the new p2skh ticket.
         // make sure the price is correct and performs a correct conversion at the listed price in the SMT for the given batch
         require(
-            BatchPriceSMTVerifier.checkPriceSwap(
+            SwapProofVerifier.checkPriceSwap(
                 price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
-                prior_price_root_for_deactivator_amount,
-                priceDataCommitment,
+                swap_event_commitment,
                 old_swap_hash_commitment,
                 new_p2skh_ticket_hash
             )
@@ -496,7 +496,7 @@ contract Pinch is AccessControl {
         // we need to prove:
         // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
         // 2. they are updated correctly in the SMT :)
-        // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means: addition invariant 
+        // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means: addition invariant
         // 4. they are also updated correctly in the SMT :)
 
         // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
@@ -524,10 +524,7 @@ contract Pinch is AccessControl {
         // check addition invariant o_O
         require(
             WellFormedTicketVerifier.wellFormedP2SKHSplitAdditionInvariant(
-                well_formed_new_p2skh_tickets_proof,
-                old_p2skh_ticket_commitment,
-                new_p2skh_ticket_1,
-                new_p2skh_ticket_2
+                well_formed_new_p2skh_tickets_proof, old_p2skh_ticket_commitment, new_p2skh_ticket_1, new_p2skh_ticket_2
             ),
             "either the new p2skh tickets weren't well formed, or their tokens were not all the same as the old commitments, or... spooky... the addition invariant failed... were you trying to steal funds?"
         );
@@ -557,7 +554,6 @@ contract Pinch is AccessControl {
         utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket_2);
     }
 
-
     function mergeP2SKH(
         WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_1,
         WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_2,
@@ -582,7 +578,7 @@ contract Pinch is AccessControl {
         // we need to prove:
         // 1. the deactivator hash are well formed vs the old p2skh ticket commitments
         // 2. they are updated correctly in the SMT :)
-        // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means: addition invariant 
+        // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means: addition invariant
         // 4. they are also updated correctly in the SMT :)
 
         // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
@@ -625,7 +621,6 @@ contract Pinch is AccessControl {
             "you didn't modify the SMT correctly to add your deactivator 2."
         );
 
-
         // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means:
         // check addition invariant o_O
         require(
@@ -648,7 +643,6 @@ contract Pinch is AccessControl {
             ),
             "you didn't modify the SMT correctly to add your new p2skh ticket."
         );
-        
         utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket);
     }
 }
