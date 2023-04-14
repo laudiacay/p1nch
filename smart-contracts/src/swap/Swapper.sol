@@ -208,7 +208,8 @@ contract Swapper is AccessControl {
                     last_and_needs_entry_to_root.batchNumber,
                     pair.token1,
                     pair.token2,
-                    prices.token_src_amount_in
+                    prices.token_src_amount_in,
+                    1 // TODO: fix
                 ),
                 "you did not update the prices right :(, check your proofs"
             );
@@ -222,7 +223,8 @@ contract Swapper is AccessControl {
                     last_and_needs_entry_to_root.batchNumber,
                     pair.token1,
                     pair.token2,
-                    prices.token_src_amount_in
+                    prices.token_src_amount_in,
+                    1 // TODO: fix
                 ),
                 "you did not update the prices right :(, check your proofs"
             );
