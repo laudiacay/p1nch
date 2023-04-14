@@ -6,7 +6,8 @@ import "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
 import "./SMTMembershipVerifier.sol";
 import "./WellFormedTicketVerifier.sol";
-import "./Swapper.sol";
+import "./swap/Swapper.sol";
+import "./swap/SwapProofVerifier.sol";
 import "./HistoricalRoots.sol";
 
 contract Pinch is AccessControl {
@@ -241,7 +242,7 @@ contract Pinch is AccessControl {
         // check validity and well-formedness of the new swap ticket versus the old ticket's hash commitment and the provided arguments.
         // TODO does new_swap_ticket_hash and old_ticket_hash_commitment need to be provided as arguments?
         require(
-            WellFormedTicketVerifier.wellFormedSwapTicketProof(
+            SwapProofVerifier.wellFormedSwapTicketProof(
                 well_formed_new_swap_ticket_proof,
                 address(token),
                 address(destination_token),
@@ -280,7 +281,7 @@ contract Pinch is AccessControl {
         uint256 prior_root_for_commitment_inclusion,
         SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
         uint256 root_after_adding_deactivator,
-        BatchPriceSMTVerifier.Proof calldata price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
+        SwapProofVerifier.Proof calldata price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
         uint256 new_p2skh_ticket_hash,
         uint256 prior_price_root_for_deactivator_amount,
         uint256 swap_event_commitment,
@@ -341,7 +342,7 @@ contract Pinch is AccessControl {
         // check well-formedness of the new p2skh ticket.
         // make sure the price is correct and performs a correct conversion at the listed price in the SMT for the given batch
         require(
-            BatchPriceSMTVerifier.checkPriceSwap(
+            SwapProofVerifier.checkPriceSwap(
                 price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
                 swap_event_commitment,
                 old_swap_hash_commitment,

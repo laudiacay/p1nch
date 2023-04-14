@@ -2,8 +2,10 @@
 pragma solidity ^0.8.13;
 
 import {Verifier as SwapResolveVerif} from "@circuits/swap_resolve_verify.sol";
+import {Verifier as SwapWellFormedVerify} from "@circuits/swap_start_verify.sol";
+
 // this contains the swap batch info. it is an SMT that contains:
-// (timestamp_of_prior_batch, timestamp_of_current_batch, token1, token2, token1_price_in_token2) => 0
+// (timestamp_of_prior_batch, timestamp_of_current_batch, token1, token2, token_src_amount_in) => 0
 // why does it contain timestamp_of_prior_batch? make sure that timestamp of swap ticket was actually inside the bounds
 // why does it contain timestamp_of_current_batch? same reason.
 // users can look up the price of a token in a given batch and present it to the contract
@@ -11,7 +13,7 @@ import {Verifier as SwapResolveVerif} from "@circuits/swap_resolve_verify.sol";
 // and that the given token was swapped in that batch_num at that swap price
 
 // a contract that verifies whether an update to the SMT is done right (and not including this ticket already!)
-library BatchPriceSMTVerifier {
+library SwapProofVerifier {
     // types
     // TODO SHAME! SHAME!. there should be separate types for each proof. SHAME!!
     struct Proof {
@@ -32,10 +34,8 @@ library BatchPriceSMTVerifier {
         address token_b,
         uint256 amount_in,
         uint256 amount_out
-    )
-        public
-        returns (bool r)
-    {
+    ) public returns (bool r) {
+        // TODO: should this be public
         return true;
     }
 
@@ -50,15 +50,48 @@ library BatchPriceSMTVerifier {
         uint256 swap_utxo_hash_comm,
         uint256 p2skh_hash
     )
-    // Hmmm/
         public
-        returns (bool r)
+        returns (
+            bool r
+        )
     {
         SwapResolveVerif verif = new SwapResolveVerif();
-        return verif.verifyProof(proof.a, proof.b, proof.c, [
-            swap_event_comm,
-            p2skh_hash,
-            swap_utxo_hash_comm
-        ]);
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [swap_event_comm, p2skh_hash, swap_utxo_hash_comm]
+            );
+    }
+
+    // assert!(ticket_hash = hash(active=true, token, amount, "initSwap" ...some other fields...))
+    // assert!(ticket.source = source, ticket.timestamp=timestamp, ticket.amount = amount, ticket.dest=dest)
+    // assert!(old_ticket_hash_commitment = hash(old_ticket_hash) = hash(hash(old_ticket)))
+    // assert!(old_ticket.token = source, old_ticket.amount = amount)
+    function wellFormedSwapTicketProof(
+        Proof calldata proof,
+        address source,
+        address dest,
+        uint256 amount,
+        uint256 batchNumber,
+        uint256 ticket_hash,
+        uint256 old_ticket_hash_commitment
+    ) public returns (bool r) {
+        SwapWellFormedVerify verif = new SwapWellFormedVerify();
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [
+                    uint160(source),
+                    uint160(dest),
+                    ticket_hash,
+                    old_ticket_hash_commitment,
+                    batchNumber,
+                    amount
+                ]
+            );
     }
 }
