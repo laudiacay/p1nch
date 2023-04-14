@@ -164,7 +164,7 @@ contract Swapper is AccessControl, SwapProxy {
             // Perform the swap with ERC20 tokens owned by the contract
             // TODO: SAFE TRANSFER FROM EVERYWHERE!!!!!!
             // IERC20(pair.token_src).transferFrom(address(this), address(this), swap_amounts.token_src_amount_in);
-            super.swap(
+            uint256 amount_out = super.swap(
                 SwapProxy.SwapDescription({
                     srcToken: pair.token_src,
                     dstToken: pair.token_dest,
@@ -173,6 +173,8 @@ contract Swapper is AccessControl, SwapProxy {
                     priceLimit: 0 // TODO: min return amount
                 })
             );
+
+            current.swap_amounts[pairid].token_dest_amount_out += amount_out;
             // TODO:
 
             // We do not need this...
