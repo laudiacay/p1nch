@@ -71,7 +71,7 @@ contract Pinch is AccessControl {
         // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         require(
-            WellFormedTicketVerifier.wellformed_p2skh_proof(well_formed_proof, address(token), amount, ticket_hash),
+            WellFormedTicketVerifier.wellFormedP2SKHproof(well_formed_proof, address(token), amount, ticket_hash),
             "Well-formed proof failed"
         );
 
@@ -127,7 +127,7 @@ contract Pinch is AccessControl {
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
         require(
-            WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
+            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorProof(
                 well_formed_deactivator_proof,
                 address(token),
                 amount,
@@ -191,10 +191,7 @@ contract Pinch is AccessControl {
         require(token != destination_token);
 
         // check the swap batch number
-        require(
-            swap_batch_number == swapper.getBatchNumber(),
-            "wrong swap batch number"
-        );
+        require(swap_batch_number == swapper.getBatchNumber(), "wrong swap batch number");
 
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
@@ -203,7 +200,7 @@ contract Pinch is AccessControl {
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
         require(
-            WellFormedTicketVerifier.well_formed_deactivation_hash_proof(
+            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorProof(
                 well_formed_deactivator_proof,
                 address(token),
                 amount,
@@ -363,5 +360,295 @@ contract Pinch is AccessControl {
 
         // update SMT root to add both tickets
         utxo_root.setRoot(root_after_adding_new_p2skh_ticket);
+    }
+
+    // function splitMergeP2SKH(
+    //     WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_1,
+    //     WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_2,
+    //     SMTMembershipVerifier.Proof calldata smt_update_deactivator_1_proof,
+    //     SMTMembershipVerifier.Proof calldata smt_update_deactivator_2_proof,
+    //     uint256 old_p2skh_ticket_commitment_1,
+    //     uint256 old_p2skh_ticket_commitment_or_dummy_2,
+    //     uint256 old_p2skh_deactivator_ticket_1,
+    //     uint256 smt_root_after_adding_deactivator_1,
+    //     uint256 old_p2skh_deactivator_ticket_or_dummy_2,
+    //     uint256 smt_root_after_adding_deactivator_2,
+    //     WellFormedTicketVerifier.Proof calldata well_formed_new_p2skh_tickets_proof,
+    //     SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_1_proof,
+    //     SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_2_proof,
+    //     uint256 new_p2skh_ticket_1,
+    //     uint256 smt_root_after_adding_new_p2skh_ticket_1,
+    //     uint256 new_p2skh_ticket_or_dummy_2,
+    //     uint256 smt_root_after_adding_new_p2skh_ticket_2
+    // )
+    //     public
+    //     onlyRole(SEQUENCER_ROLE)
+    // {
+    //     counter += 4;
+    //     // ok so
+    //     // we need to prove:
+    //     // 1. the deactivator hashes are well formed vs the old p2skh ticket commitments OR they're "dummy || some BS randomness"
+    //     // 2. they are updated correctly in the SMT :)
+    //     // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means: addition invariant (with zero add if it's a dummy input) ;) OR they're "dummy || some BS randomness"
+    //     // 4. they are also updated correctly in the SMT :)
+
+    //     // 1. the deactivator hashes are well formed vs the old p2skh ticket commitments OR they're "dummy || some BS randomness"
+
+    //     // 1a. deactivator 1
+    //     require(
+    //         WellFormedTicketVerifier.wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+    //             well_formed_deactivator_for_p2skh_1, old_p2skh_ticket_commitment_1, old_p2skh_deactivator_ticket_1
+    //         ),
+    //         "deactivator 1 wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+    //     );
+
+    //     // 1b. deactivator 2
+    //     require(
+    //         WellFormedTicketVerifier.wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+    //             well_formed_deactivator_for_p2skh_2,
+    //             old_p2skh_ticket_commitment_or_dummy_2,
+    //             old_p2skh_deactivator_ticket_or_dummy_2
+    //         ),
+    //         "deactivator 2 wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+    //     );
+
+    //     // 2. they are updated correctly in the SMT :)
+    //     // 2a. deactivator 1
+    //     require(
+    //         SMTMembershipVerifier.updateProof(
+    //             smt_update_deactivator_1_proof,
+    //             utxo_root.getCurrent(),
+    //             smt_root_after_adding_deactivator_1,
+    //             old_p2skh_deactivator_ticket_1
+    //         ),
+    //         "you didn't modify the SMT correctly to add your deactivator 1."
+    //     );
+
+    //     // 2b. deactivator 2
+    //     require(
+    //         SMTMembershipVerifier.updateProof(
+    //             smt_update_deactivator_2_proof,
+    //             smt_root_after_adding_deactivator_1,
+    //             smt_root_after_adding_deactivator_2,
+    //             old_p2skh_deactivator_ticket_or_dummy_2
+    //         ),
+    //         "you didn't modify the SMT correctly to add your deactivator 2."
+    //     );
+
+    //     // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means:
+    //     // check addition invariant o_O
+    //     // they're also allowed to be "dummy || some BS randomness" with zero contribution to the add invariant
+    //     require(
+    //         WellFormedTicketVerifier.wellFormedP2SKHMergeSplitAdditionInvariantOrDummyProof(
+    //             well_formed_new_p2skh_tickets_proof,
+    //             old_p2skh_ticket_commitment_1,
+    //             old_p2skh_ticket_commitment_or_dummy_2,
+    //             new_p2skh_ticket_1,
+    //             new_p2skh_ticket_or_dummy_2
+    //         ),
+    //         "either the new p2skh tickets weren't well formed, or their tokens were not all the same as the old commitments, or they weren't correct dummies, or... spooky... the addition invariant failed... were you trying to steal funds?"
+    //     );
+
+    //     // 4. they are also updated correctly in the SMT :)
+    //     // 4a. new p2skh ticket 1
+    //     require(
+    //         SMTMembershipVerifier.updateProof(
+    //             smt_update_new_p2skh_ticket_1_proof,
+    //             smt_root_after_adding_deactivator_2,
+    //             smt_root_after_adding_new_p2skh_ticket_1,
+    //             new_p2skh_ticket_1
+    //         ),
+    //         "you didn't modify the SMT correctly to add your new p2skh ticket 1."
+    //     );
+
+    //     // 4b. new p2skh ticket 2
+    //     require(
+    //         SMTMembershipVerifier.updateProof(
+    //             smt_update_new_p2skh_ticket_2_proof,
+    //             smt_root_after_adding_new_p2skh_ticket_1,
+    //             smt_root_after_adding_new_p2skh_ticket_2,
+    //             new_p2skh_ticket_or_dummy_2
+    //         ),
+    //         "you didn't modify the SMT correctly to add your new p2skh ticket 2."
+    //     );
+    //     utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket_2);
+    // }
+
+    function splitP2SKH(
+        WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh,
+        SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
+        uint256 old_p2skh_ticket_commitment,
+        uint256 old_p2skh_deactivator_ticket,
+        uint256 smt_root_after_adding_deactivator,
+        WellFormedTicketVerifier.Proof calldata well_formed_new_p2skh_tickets_proof,
+        SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_1_proof,
+        SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_2_proof,
+        uint256 new_p2skh_ticket_1,
+        uint256 smt_root_after_adding_new_p2skh_ticket_1,
+        uint256 new_p2skh_ticket_2,
+        uint256 smt_root_after_adding_new_p2skh_ticket_2
+    )
+        public
+        onlyRole(SEQUENCER_ROLE)
+    {
+        counter += 3;
+        // ok so
+        // we need to prove:
+        // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
+        // 2. they are updated correctly in the SMT :)
+        // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means: addition invariant 
+        // 4. they are also updated correctly in the SMT :)
+
+        // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
+
+        // 1. deactivator
+        require(
+            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+                well_formed_deactivator_for_p2skh, old_p2skh_ticket_commitment, old_p2skh_deactivator_ticket
+            ),
+            "deactivator 1 wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+        );
+
+        // 2. deactivator updated correctly in the SMT :)
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_deactivator_proof,
+                utxo_root.getCurrent(),
+                smt_root_after_adding_deactivator,
+                old_p2skh_deactivator_ticket
+            ),
+            "you didn't modify the SMT correctly to add your deactivator."
+        );
+
+        // 3. the new p2skh tickets are well formed vs the old p2skh ticket commitments: this means:
+        // check addition invariant o_O
+        require(
+            WellFormedTicketVerifier.wellFormedP2SKHSplitAdditionInvariant(
+                well_formed_new_p2skh_tickets_proof,
+                old_p2skh_ticket_commitment,
+                new_p2skh_ticket_1,
+                new_p2skh_ticket_2
+            ),
+            "either the new p2skh tickets weren't well formed, or their tokens were not all the same as the old commitments, or... spooky... the addition invariant failed... were you trying to steal funds?"
+        );
+
+        // 4. they are also updated correctly in the SMT :)
+        // 4a. new p2skh ticket 1
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_new_p2skh_ticket_1_proof,
+                smt_root_after_adding_deactivator,
+                smt_root_after_adding_new_p2skh_ticket_1,
+                new_p2skh_ticket_1
+            ),
+            "you didn't modify the SMT correctly to add your new p2skh ticket 1."
+        );
+
+        // 4b. new p2skh ticket 2
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_new_p2skh_ticket_2_proof,
+                smt_root_after_adding_new_p2skh_ticket_1,
+                smt_root_after_adding_new_p2skh_ticket_2,
+                new_p2skh_ticket_2
+            ),
+            "you didn't modify the SMT correctly to add your new p2skh ticket 2."
+        );
+        utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket_2);
+    }
+
+
+    function mergeP2SKH(
+        WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_1,
+        WellFormedTicketVerifier.Proof calldata well_formed_deactivator_for_p2skh_2,
+        SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof_1,
+        SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof_2,
+        uint256 old_p2skh_ticket_commitment_1,
+        uint256 old_p2skh_ticket_commitment_2,
+        uint256 old_p2skh_deactivator_ticket_1,
+        uint256 old_p2skh_deactivator_ticket_2,
+        uint256 smt_root_after_adding_deactivator_1,
+        uint256 smt_root_after_adding_deactivator_2,
+        WellFormedTicketVerifier.Proof calldata well_formed_new_p2skh_ticket_proof,
+        SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_proof,
+        uint256 new_p2skh_ticket,
+        uint256 smt_root_after_adding_new_p2skh_ticket
+    )
+        public
+        onlyRole(SEQUENCER_ROLE)
+    {
+        counter += 3;
+        // ok so
+        // we need to prove:
+        // 1. the deactivator hash are well formed vs the old p2skh ticket commitments
+        // 2. they are updated correctly in the SMT :)
+        // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means: addition invariant 
+        // 4. they are also updated correctly in the SMT :)
+
+        // 1. the deactivator hash is well formed vs the old p2skh ticket commitment
+
+        // 1a. deactivator1
+        require(
+            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+                well_formed_deactivator_for_p2skh_1, old_p2skh_ticket_commitment_1, old_p2skh_deactivator_ticket_1
+            ),
+            "deactivator 1 wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+        );
+
+        // 1b. deactivator2
+        require(
+            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+                well_formed_deactivator_for_p2skh_2, old_p2skh_ticket_commitment_2, old_p2skh_deactivator_ticket_2
+            ),
+            "deactivator 2 wasn't well formed either in itself, or against your commitment to its p2skh ticket, or against your call arguments, or your babyjub key."
+        );
+
+        // 2a. deactivator 1 updated correctly in the SMT :)
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_deactivator_proof_1,
+                utxo_root.getCurrent(),
+                smt_root_after_adding_deactivator_1,
+                old_p2skh_deactivator_ticket_1
+            ),
+            "you didn't modify the SMT correctly to add your deactivator 1."
+        );
+
+        // 2b. deactivator 2 updated correctly in the SMT :)
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_deactivator_proof_2,
+                smt_root_after_adding_deactivator_1,
+                smt_root_after_adding_deactivator_2,
+                old_p2skh_deactivator_ticket_2
+            ),
+            "you didn't modify the SMT correctly to add your deactivator 2."
+        );
+
+
+        // 3. the new p2skh ticket is well formed vs the old p2skh ticket commitments: this means:
+        // check addition invariant o_O
+        require(
+            WellFormedTicketVerifier.wellFormedP2SKHMergeAdditionInvariant(
+                well_formed_new_p2skh_ticket_proof,
+                old_p2skh_ticket_commitment_1,
+                old_p2skh_ticket_commitment_2,
+                new_p2skh_ticket
+            ),
+            "either the new p2skh tickets isn't well formed, or their tokens were not all the same as the old commitment, or... spooky... the addition invariant failed... were you trying to steal funds?"
+        );
+
+        // 4. they are also updated correctly in the SMT :)
+        require(
+            SMTMembershipVerifier.updateProof(
+                smt_update_new_p2skh_ticket_proof,
+                smt_root_after_adding_deactivator_2,
+                smt_root_after_adding_new_p2skh_ticket,
+                new_p2skh_ticket
+            ),
+            "you didn't modify the SMT correctly to add your new p2skh ticket."
+        );
+        
+        utxo_root.setRoot(smt_root_after_adding_new_p2skh_ticket);
     }
 }
