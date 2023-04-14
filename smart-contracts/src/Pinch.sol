@@ -175,7 +175,7 @@ contract Pinch is AccessControl {
         uint256 old_ticket_hash_commitment,
         SMTMembershipVerifier.Proof calldata smt_update_deactivator_proof,
         uint256 root_after_adding_deactivator,
-        WellFormedTicketVerifier.Proof calldata well_formed_new_swap_ticket_proof,
+        SwapProofVerifier.Proof calldata well_formed_new_swap_ticket_proof,
         uint256 new_swap_ticket_hash,
         uint256 swap_batch_number,
         SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
