@@ -8,7 +8,7 @@ component main {
 		out_tok_addr,
 		new_swap_hash,
 		p2skh_comm,
-		new_hash_timestamp,
+		swap_batch_index,
 		p2skh_amount
 	]
 } = Swap();
