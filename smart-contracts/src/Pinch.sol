@@ -127,7 +127,7 @@ contract Pinch is AccessControl {
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
         require(
-            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorProof(
+            WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_deactivator_proof,
                 // address(token),
                 // amount,
@@ -203,7 +203,7 @@ contract Pinch is AccessControl {
         // assert!(commitment(old_ticket_hash) is such that the fields in the new deactivator match it...
         // assert!(spending permissioning is okay/knowledge of recipient secret key)
         require(
-            WellFormedTicketVerifier.wellFormedP2SKHDeactivatorProof(
+            WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_deactivator_proof,
                 // address(token),
                 // amount,
@@ -283,7 +283,7 @@ contract Pinch is AccessControl {
         BatchPriceSMTVerifier.Proof calldata price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
         uint256 new_p2skh_ticket_hash,
         uint256 prior_price_root_for_deactivator_amount,
-        uint256 priceDataCommitment,
+        uint256 swap_event_commitment,
         SMTMembershipVerifier.Proof calldata smt_update_new_p2skh_ticket_proof,
         uint256 root_after_adding_new_p2skh_ticket
     )
@@ -301,7 +301,7 @@ contract Pinch is AccessControl {
 
         // 1. the deactivator is well formed versus the old swap ticket
         require(
-            WellFormedTicketVerifier.wellformedSwapDeactivatorProof(
+            WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_spent_swap_deactivator_proof, old_swap_hash_commitment, new_spent_swap_deactivator_ticket
             ),
             "deactivator wasn't well formed either in itself, or against your commitment to its swap ticket, or against your call arguments, or your babyjub key."
@@ -343,8 +343,7 @@ contract Pinch is AccessControl {
         require(
             BatchPriceSMTVerifier.checkPriceSwap(
                 price_smt_proof_and_wellformed_new_p2skh_ticket_proof,
-                prior_price_root_for_deactivator_amount,
-                priceDataCommitment,
+                swap_event_commitment,
                 old_swap_hash_commitment,
                 new_p2skh_ticket_hash
             )

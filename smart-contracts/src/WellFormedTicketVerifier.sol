@@ -2,6 +2,11 @@
 pragma solidity ^0.8.13;
 
 import {Verifier as P2SKHWellFormedVerify} from "@circuits/p2skh_well_formed_verify.sol";
+import {Verifier as SwapWellFormedVerify} from "@circuits/swap_start_verify.sol";
+import {Verifier as SwapResolveWellFormedVerify} from "@circuits/swap_resolve_verify.sol";
+import {Verifier as DeactivatorWellFormedVerify} from "@circuits/deactivator_well_formed_verify.sol";
+import {Verifier as MergeWellFormedVerify} from "@circuits/p2skh_merge_verify.sol";
+import {Verifier as SplitWellFormedVerify} from "@circuits/p2skh_split_verify.sol";
 
 // a contract that verifies whether a ticket is well-formed
 library WellFormedTicketVerifier {
@@ -14,38 +19,40 @@ library WellFormedTicketVerifier {
 
     // public functions
     // assert!(ticket_hash = hash(active=true, token, amount, "deposit/swap" ...some other fields...))
-    function wellFormedP2SKHproof(Proof calldata proof, address token, uint256 amount, uint256 ticket_hash)
-        public
-        returns (bool r)
-    {
+    function wellFormedP2SKHproof(
+        Proof calldata proof,
+        address token,
+        uint256 amount,
+        uint256 ticket_hash
+    ) public returns (bool r) {
         P2SKHWellFormedVerify verif = new P2SKHWellFormedVerify();
-        return verif.verifyProof(
-            proof.a,
-            proof.b,
-            proof.c,
-            [
-                amount,
-                uint160(token),
-                ticket_hash
-            ]);
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [amount, uint160(token), ticket_hash]
+            );
     }
 
     // assert!(ticket_hash = hash(active=false, token, amount, "deposit/swap" ...some other fields...))
     // assert!(all fields of cancelling_ticket_hash eq to fields of old_key)
     // assert!(know secret key that this is intended for)
-    // TODO: remove?
-    function wellFormedP2SKHDeactivatorProof(
+    function wellFormedDeactivatorProof(
         Proof calldata proof,
         // address token,
         // uint256 amount,
         uint256 commitment_to_old_key,
-        uint256 cancelling_key
-    )
-        public
-        returns (bool r)
-    {
-
-        return true;
+        uint256 cancelling_hash
+    ) public returns (bool r) {
+        DeactivatorWellFormedVerify verif = new DeactivatorWellFormedVerify();
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [cancelling_hash, commitment_to_old_key]
+            );
     }
 
     // assert!(ticket_hash = hash(active=true, token, amount, "initSwap" ...some other fields...))
@@ -60,21 +67,22 @@ library WellFormedTicketVerifier {
         uint256 batchNumber,
         uint256 ticket_hash,
         uint256 old_ticket_hash_commitment
-    )
-        public
-        returns (bool r)
-    {}
-
-    // prove the deactivator is well formed versus the old swap ticket
-    function wellformedSwapDeactivatorProof(
-        Proof calldata proof,
-        uint256 old_swap_ticket_commit,
-        uint256 new_spent_swap_deactivator_ticket
-    )
-        public
-        returns (bool r)
-    {
-        return true;
+    ) public returns (bool r) {
+        SwapWellFormedVerify verif = new SwapWellFormedVerify();
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [
+                    uint160(source),
+                    uint160(dest),
+                    ticket_hash,
+                    old_ticket_hash_commitment,
+                    batchNumber,
+                    amount
+                ]
+            );
     }
 
     // checks p2skh deactivation proof. same as the SNARK above,
@@ -85,8 +93,14 @@ library WellFormedTicketVerifier {
         uint256 new_spent_swap_deactivator_ticket
     )
         public
-        returns (bool r)
+        returns (
+            // Isn't this the same thing... will ask
+            bool r
+        )
     {
+        // Oh wait... do we need **another** circuit for this??
+        // (SMT + Comm check)
+        // Or is it like you do 2 seperate circ. checks... I think thats it
         return true;
     }
 
@@ -115,11 +129,19 @@ library WellFormedTicketVerifier {
         uint256 old_p2skh_ticket_commitment,
         uint256 new_p2skh_ticket_1,
         uint256 new_p2skh_ticket_2
-    )
-        public
-        returns (bool r)
-    {
-        return true;
+    ) public returns (bool r) {
+        SplitWellFormedVerify verif = new SplitWellFormedVerify();
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [
+                    old_p2skh_ticket_commitment,
+                    new_p2skh_ticket_1,
+                    new_p2skh_ticket_2
+                ]
+            );
     }
 
     // assert!(ticket_hash for new_p2skh ticket = hash(active=true, token, amount, "p2skh" ...some other fields...))
@@ -130,10 +152,18 @@ library WellFormedTicketVerifier {
         uint256 old_p2skh_ticket_commitment_1,
         uint256 old_p2skh_ticket_commitment_2,
         uint256 new_p2skh_ticket
-    )
-        public
-        returns (bool r)
-    {
-        return true;
+    ) public returns (bool r) {
+        MergeWellFormedVerify verif = new MergeWellFormedVerify();
+        return
+            verif.verifyProof(
+                proof.a,
+                proof.b,
+                proof.c,
+                [
+                    old_p2skh_ticket_commitment_1,
+                    old_p2skh_ticket_commitment_2,
+                    new_p2skh_ticket
+                ]
+            );
     }
 }
