@@ -4,8 +4,8 @@ pragma solidity ^0.8.13;
 import "openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-import "./BatchPriceSMTVerifier.sol";
-import "./HistoricalRoots.sol";
+import "./SwapProofVerifier.sol";
+import "../HistoricalRoots.sol";
 
 // TODO handle if the swap (or other operation) fails!
 contract Swapper is AccessControl {
@@ -18,14 +18,9 @@ contract Swapper is AccessControl {
         address token2;
     }
 
-    struct PairTargetAmounts {
-        uint256 token1_to_token2_amount;
-        uint256 token2_to_token1_amount;
-    }
-
-    struct PairPrices {
-        uint256 token1_price_in_token2;
-        uint256 token2_price_in_token1;
+    struct PairTokenAmount {
+        uint256 token_src_amount_in;
+        uint256 token_dest_amount_out;
     }
 
     // batch swap update proof
@@ -36,7 +31,7 @@ contract Swapper is AccessControl {
     }
 
     // this contains the swap batch info. it is an SMT that contains:
-    // (batch_num, token1, token2, token1_price_in_token2) => 0
+    // (batch_num, token1, token2, token_src_amount_in) => 0
     // users can look up the price of a token in a given batch and present it to the contract
     // the contract will verify the proof that the given swap UTXO *was* executed in that batch_num (per its timestamp)
     // and that the given token was swapped in that batch_num at that swap price
@@ -56,13 +51,13 @@ contract Swapper is AccessControl {
         // a mapping that says how much of each vault should be net swapped into another token in this batch.
         // get the first half of the mapping from pairHash.
         // first entry in output is amount that goes from A to B, second entry is B to A. need to track separately because exchange rate is yet unknown.
-        mapping(uint256 => PairTargetAmounts) swap_amounts;
+        mapping(uint256 => PairTokenAmount) swap_amounts;
         // list of pairs in the current batch :)
         Pair[] swap_tokens;
         // prices... price of one tokenA in tokenB denomination
         // empty until swap happens.
         // get the first half of the mapping from pairHash
-        mapping(uint256 => PairPrices) prices;
+        mapping(uint256 => PairTokenAmount) prices;
     }
 
     // TODO i hereby invite you to put some thought into making the bot permissionless
@@ -119,9 +114,9 @@ contract Swapper is AccessControl {
 
         uint256 pairid = pairHash(Pair({token1: token_a, token2: token_b}));
         if (token_a == from) {
-            current.swap_amounts[pairid].token1_to_token2_amount += amount;
+            current.swap_amounts[pairid].token_src_amount_in += amount;
         } else {
-            current.swap_amounts[pairid].token2_to_token1_amount += amount;
+            current.swap_amounts[pairid].token_dest_amount_out += amount;
         }
     }
 
@@ -149,34 +144,35 @@ contract Swapper is AccessControl {
 
             // TODO: one day, you should do an internal matching step to make sure that you're satisfying demand first from within your own pools.
             // but not yet.
-            PairTargetAmounts memory swap_amounts = last_and_needs_entry_to_root.swap_amounts[pairid];
+            PairTokenAmount memory swap_amounts = last_and_needs_entry_to_root.swap_amounts[pairid];
 
             // Perform the swap with ERC20 tokens owned by the contract
-            if (swap_amounts.token1_to_token2_amount > 0) {
+            if (swap_amounts.token_src_amount_in > 0) {
                 // Swap tokenA for tokenB
                 // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
-                IERC20(pair.token1).transferFrom(address(this), address(this), swap_amounts.token1_to_token2_amount);
+                IERC20(pair.token1).transferFrom(address(this), address(this), swap_amounts.token_src_amount_in);
 
                 // TODO make this 1 into the right price
-                // TODO is this the right direction? token1_price_in_token2 or token2_price_in_token1?
-                last_and_needs_entry_to_root.prices[pairid].token1_price_in_token2 = 1;
+                // TODO is this the right direction? token_src_amount_in or token_dest_amount_out?
+                last_and_needs_entry_to_root.prices[pairid].token_src_amount_in = 1;
             } 
-            if (swap_amounts.token2_to_token1_amount > 0) {
+            // TODO: I think this broken
+            if (swap_amounts.token_dest_amount_out > 0) {
                 // Swap tokenB for tokenA
 
                 // TODO Add your swapping logic here, e.g., using a DEX or an aggregator
-                IERC20(pair.token2).transferFrom(address(this), address(this), swap_amounts.token2_to_token1_amount);
+                IERC20(pair.token2).transferFrom(address(this), address(this), swap_amounts.token_dest_amount_out);
 
                 // TODO make this 1 into the right price
-                // TODO is this the right direction? token1_price_in_token2 or token2_price_in_token1?    
-                last_and_needs_entry_to_root.prices[pairid].token2_price_in_token1 = 1;
+                // TODO is this the right direction? token_src_amount_in or token_dest_amount_out?    
+                last_and_needs_entry_to_root.prices[pairid].token_dest_amount_out = 1;
             }
             // TODO what happens if you had zero that needs to swap? do you need a price on that? what's that mean?
         }
     }
 
     // todo this is a rough one
-    function updateRoot(BatchPriceSMTVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
+    function updateRoot(SwapProofVerifier.Proof[] calldata updateProofs, uint256[] calldata newRoots)
         public
         onlyRole(BOT_ROLE)
     {
@@ -201,32 +197,32 @@ contract Swapper is AccessControl {
         for (uint256 i = 0; i < last_and_needs_entry_to_root.swap_tokens.length; i++) {
             Pair memory pair = last_and_needs_entry_to_root.swap_tokens[i];
             uint256 pairid = pairHash(pair);
-            PairPrices memory prices = last_and_needs_entry_to_root.prices[pairid];
+            PairTokenAmount memory prices = last_and_needs_entry_to_root.prices[pairid];
             // validate that it's a valid proof
             lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[2*i];
             require(
-                BatchPriceSMTVerifier.updateProof(
+                SwapProofVerifier.updateProof(
                     updateProofs[i*2],
                     lastRoot,
                     newRoots[i*2],
                     last_and_needs_entry_to_root.batchNumber,
                     pair.token1,
                     pair.token2,
-                    prices.token1_price_in_token2
+                    prices.token_src_amount_in
                 ),
                 "you did not update the prices right :(, check your proofs"
             );
 
             lastRoot = newRoots[2*i];
             require(
-                BatchPriceSMTVerifier.updateProof(
+                SwapProofVerifier.updateProof(
                     updateProofs[2*i + 1],
                     lastRoot,
                     newRoots[2*i + 1],
                     last_and_needs_entry_to_root.batchNumber,
                     pair.token1,
                     pair.token2,
-                    prices.token1_price_in_token2
+                    prices.token_src_amount_in
                 ),
                 "you did not update the prices right :(, check your proofs"
             );

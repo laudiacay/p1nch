@@ -2,8 +2,6 @@
 pragma solidity ^0.8.13;
 
 import {Verifier as P2SKHWellFormedVerify} from "@circuits/p2skh_well_formed_verify.sol";
-import {Verifier as SwapWellFormedVerify} from "@circuits/swap_start_verify.sol";
-import {Verifier as SwapResolveWellFormedVerify} from "@circuits/swap_resolve_verify.sol";
 import {Verifier as DeactivatorWellFormedVerify} from "@circuits/deactivator_well_formed_verify.sol";
 import {Verifier as MergeWellFormedVerify} from "@circuits/p2skh_merge_verify.sol";
 import {Verifier as SplitWellFormedVerify} from "@circuits/p2skh_split_verify.sol";
@@ -55,54 +53,24 @@ library WellFormedTicketVerifier {
             );
     }
 
-    // assert!(ticket_hash = hash(active=true, token, amount, "initSwap" ...some other fields...))
-    // assert!(ticket.source = source, ticket.timestamp=timestamp, ticket.amount = amount, ticket.dest=dest)
-    // assert!(old_ticket_hash_commitment = hash(old_ticket_hash) = hash(hash(old_ticket)))
-    // assert!(old_ticket.token = source, old_ticket.amount = amount)
-    function wellFormedSwapTicketProof(
-        Proof calldata proof,
-        address source,
-        address dest,
-        uint256 amount,
-        uint256 batchNumber,
-        uint256 ticket_hash,
-        uint256 old_ticket_hash_commitment
-    ) public returns (bool r) {
-        SwapWellFormedVerify verif = new SwapWellFormedVerify();
-        return
-            verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
-                [
-                    uint160(source),
-                    uint160(dest),
-                    ticket_hash,
-                    old_ticket_hash_commitment,
-                    batchNumber,
-                    amount
-                ]
-            );
-    }
-
-    // checks p2skh deactivation proof. same as the SNARK above,
-    // but also will accept on an input of hash("dummy" || some BS randomness for hiding), if the ticket is a commitment(hash("dummy" || some BS randomness for hiding)))
-    function wellFormedP2SKHDeactivatorOrCorrectDummyProof(
-        Proof calldata proof,
-        uint256 old_swap_ticket_commit,
-        uint256 new_spent_swap_deactivator_ticket
-    )
-        public
-        returns (
-            // Isn't this the same thing... will ask
-            bool r
-        )
-    {
-        // Oh wait... do we need **another** circuit for this??
-        // (SMT + Comm check)
-        // Or is it like you do 2 seperate circ. checks... I think thats it
-        return true;
-    }
+    // // checks p2skh deactivation proof. same as the SNARK above,
+    // // but also will accept on an input of hash("dummy" || some BS randomness for hiding), if the ticket is a commitment(hash("dummy" || some BS randomness for hiding)))
+    // function wellFormedP2SKHDeactivatorOrCorrectDummyProof(
+    //     Proof calldata proof,
+    //     uint256 old_swap_ticket_commit,
+    //     uint256 new_spent_swap_deactivator_ticket
+    // )
+    //     public
+    //     returns (
+    //         // Isn't this the same thing... will ask
+    //         bool r
+    //     )
+    // {
+    //     // Oh wait... do we need **another** circuit for this??
+    //     // (SMT + Comm check)
+    //     // Or is it like you do 2 seperate circ. checks... I think thats it
+    //     return true;
+    // }
 
     // // assert!(ticket_hash for both new_p2skh tickets = hash(active=true, token, amount, "p2skh" ...some other fields...))
     // // assert!(ALL FOUR HAVE THE SAME TOKEN OR ARE DUMMIES!!)
