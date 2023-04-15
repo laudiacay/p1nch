@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
-import "openzeppelin-contracts/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract HistoricalRoots is AccessControl {
     uint256 constant MAX_SIZE = 100;

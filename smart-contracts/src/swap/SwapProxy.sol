@@ -30,24 +30,24 @@ contract SwapProxy {
     }
 
     function swap(
-        SwapDescription memory swap
+        SwapDescription memory swap_description
     ) internal returns (uint256 amountOut) {
         // Approve the router to spend srcToken.
         TransferHelper.safeApprove(
-            swap.srcToken,
+            swap_description.srcToken,
             address(swapRouter),
-            swap.amount
+            swap_description.amount
         );
         ISwapRouter.ExactInputSingleParams memory params = ISwapRouter
             .ExactInputSingleParams({
-                tokenIn: swap.srcToken,
-                tokenOut: swap.dstToken,
+                tokenIn: swap_description.srcToken,
+                tokenOut: swap_description.dstToken,
                 fee: feeTier,
                 recipient: msg.sender,
                 deadline: block.timestamp,
-                amountIn: swap.amount,
-                amountOutMinimum: swap.minReturnAmount,
-                sqrtPriceLimitX96: swap.priceLimit
+                amountIn: swap_description.amount,
+                amountOutMinimum: swap_description.minReturnAmount,
+                sqrtPriceLimitX96: swap_description.priceLimit
             });
         amountOut = swapRouter.exactInputSingle(params);
     }
