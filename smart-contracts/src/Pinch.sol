@@ -13,6 +13,8 @@ import "./HistoricalRoots.sol";
 contract Pinch is AccessControl {
     // TODO for circuit reasons, you need to safemath it with uint252
 
+    // TODO clean up argument ordering!
+    
     // number of utxos in the smt root. apparently this is useful for some kind of regulatory compliance reason
     uint256 counter = 0;
 
@@ -61,7 +63,8 @@ contract Pinch is AccessControl {
         SMTMembershipVerifier.Proof calldata smt_update_proof,
         uint256 new_root,
         IERC20 token,
-        uint256 amount
+        uint256 amount,
+        address alice
     )
         public
         onlyRole(SEQUENCER_ROLE)
@@ -85,7 +88,7 @@ contract Pinch is AccessControl {
         );
 
         // Perform ERC 20 Approved Transfer
-        require(token.transferFrom(msg.sender, address(this), amount), "ERC20 transfer failed");
+        require(token.transferFrom(alice, address(this), amount), "ERC20 transfer failed");
 
         // Update the root
         utxo_root.setRoot(new_root);
