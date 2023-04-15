@@ -36,8 +36,8 @@ contract Pinch is AccessControl {
     bytes32 public constant SEQUENCER_ROLE = keccak256("SEQUENCER_ROLE");
 
     // TODO seriously think about permissioning better on this!
-    constructor(address sequencer, address swap_bot, address swap_router) {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    constructor(address owner, address sequencer, address swap_bot, address swap_router) {
+        _grantRole(DEFAULT_ADMIN_ROLE, owner);
         _grantRole(SEQUENCER_ROLE, sequencer);
         swapper = new Swapper(address(this), swap_bot, swap_router);
         utxo_root = new HistoricalRoots();

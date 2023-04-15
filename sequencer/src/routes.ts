@@ -62,7 +62,7 @@ defaultRoute.post('/sequencer/deposit', async (req: Request, res: Response) => {
     res.status(500).json({
       message: 'missing required fields... check the api spec',
     });
-    break;
+    return;
   }
 
   // check that the ticketKey is not in the SMT currently
@@ -78,7 +78,8 @@ defaultRoute.post('/sequencer/deposit', async (req: Request, res: Response) => {
   );
   if (aliceAuthorized < data.amount) {
     console.log("dropping item: alice didn't authorize sufficient funds", data);
-    break;
+    res.status(500).json({ message: 'alice did not authorize sufficient funds' });
+    return;
   }
 
   // TODO validate the snarks provided before you put them on chain. god forbid.
@@ -136,7 +137,7 @@ defaultRoute.post(
       res.status(500).json({
         message: 'missing required fields... check the api spec',
       });
-      break;
+      return;
     }
     // check that the ticketKey is not in the SMT currently
     if ((await smt.find(data.new_deactivator_ticket_hash, false)) === null) {
@@ -169,7 +170,6 @@ defaultRoute.post(
     const receipt = await tx.wait();
     console.log('receipt', receipt);
     res.status(200).json({ message: 'success' });
-    break;
   }
 );
 defaultRoute.post('/sequencer/merge', async (req: Request, res: Response) => {
