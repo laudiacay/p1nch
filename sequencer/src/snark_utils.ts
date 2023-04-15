@@ -1,7 +1,7 @@
 //@ts-ignore
-import snarkjs from "snarkjs";
-import { readFileSync } from "fs";
-import { configs } from "./configs";
+import snarkjs from 'snarkjs';
+import { readFileSync } from 'fs';
+import { configs } from './configs';
 
 export const compile_snark = async (
   witness: any,
@@ -14,17 +14,17 @@ export const compile_snark = async (
     zkey_path
   );
 
-  console.log("Proof: ");
+  console.log('Proof: ');
   console.log(JSON.stringify(proof, null, 1));
 
-  const vKey = readFileSync("verification_key.json").toJSON();
+  const vKey = readFileSync('verification_key.json').toJSON();
 
   const res = await snarkjs.groth16.verify(vKey, publicSignals, proof);
 
   if (res === true) {
-    console.log("Verification OK");
+    console.log('Verification OK');
   } else {
-    console.log("Invalid proof");
+    console.log('Invalid proof');
   }
   return { proof, public_signals: publicSignals };
 };

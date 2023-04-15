@@ -1,9 +1,9 @@
 //@ts-ignore
-import { newMemEmptyTrie, buildBabyjub } from "circomlibjs";
+import { newMemEmptyTrie, buildBabyjub } from 'circomlibjs';
 
 // make a function that constructs the tree from redis batches
-import Redis from "ioredis";
-type BigIntish = BigInt | string | number;
+import Redis from 'ioredis';
+type BigIntish = bigint | string | number;
 
 interface TreeFindRes {
   found: boolean;
@@ -58,11 +58,15 @@ export class CircomSMT {
     return t;
   }
 
+  public get_root(): BigIntish {
+    return this._smt.root;
+  }
+
   private async insert_from_redis(redis: Redis) {
     // Fetch all the batches from Redis
-    const batchSize = await redis.zcard("ticket_batches");
-    const batchData = await redis.zrange("ticket_batches", 0, batchSize - 1);
-    console.log("batchsize", batchSize);
+    const batchSize = await redis.zcard('ticket_batches');
+    const batchData = await redis.zrange('ticket_batches', 0, batchSize - 1);
+    console.log('batchsize', batchSize);
 
     const proms_nested: Promise<void>[][] = batchData.map((ticket_batch_str) =>
       (JSON.parse(ticket_batch_str) as any[]).map(
@@ -75,13 +79,16 @@ export class CircomSMT {
 
   public async insert(inp_key: BigIntish) {
     const tree_insert = await this._smt.insert(inp_key, 0);
+    const siblings = tree_insert.siblings;
+    for (let i = 0; i < siblings.length; i++)
+      siblings[i] = this._smt.F.toObject(siblings[i]);
+
+    // Pad siblings path until we reach depth
+    while (siblings.length < this.n_levels) siblings.push(0);
+
     return {
-      fnc: [1, 0],
       oldRoot: this._smt.F.toObject(tree_insert.oldRoot),
-      siblings: tree_insert.siblings,
-      oldKey: tree_insert.isOld0 ? 0 : this._smt.F.toObject(tree_insert.oldKey),
-      oldValue: tree_insert.isOld0 ? 0 : this._smt.F.toObject(0),
-      isOld0: tree_insert.isOld0 ? 1 : 0,
+      siblings: siblings,
       newKey: this._smt.F.toObject(tree_insert.key),
       newValue: this._smt.F.toObject(0),
     };
@@ -90,7 +97,7 @@ export class CircomSMT {
   // See Circom's test: https://github.com/iden3/circomlib/blob/master/test/smtverifier.js, for details
   public async find(inp_key: BigIntish, inclusion = true) {
     const res: TreeFindRes = await this._smt.find(inp_key);
-    let siblings = res.siblings;
+    const siblings = res.siblings;
     for (let i = 0; i < siblings.length; i++)
       siblings[i] = this._smt.F.toObject(siblings[i]);
 
@@ -99,8 +106,7 @@ export class CircomSMT {
     res.key = inp_key;
     res.siblings = siblings;
     const tree_find = res;
-    if (tree_find.found !== inclusion)
-      return null
+    if (tree_find.found !== inclusion) return null;
     return {
       enabled: 1,
       fnc: inclusion ? 0 : 1,
