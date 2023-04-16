@@ -61,8 +61,8 @@ template SwapEventHasher() {
   signal input batch_index;
   signal input tok_in;
   signal input tok_out;
-  signal input swap_total_in; // TODO: price per what???
-  signal input swap_total_out; // TODO: price per what???
+  signal input swap_total_in;
+  signal input swap_total_out;
 
   signal output out;
 
