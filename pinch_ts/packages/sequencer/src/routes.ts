@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 export const defaultRoute = Router();
 
-import { CircomSMT } from './smt';
+import {CircomSMT} from '@pinch-ts/data-layer'
 import { configs } from './configs';
 import { compile_snark } from './snark_utils';
 

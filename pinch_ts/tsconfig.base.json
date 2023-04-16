@@ -15,6 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@pinch-ts/common": ["packages/common/src/index.ts"],
+      "@pinch-ts/data-layer": ["packages/data-layer/src/index.ts"],
       "@pinch-ts/proof-utils": ["packages/proof-utils/src/index.ts"]
     }
   },

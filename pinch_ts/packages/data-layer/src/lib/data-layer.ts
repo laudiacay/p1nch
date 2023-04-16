@@ -1,9 +1,9 @@
 //@ts-ignore
 import { newMemEmptyTrie, buildBabyjub } from 'circomlibjs';
+import type { BigIntish } from '@pinch-ts/common';
 
 // make a function that constructs the tree from redis batches
 import Redis from 'ioredis';
-type BigIntish = bigint | string | number;
 
 interface TreeFindRes {
   found: boolean;
@@ -25,6 +25,9 @@ interface TreeDeleteRes extends TreeFindRes {
   oldKey: BigIntish;
   delKey: BigIntish;
 }
+
+export type SMTInsertArgs = Awaited<ReturnType<CircomSMT['insert']>>;
+export type SMTInclusionArgs = Awaited<ReturnType<CircomSMT['inclusiong']>>;
 
 // Adding leaves up to depth is in https://github.com/iden3/circomlib/blob/master/test/smtverifier.js
 export class CircomSMT {
@@ -95,7 +98,7 @@ export class CircomSMT {
   }
 
   // See Circom's test: https://github.com/iden3/circomlib/blob/master/test/smtverifier.js, for details
-  public async find(inp_key: BigIntish, inclusion = true) {
+  public async inclusion(inp_key: BigIntish) {
     const res: TreeFindRes = await this._smt.find(inp_key);
     const siblings = res.siblings;
     for (let i = 0; i < siblings.length; i++)
@@ -106,21 +109,13 @@ export class CircomSMT {
     res.key = inp_key;
     res.siblings = siblings;
     const tree_find = res;
-    if (tree_find.found !== inclusion) return null;
+    if (tree_find.found) throw `Not found ${inp_key} in the tree`;
     return {
-      enabled: 1,
-      fnc: inclusion ? 0 : 1,
+      // enabled: 1,
+      // fnc: inclusion ? 0 : 1,
       root: this._smt.F.toObject(this._smt.root),
       siblings: tree_find.siblings,
-      oldKey: tree_find.isOld0
-        ? 0
-        : this._smt.F.toObject(tree_find.notFoundKey),
-      oldValue: tree_find.isOld0
-        ? 0
-        : this._smt.F.toObject(tree_find.notFoundValue),
-      isOld0: tree_find.isOld0 ? 1 : 0,
       key: this._smt.toObject(tree_find.key),
-      value: 0,
     };
   }
 }
