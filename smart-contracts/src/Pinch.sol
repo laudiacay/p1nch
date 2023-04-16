@@ -180,7 +180,6 @@ contract Pinch is AccessControl {
         uint256 root_after_adding_deactivator,
         SwapProofVerifier.Proof calldata well_formed_new_swap_ticket_proof,
         uint256 new_swap_ticket_hash,
-        uint256 swap_batch_number,
         SMTMembershipVerifier.Proof calldata smt_update_new_swap_ticket_proof,
         uint256 root_after_adding_new_swap_ticket,
         IERC20 token,
@@ -194,8 +193,8 @@ contract Pinch is AccessControl {
         require(amount > 0);
         require(token != destination_token);
 
-        // check the swap batch number
-        require(swap_batch_number == swapper.getBatchNumber(), "wrong swap batch number");
+        // get the swap batch number
+        uint256 swap_batch_number = swapper.getBatchNumber();
 
         // Check the proof that the nullfier is well-formed and valid and new etc
         // check proof that the commitment
@@ -206,8 +205,6 @@ contract Pinch is AccessControl {
         require(
             WellFormedTicketVerifier.wellFormedDeactivatorProof(
                 well_formed_deactivator_proof,
-                // address(token),
-                // amount,
                 old_ticket_hash_commitment,
                 new_deactivator_ticket_hash
             ),

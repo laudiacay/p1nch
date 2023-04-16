@@ -169,29 +169,20 @@ contract Swapper is AccessControl, SwapProxy {
                     srcToken: pair.token_src,
                     dstToken: pair.token_dest,
                     amount: swap_amounts.token_src_amount_in,
-                    minReturnAmount: 0, // TODO: min return amounts
-                    priceLimit: 0 // TODO: min return amount
+                    minReturnAmount: 0, // TODO: min return amounts, see Trello
+                    priceLimit: 0 // TODO: min return amount, see Trello
                 })
             );
 
             current.swap_amounts[pairid].token_dest_amount_out += amount_out;
-            // TODO:
-
-            // We do not need this...
-            // last_and_needs_entry_to_root.prices[pairid].token_src_amount_in = 1;
-            // TODO make this 1 into the right price
-            // TODO is this the right direction? token_src_amount_in or token_dest_amount_out?
-            // last_and_needs_entry_to_root.prices[pairid].token_src_amount_in = 1;
-            // What do this mean???
-            // TODO: I think this broken
-            // TODO what happens if you had zero that needs to swap? do you need a price on that? what's that mean?
         }
     }
 
     // todo this is a rough one
     function updateRoot(
         SwapProofVerifier.Proof[] calldata updateProofs,
-        uint256[] calldata newRoots
+        uint256[] calldata newRoots,
+        uint256[] calldata swap_event_hashes
     ) public onlyRole(BOT_ROLE) {
         require(
             !swapDataIsEmpty(last_and_needs_entry_to_root),
@@ -203,17 +194,10 @@ contract Swapper is AccessControl, SwapProxy {
             updateProofs.length ==
                 last_and_needs_entry_to_root.swap_tokens.length * 2 &&
                 newRoots.length ==
-                last_and_needs_entry_to_root.swap_tokens.length * 2,
+                last_and_needs_entry_to_root.swap_tokens.length &&
+                swap_event_hashes.length == newRoots.length,
             "updateProofs and newRoots must be 2*the same length as num of swap pairs"
         );
-        // get the last and current batch timestamps (last two entries in the batch_swap_timestamps array)
-        uint256 lastBatchTimestamp = batch_swap_timestamps[
-            batch_swap_timestamps.length - 2
-        ];
-        uint256 currentBatchTimestamp = batch_swap_timestamps[
-            batch_swap_timestamps.length - 1
-        ];
-
         uint256 lastRoot = 0;
 
         // iterate over pairs
@@ -232,31 +216,34 @@ contract Swapper is AccessControl, SwapProxy {
             require(
                 SwapProofVerifier.updateProof(
                     updateProofs[i * 2],
+                    updateProofs[i * 2 + 1],
+                    swap_event_hashes[i],
                     lastRoot,
-                    newRoots[i * 2],
+                    newRoots[i],
                     last_and_needs_entry_to_root.batchNumber,
                     pair.token_src,
                     pair.token_dest,
                     prices.token_src_amount_in,
-                    1 // TODO: fix
+                    prices.token_dest_amount_out
                 ),
                 "you did not update the prices right :(, check your proofs"
             );
 
-            lastRoot = newRoots[2 * i];
-            require(
-                SwapProofVerifier.updateProof(
-                    updateProofs[2 * i + 1],
-                    lastRoot,
-                    newRoots[2 * i + 1],
-                    last_and_needs_entry_to_root.batchNumber,
-                    pair.token_src,
-                    pair.token_dest,
-                    prices.token_src_amount_in,
-                    1 // TODO: fix
-                ),
-                "you did not update the prices right :(, check your proofs"
-            );
+            lastRoot = newRoots[i];
+            // @laudiacay I am a little confused by the below
+            // require(
+            //     SwapProofVerifier.updateProof(
+            //         updateProofs[2 * i + 1],
+            //         lastRoot,
+            //         newRoots[2 * i + 1],
+            //         last_and_needs_entry_to_root.batchNumber,
+            //         pair.token_src,
+            //         pair.token_dest,
+            //         prices.token_src_amount_in,
+            //         prices.token_dest_amount_out
+            //     ),
+            //     "you did not update the prices right :(, check your proofs"
+            // );
         }
 
         emptySwapData(last_and_needs_entry_to_root);

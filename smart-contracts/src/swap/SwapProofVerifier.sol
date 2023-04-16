@@ -3,6 +3,9 @@ pragma solidity ^0.8.13;
 
 import {Verifier as SwapResolveVerif} from "@circuits/swap_resolve_verify.sol";
 import {Verifier as SwapWellFormedVerify} from "@circuits/swap_start_verify.sol";
+import {Verifier as SwapEventFormatVerify} from "@circuits/swap_event_format_verifier.sol";
+
+import "../SMTMembershipVerifier.sol";
 
 // this contains the swap batch info. it is an SMT that contains:
 // (timestamp_of_prior_batch, timestamp_of_current_batch, token_src, token_dest, token_src_amount_in) => 0
@@ -26,7 +29,9 @@ library SwapProofVerifier {
     // assert!(you are adding all the price data in the right format to the thing :3)
     // TODO the price data type here is super fucked up and you need to come back and fix it?
     function updateProof(
-        Proof calldata proof,
+        Proof calldata proof_smt,
+        Proof calldata proof_well_formed,
+        uint256 event_hash,
         uint256 old_root,
         uint256 new_root,
         uint256 swap_batch_number,
@@ -36,7 +41,22 @@ library SwapProofVerifier {
         uint256 amount_out
     ) public returns (bool r) {
         // TODO: should this be public
-        return true;
+        bool smt_verified = SMTMembershipVerifier.updateProof(
+            SMTMembershipVerifier.Proof(proof_smt.a, proof_smt.b, proof_smt.c),
+            old_root,
+            new_root,
+            event_hash
+        );
+        if (!smt_verified) return false;
+        SwapEventFormatVerify verif = new SwapEventFormatVerify();
+        return verif.verifyProof(proof_well_formed.a, proof_well_formed.b, proof_well_formed.c, [
+            swap_batch_number,
+            uint256(uint160(token_a)),
+            uint256(uint160(token_b)),
+            amount_in,
+            amount_out,
+            event_hash
+        ]);
     }
 
     // assert!(new p2skh ticket is well-formed)
@@ -49,12 +69,7 @@ library SwapProofVerifier {
         uint256 swap_event_comm,
         uint256 swap_utxo_hash_comm,
         uint256 p2skh_hash
-    )
-        public
-        returns (
-            bool r
-        )
-    {
+    ) public returns (bool r) {
         SwapResolveVerif verif = new SwapResolveVerif();
         return
             verif.verifyProof(
