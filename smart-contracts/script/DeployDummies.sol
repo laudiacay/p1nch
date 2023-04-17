@@ -1,8 +1,27 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.4;
+/**** Deploy dummy contracts for purposes of local testing ****/
 
 import "@forge-std/src/Script.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+// import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "../src/Pinch.sol";
+
+contract DummyUniswap {
+}
+
+contract DummyTokenA is ERC20("DummyTokenA", "DA") {
+    constructor(address mint_to) {
+        _mint(mint_to, 1000000);
+    }
+}
+
+contract DummyTokenB is ERC20("DummyTokenB", "DB") {
+    constructor(address mint_to) {
+        _mint(mint_to, 1000000);
+    }
+}
 
 contract P1nchDeployScript is Script {
     function setUp() public {}
