@@ -27,26 +27,23 @@ contract DummyTokenB is ERC20("DummyTokenB", "DB") {
     }
 }
 
-contract P1nchDeployScript is Script {
+contract DummyDeployScript is Script {
     function setUp() public {}
 
     function run() public {
         // string memory seedPhrase = vm.readFile(".secret_localnet");
         uint256 privateKey = vm.envUint("DEPLOY_SECRET_KEY");
+        address mintToAddr = vm.envAddress("MINT_TO_ADDRESS");
         vm.startBroadcast(privateKey);
-        address botAddress = vm.envAddress("BOT_ADDRESS");
-        address sequencerAddress = vm.envAddress("SEQUENCER_ADDRESS");
-        address gnosisOrOwnerAddress = vm.envAddress("GNOSIS_OR_OWNER_ADDRESS");
-        address uniswapSwapRouterAddress = vm.envAddress(
-            "UNISWAP_SWAP_ROUTER_ADDRESS"
-        );
 
-        Pinch pinch = new Pinch(
-            gnosisOrOwnerAddress,
-            sequencerAddress,
-            botAddress,
-            uniswapSwapRouterAddress
-        );
+        DummyTokenA tokA = new DummyTokenA(mintToAddr);
+
+        DummyTokenB tokB = new DummyTokenB(mintToAddr);
+
+        UniswapV3Factory uniFact = new UniswapV3Factory();
+
+        address _pool = uniFact.createPool(tokA.address, tokB.address, 0);
+        DummyUniswapRouter uniRouter = new DummyUniswapRouter(uniFact.address);
 
         vm.stopBroadcast();
     }
