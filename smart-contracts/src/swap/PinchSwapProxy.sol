@@ -1,12 +1,12 @@
 // Inspred by: https://github.com/smye/1inch-swap/blob/master/contracts/SwapProxy.sol
-pragma solidity ^0.8.6;
+pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@uniswap-node-mod/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "@uniswap-node-mod/v3-periphery/contracts/libraries/TransferHelper.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 
-contract SwapProxy {
+contract PinchSwapProxy {
     ISwapRouter public immutable swapRouter;
     // address public constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
     // address public constant WETH9 = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
@@ -23,10 +23,8 @@ contract SwapProxy {
         uint160 priceLimit;
     }
 
-    // address immutable AGGREGATION_ROUTER_V3;
-
-    constructor(ISwapRouter _swapRouter) {
-        swapRouter = _swapRouter;
+    constructor(address swapRouterAddr) {
+        swapRouter = ISwapRouter(swapRouterAddr);
     }
 
     function swap(

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-pragma solidity ^0.8.4;
+pragma solidity ^0.8.13;
 
 import "@forge-std/src/Script.sol";
 import "../src/Pinch.sol";
@@ -14,7 +14,7 @@ contract P1nchDeployScript is Script {
         address botAddress = vm.envAddress("BOT_ADDRESS");
         address sequencerAddress = vm.envAddress("SEQUENCER_ADDRESS");
         address gnosisOrOwnerAddress = vm.envAddress("GNOSIS_OR_OWNER_ADDRESS");
-        address uniswapSwapRouterAddress = vm.envAddress("UNISWAP_SWAP_ROUTER_ADDRESS");
+        address uniswapSwapRouterAddress = vm.envAddress("UNISWAP_ROUTER_ADDRESS");
 
         Pinch pinch = new Pinch(gnosisOrOwnerAddress, sequencerAddress, botAddress, uniswapSwapRouterAddress);
 

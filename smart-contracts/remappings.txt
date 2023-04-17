@@ -1,6 +1,4 @@
 @circuits/=circuit_build/
-@uniswap-node-mod/=node_modules/@uniswap/
-@uniswap/v3-periphery/=lib/v3-periphery/
-@uniswap/v3-core/=lib/v3-core/
+@uniswap/=node_modules/@uniswap/
 @forge-std/=lib/forge-std/
 @openzeppelin/=lib/openzeppelin-contracts/

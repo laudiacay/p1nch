@@ -3,14 +3,13 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
 
-import "./SwapProofVerifier.sol";
-import "./SwapProxy.sol";
-import "../HistoricalRoots.sol";
+import {SwapProofVerifier} from "./SwapProofVerifier.sol";
+import {PinchSwapProxy} from "./PinchSwapProxy.sol";
+import {HistoricalRoots} from "../HistoricalRoots.sol";
 
 // TODO handle if the swap (or other operation) fails!
-contract Swapper is AccessControl, SwapProxy {
+contract Swapper is AccessControl, PinchSwapProxy {
     bytes32 public constant STATE_ADMIN_ROLE = keccak256("STATE_ADMIN_ROLE");
     bytes32 public constant BOT_ROLE = keccak256("BOT_ROLE");
 
@@ -67,7 +66,7 @@ contract Swapper is AccessControl, SwapProxy {
         address governance_owner,
         address bot,
         address swap_router
-    ) SwapProxy(ISwapRouter(swap_router)) {
+    ) PinchSwapProxy(swap_router) {
         // TODO check this
         _grantRole(DEFAULT_ADMIN_ROLE, governance_owner);
         _grantRole(STATE_ADMIN_ROLE, msg.sender);
@@ -165,7 +164,7 @@ contract Swapper is AccessControl, SwapProxy {
             // TODO: SAFE TRANSFER FROM EVERYWHERE!!!!!!
             // IERC20(pair.token_src).transferFrom(address(this), address(this), swap_amounts.token_src_amount_in);
             uint256 amount_out = super.swap(
-                SwapProxy.SwapDescription({
+                PinchSwapProxy.SwapDescription({
                     srcToken: pair.token_src,
                     dstToken: pair.token_dest,
                     amount: swap_amounts.token_src_amount_in,
