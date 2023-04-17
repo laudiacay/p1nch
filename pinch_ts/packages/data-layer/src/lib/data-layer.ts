@@ -27,7 +27,7 @@ interface TreeDeleteRes extends TreeFindRes {
 }
 
 export type SMTInsertArgs = Awaited<ReturnType<CircomSMT['insert']>>;
-export type SMTInclusionArgs = Awaited<ReturnType<CircomSMT['inclusiong']>>;
+export type SMTInclusionArgs = Awaited<ReturnType<CircomSMT['inclusion']>>;
 
 // Adding leaves up to depth is in https://github.com/iden3/circomlib/blob/master/test/smtverifier.js
 export class CircomSMT {
@@ -98,8 +98,11 @@ export class CircomSMT {
   }
 
   // See Circom's test: https://github.com/iden3/circomlib/blob/master/test/smtverifier.js, for details
+  /**
+   * Find the path to a key. If it is not in the tree, return null
+   */
   public async inclusion(inp_key: BigIntish) {
-    const res: TreeFindRes = await this._smt.find(inp_key);
+    const res: TreeFindRes = await this._smt.inclusion(inp_key);
     const siblings = res.siblings;
     for (let i = 0; i < siblings.length; i++)
       siblings[i] = this._smt.F.toObject(siblings[i]);
@@ -109,10 +112,8 @@ export class CircomSMT {
     res.key = inp_key;
     res.siblings = siblings;
     const tree_find = res;
-    if (tree_find.found) throw `Not found ${inp_key} in the tree`;
+    if (tree_find.found) return null;
     return {
-      // enabled: 1,
-      // fnc: inclusion ? 0 : 1,
       root: this._smt.F.toObject(this._smt.root),
       siblings: tree_find.siblings,
       key: this._smt.toObject(tree_find.key),

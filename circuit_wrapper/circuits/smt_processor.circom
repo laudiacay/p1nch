@@ -12,13 +12,12 @@ include "circuits/common.circom";
 template SMTProcessorWrapper(NLevels) {
 	signal input oldRoot;
   signal input siblings[NLevels];
-  signal input oldKey;
   signal input newKey;
 
   signal output newRoot;
 
 	newRoot <== SMTProcessor(NLevels)(
-		oldRoot, siblings, oldKey, 0, 1 /* isOld0 being 1 means we do not have an old key */, newKey, 0, [1, 0] // We only support insertions
+		oldRoot, siblings, 0, 0, 1 /* isOld0 being 1 means we do not have an old key */, newKey, 0, [1, 0] // We only support insertions
 	);
 }
 
@@ -29,9 +28,6 @@ template VerifyCommMembership(NLevels) {
 		signal input key;
 		signal input randomness;
 		signal input siblings[NLevels];
-		signal input oldKey;
-    signal input oldValue;
-    signal input isOld0;
 
 	  /**** Public Signals ****/
     signal input comm;
@@ -40,5 +36,5 @@ template VerifyCommMembership(NLevels) {
 
     signal _comm <== Poseidon(2)([key, randomness]);
 		comm === _comm;
-		SMTVerifier(NLevels)(1, root, siblings, oldKey, oldValue, isOld0, key, 0, 0);
+		SMTVerifier(NLevels)(1, root, siblings, 0, 0, 1, key, 0, 0);
 }

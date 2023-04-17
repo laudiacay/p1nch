@@ -1,7 +1,6 @@
 //@ts-ignore
 import snarkjs from 'snarkjs';
 import { readFileSync } from 'fs';
-import { configs } from './configs';
 
 export const compile_snark = async (
   witness: any,

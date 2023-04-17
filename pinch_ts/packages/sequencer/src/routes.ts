@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 export const defaultRoute = Router();
 
 import { CircomSMT } from '@pinch-ts/data-layer';
-import { configs } from './configs';
+import { configs } from '@pinch-ts/common';
 import { compile_snark } from './snark_utils';
 
 import Redis from 'ioredis';
@@ -10,7 +10,8 @@ import Redis from 'ioredis';
 const redis = new Redis();
 import { ethers, Contract } from 'ethers';
 import erc20Abi from './erc20Abi.json';
-import p1nchAbi from '../../smart-contracts/out/Pinch.sol/Pinch.json';
+// TODO: fix me
+import p1nchAbi from '../../../../smart-contracts/out/Pinch.sol/Pinch.json';
 const provider = ethers.getDefaultProvider('goerli');
 
 // pinch address const
@@ -57,7 +58,7 @@ defaultRoute.post('/sequencer/deposit', async (req: Request, res: Response) => {
     !data.ticket_hash ||
     !data.token ||
     !data.amount ||
-    !data.alice
+    !data.token_sender
   ) {
     res.status(500).json({
       message: 'missing required fields... check the api spec',
@@ -66,14 +67,14 @@ defaultRoute.post('/sequencer/deposit', async (req: Request, res: Response) => {
   }
 
   // check that the ticketKey is not in the SMT currently
-  if ((await smt.find(data.ticket_hash, false)) === null) {
+  if ((await smt.inclusion(data.ticket_hash)) !== null) {
     res.status(500).json({ message: 'ticketKey already in SMT' });
   }
 
   // check that alice authorized her funds.
   const erc20Contract = new Contract(data.token, erc20Abi, provider);
   const aliceAuthorized = await erc20Contract.allowance(
-    data.alice,
+    data.token_sender,
     process.env.CONTRACT_ADDRESS
   );
   if (aliceAuthorized < data.amount) {
@@ -101,7 +102,7 @@ defaultRoute.post('/sequencer/deposit', async (req: Request, res: Response) => {
     smt_new_root,
     data.token,
     data.amount,
-    data.alice
+    data.token_sender
   );
   const receipt = await tx.wait();
   console.log('receipt', receipt);
@@ -142,7 +143,7 @@ defaultRoute.post(
       return;
     }
     // check that the ticketKey is not in the SMT currently
-    if ((await smt.find(data.new_deactivator_ticket_hash, false)) === null) {
+    if ((await smt.inclusion(data.new_deactivator_ticket_hash)) !== null) {
       res.status(500).json({ message: 'ticketKey already in SMT' });
     }
     // TODO validate the snarks provided before you put them on chain. god forbid.
@@ -209,13 +210,13 @@ defaultRoute.post('/sequencer/merge', async (req: Request, res: Response) => {
     });
   }
   // check that the various tickets are not in the SMT currently
-  if ((await smt.find(data.old_p2skh_deactivator_ticket_1, false)) === null) {
+  if ((await smt.inclusion(data.old_p2skh_deactivator_ticket_1)) !== null) {
     res.status(500).json({ message: 'ticketKey already in SMT' });
   }
-  if ((await smt.find(data.old_p2skh_deactivator_ticket_2, false)) === null) {
+  if ((await smt.inclusion(data.old_p2skh_deactivator_ticket_2)) !== null) {
     res.status(500).json({ message: 'ticketKey already in SMT' });
   }
-  if ((await smt.find(data.new_p2skh_ticket, false)) === null) {
+  if ((await smt.inclusion(data.new_p2skh_ticket)) !== null) {
     res.status(500).json({ message: 'ticketKey already in SMT' });
   }
 
@@ -350,12 +351,8 @@ defaultRoute.post('/sequencer/split', async (req, res) => {
     configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
     configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
   );
-  // call contract
-  const p1nchcontract = new ethers.Contract(
-    configs.p1nch_contract_address,
-    configs.p1nch_contract_abi,
-    wallet
-  );
+
+  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
   const tx = await p1nchcontract.split(
     data.well_formed_deactivator_for_p2skh,
     [smt_update_deactivator_proof, smt_update_deactivator_pub],
@@ -374,31 +371,3 @@ defaultRoute.post('/sequencer/split', async (req, res) => {
   console.log('receipt', receipt);
   res.status(200).json({ message: 'success' });
 });
-
-//     case 'swap': {
-//       break;
-//     }
-//     case 'closeSwap': {
-//       break;
-//     }
-//     default: {
-//       res.status(500).json({ message: 'invalid message type' });
-//     }
-//   }
-// } catch (error) {
-//   console.error('Error:', error);
-// }
-
-//   // Append the posted JSON data as a string to the Redis list
-//   await redis.rpush("unprocessedData", JSON.stringify(data));
-
-//   // Send a response back to the client
-//   res.json({
-//     message: "Data received and added to Redis. it will be on chain soon :)",
-//     receivedData: data,
-//   });
-// } catch (error) {
-//   console.error("Error:", error);
-//   res.status(500).json({ message: "Error adding data to Redis" });
-// }
-// });

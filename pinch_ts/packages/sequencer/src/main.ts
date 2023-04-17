@@ -4,8 +4,11 @@ import * as cron from 'node-cron';
 import { ethers, Contract } from 'ethers';
 import erc20Abi from './erc20Abi.json';
 
-import { configs } from './configs';
+import { configs } from '@pinch-ts/common';
 import { compile_snark } from './snark_utils';
+
+import Redis from 'ioredis';
+const redis = new Redis();
 
 import { defaultRoute } from './routes';
 const app = express();
