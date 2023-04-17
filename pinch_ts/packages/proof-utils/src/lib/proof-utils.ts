@@ -19,6 +19,8 @@ export const proveSMTInsert = async (insert_args: SMTInsertArgs) => {
 };
 
 // TODO: fill in **after testing**
+// Hmmmm.... now its a question of where to keep zkeys etc...
+// TODO: add assets folder
 export const proveSMTInclusion = async (inclusion_args: SMTInclusionArgs) => {};
 
 type P2SKHWellFormedArgs = {

@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 export const defaultRoute = Router();
 
-import {CircomSMT} from '@pinch-ts/data-layer'
+import { CircomSMT } from '@pinch-ts/data-layer';
 import { configs } from './configs';
 import { compile_snark } from './snark_utils';
 
@@ -78,7 +78,9 @@ defaultRoute.post('/sequencer/deposit', async (req: Request, res: Response) => {
   );
   if (aliceAuthorized < data.amount) {
     console.log("dropping item: alice didn't authorize sufficient funds", data);
-    res.status(500).json({ message: 'alice did not authorize sufficient funds' });
+    res
+      .status(500)
+      .json({ message: 'alice did not authorize sufficient funds' });
     return;
   }
 
