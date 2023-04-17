@@ -4,11 +4,15 @@ pragma solidity ^0.8.4;
 
 import "@forge-std/src/Script.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-periphery/contracts/SwapRouter.sol";
+import "@uniswap/v3-core/contracts/UniswapV3Factory.sol";
 // import "@uniswap/v3-periphery/contracts/libraries/TransferHelper.sol";
 import "../src/Pinch.sol";
 
-contract DummyUniswap {
+contract DummyUniswapFactory is UniswapV3Factory {}
+
+contract DummyUniswapRouter is SwapRouter {
+    constructor(address factory) SwapRouter(factory, address(0)) {}
 }
 
 contract DummyTokenA is ERC20("DummyTokenA", "DA") {
@@ -33,9 +37,16 @@ contract P1nchDeployScript is Script {
         address botAddress = vm.envAddress("BOT_ADDRESS");
         address sequencerAddress = vm.envAddress("SEQUENCER_ADDRESS");
         address gnosisOrOwnerAddress = vm.envAddress("GNOSIS_OR_OWNER_ADDRESS");
-        address uniswapSwapRouterAddress = vm.envAddress("UNISWAP_SWAP_ROUTER_ADDRESS");
+        address uniswapSwapRouterAddress = vm.envAddress(
+            "UNISWAP_SWAP_ROUTER_ADDRESS"
+        );
 
-        Pinch pinch = new Pinch(gnosisOrOwnerAddress, sequencerAddress, botAddress, uniswapSwapRouterAddress);
+        Pinch pinch = new Pinch(
+            gnosisOrOwnerAddress,
+            sequencerAddress,
+            botAddress,
+            uniswapSwapRouterAddress
+        );
 
         vm.stopBroadcast();
     }
