@@ -20,13 +20,13 @@ const main = (network: string) => {
       const deploy_addresses = { localnet: Object.fromEntries(addrs_entries) };
       const tok_addresses = { localnet: Object.fromEntries(addrs_toks_data) };
       writeFileSync(
-        join(__dirname, "../../pinch_ts/packages/assets/deploy_addresses.json"),
+        join(__dirname, "../../pinch_ts/packages/assets/src/deploy_addresses.json"),
         JSON.stringify(deploy_addresses)
       );
       writeFileSync(
         join(
           __dirname,
-          "../../pinch_ts/packages/assets/deploy_token_addresses.json"
+          "../../pinch_ts/packages/assets/src/deploy_token_addresses.json"
         ),
         JSON.stringify(tok_addresses)
       );

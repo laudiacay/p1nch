@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@pinch-ts/assets": ["packages/assets/src/index.ts"],
+      "@pinch-ts/assets/src/*.json": ["packages/assets/src/*.json"],
       "@pinch-ts/common": ["packages/common/src/index.ts"],
       "@pinch-ts/data-layer": ["packages/data-layer/src/index.ts"],
       "@pinch-ts/proof-utils": ["packages/proof-utils/src/index.ts"]
