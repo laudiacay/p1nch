@@ -40,6 +40,7 @@
     "ioredis": "^5.3.1",
     "node-cron": "^3.0.2",
     "snarkjs": "^0.6.10",
+    "swagger-ui-express": "^4.6.2",
     "tslib": "^2.3.0",
     "tsoa": "^5.1.1"
   }

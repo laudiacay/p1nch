@@ -1,17 +1,15 @@
 import express, { NextFunction, Request, Response } from 'express';
 //@ts-ignore
 import * as cron from 'node-cron';
+import * as swaggerUI from "swagger-ui-express";
 import { ethers, Contract } from 'ethers';
-import erc20Abi from './erc20Abi.json';
-
-import { configs } from '@pinch-ts/common';
-import { compile_snark } from '@pinch-ts/proof-utils';
 
 import Redis from 'ioredis';
 const redis = new Redis();
 
 // Import TSOA
 import { RegisterRoutes } from "../build/routes";
+import swaggerJson from "../build/swagger.json";
 import { ValidateError } from 'tsoa';
 
 const app = express();
@@ -49,6 +47,8 @@ app.use(function errorHandler(
   }
   next();
 });
+
+app.use(["/docs"], swaggerUI.serve, swaggerUI.setup(swaggerJson));
 
 
 // Schedule cron job to run every 5 minutes

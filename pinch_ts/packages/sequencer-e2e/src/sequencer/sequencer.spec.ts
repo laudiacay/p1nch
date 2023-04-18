@@ -9,7 +9,7 @@ import { configs } from '@pinch-ts/common';
 const sk: bigint = 69000420n;
 const tok_addr = '0x000';
 
-import p1nchAbi from '../../../../../smart-contracts/out/Pinch.sol/Pinch.json';
+import p1nchAbi from '../../../../smart-contracts/out/Pinch.sol/Pinch.json';
 const provider = ethers.getDefaultProvider('goerli');
 const p1nchcontract = new Contract(
   configs.addresses.PINCH_CONTRACT_ADDR,
