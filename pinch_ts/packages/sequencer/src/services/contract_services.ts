@@ -1,5 +1,9 @@
 import erc20Abi from '../erc20Abi.json';
+<<<<<<< HEAD
 import p1nchAbi from '../../../../smart-contracts/out/Pinch.sol/Pinch.json';
+=======
+import p1nchAbi from '../../../../../smart-contracts/out/Pinch.sol/Pinch.json';
+>>>>>>> a0c81dd294307fb81699fffe259e1ef87db14454
 import { TsoaResponse } from 'tsoa';
 import {
   DepositData,
