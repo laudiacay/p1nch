@@ -3,7 +3,7 @@ export const defaultRoute = Router();
 
 import { CircomSMT } from '@pinch-ts/data-layer';
 import { configs } from '@pinch-ts/common';
-import { compile_snark } from './snark_utils';
+import { compile_snark } from '@pinch-ts/proof-utils';
 
 import Redis from 'ioredis';
 
