@@ -48,7 +48,7 @@ app.use(function errorHandler(
   next();
 });
 
-app.use(["/docs"], swaggerUI.serve, swaggerUI.setup(swaggerJson));
+app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerJson));
 
 
 // Schedule cron job to run every 5 minutes

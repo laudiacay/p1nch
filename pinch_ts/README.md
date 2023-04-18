@@ -21,10 +21,10 @@ import <packageName> from '@pinch-ts/<package-name>'
 # Using the different modules
 
 ## Sequencer
-### Building and TSOA
+### Building TSOA, Swagger Documentation, and the Client Library
 When modifying the controller file, one has to **rebuild** Tsoa by running
 ```sh
-yarn nx run sequencer:build:tsoa.
+yarn nx run sequencer:build:tsoa-swagger
 ```
 
 ### Running the sequeuncer
