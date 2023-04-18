@@ -8271,7 +8271,6 @@ svgo@^2.7.0:
     picocolors "^1.0.0"
     stable "^0.1.8"
 
-<<<<<<< HEAD
 swagger-ui-dist@>=4.11.0:
   version "4.18.2"
   resolved "https://registry.yarnpkg.com/swagger-ui-dist/-/swagger-ui-dist-4.18.2.tgz#323308f1c1d87a7c22ce3e273c31835eb680a71b"
@@ -8284,8 +8283,6 @@ swagger-ui-express@^4.6.2:
   dependencies:
     swagger-ui-dist ">=4.11.0"
 
-=======
->>>>>>> a0c81dd294307fb81699fffe259e1ef87db14454
 symbol-tree@^3.2.4:
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
