@@ -4,8 +4,8 @@
   "sourceRoot": "packages/sequencer/src",
   "projectType": "application",
   "targets": {
-    "build:tsoa": {
-      "command": "cd packages/sequencer && tsoa spec && tsoa routes"
+    "build:tsoa-swagger": {
+      "command": "cd packages/sequencer && tsoa spec && tsoa routes && yarn swagger-typescript-api -p packages/sequencer/build/swagger.json -o packages/client-lib/src/lib/ -n sequencer-api.ts"
     },
     "build": {
       "executor": "@nrwl/webpack:webpack",
