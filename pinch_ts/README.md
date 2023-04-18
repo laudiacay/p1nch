@@ -21,6 +21,15 @@ import <packageName> from '@pinch-ts/<package-name>'
 # Using the different modules
 
 ## Sequencer
+### Building and TSOA
+When modifying the controller file, one has to **rebuild** Tsoa by running
+```sh
+yarn nx run sequencer:build:tsoa.
+```
+
+### Running the sequeuncer
+
+
 To run the sequencer simply run
 ```
 npx nx serve sequencer
