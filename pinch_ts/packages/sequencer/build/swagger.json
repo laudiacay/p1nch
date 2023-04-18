@@ -1,0 +1,397 @@
+{
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"Proof": {
+				"type": "string"
+			},
+			"BigIntTsoaSerial": {
+				"type": "string"
+			},
+			"DepositData": {
+				"properties": {
+					"well_formed_proof": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"ticket_hash": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"token": {
+						"type": "string"
+					},
+					"amount": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"token_sender": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"well_formed_proof",
+					"ticket_hash",
+					"token",
+					"amount",
+					"token_sender"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"WithdrawalData": {
+				"properties": {
+					"well_formed_deactivator_proof": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"new_deactivator_ticket_hash": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"old_ticket_hash_commitment": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"old_ticket_commitment_inclusion_proof": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"prior_root": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"token": {
+						"type": "string"
+					},
+					"amount": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"recipient": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"well_formed_deactivator_proof",
+					"new_deactivator_ticket_hash",
+					"old_ticket_hash_commitment",
+					"old_ticket_commitment_inclusion_proof",
+					"prior_root",
+					"token",
+					"amount",
+					"recipient"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"MergeData": {
+				"properties": {
+					"well_formed_deactivator_for_p2skh_1": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"well_formed_deactivator_for_p2skh_2": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"old_p2skh_ticket_commitment_1": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"old_p2skh_ticket_commitment_2": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"old_p2skh_deactivator_ticket_1": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"old_p2skh_deactivator_ticket_2": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"well_formed_new_p2skh_ticket_proof": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"new_p2skh_ticket": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					}
+				},
+				"required": [
+					"well_formed_deactivator_for_p2skh_1",
+					"well_formed_deactivator_for_p2skh_2",
+					"old_p2skh_ticket_commitment_1",
+					"old_p2skh_ticket_commitment_2",
+					"old_p2skh_deactivator_ticket_1",
+					"old_p2skh_deactivator_ticket_2",
+					"well_formed_new_p2skh_ticket_proof",
+					"new_p2skh_ticket"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SplitData": {
+				"properties": {
+					"well_formed_deactivator_for_p2skh": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"old_p2skh_ticket_commitment": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"old_p2skh_deactivator_ticket": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"well_formed_new_p2skh_tickets_proof": {
+						"$ref": "#/components/schemas/Proof"
+					},
+					"new_p2skh_ticket_1": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					},
+					"new_p2skh_ticket_2": {
+						"$ref": "#/components/schemas/BigIntTsoaSerial"
+					}
+				},
+				"required": [
+					"well_formed_deactivator_for_p2skh",
+					"old_p2skh_ticket_commitment",
+					"old_p2skh_deactivator_ticket",
+					"well_formed_new_p2skh_tickets_proof",
+					"new_p2skh_ticket_1",
+					"new_p2skh_ticket_2"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "TSOA",
+		"version": "1.0.0",
+		"description": "Build swagger-compliant REST APIs using TypeScript and Node",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "unknown"
+		}
+	},
+	"openapi": "3.0.0",
+	"paths": {
+		"/sequencer/deposit": {
+			"post": {
+				"operationId": "Deposit",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/DepositData"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/sequencer/withdraw": {
+			"post": {
+				"operationId": "Withdraw",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/WithdrawalData"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/sequencer/merge": {
+			"post": {
+				"operationId": "Merge",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/MergeData"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/sequencer/split": {
+			"post": {
+				"operationId": "Split",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SplitData"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

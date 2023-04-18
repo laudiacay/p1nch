@@ -4,6 +4,9 @@
   "sourceRoot": "packages/sequencer/src",
   "projectType": "application",
   "targets": {
+    "build:tsoa": {
+      "command": "cd packages/sequencer && tsoa spec && tsoa routes"
+    },
     "build": {
       "executor": "@nrwl/webpack:webpack",
       "outputs": ["{options.outputPath}"],

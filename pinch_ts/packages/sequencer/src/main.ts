@@ -1,16 +1,19 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 //@ts-ignore
 import * as cron from 'node-cron';
 import { ethers, Contract } from 'ethers';
 import erc20Abi from './erc20Abi.json';
 
 import { configs } from '@pinch-ts/common';
-import { compile_snark } from './snark_utils';
+import { compile_snark } from '@pinch-ts/proof-utils';
 
 import Redis from 'ioredis';
 const redis = new Redis();
 
-import { defaultRoute } from './routes';
+// Import TSOA
+import { RegisterRoutes } from "../build/routes";
+import { ValidateError } from 'tsoa';
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -22,8 +25,31 @@ app.use(express.json());
 //   smt = smt_;
 // });
 
-// routes
-app.use('/', defaultRoute);
+// Register TSAO routes
+RegisterRoutes(app);
+
+// Use error handler with TSOA
+app.use(function errorHandler(
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response | void {
+  if (err instanceof ValidateError) {
+    console.warn(`Caught Validation Error for ${req.path}:`, err.fields);
+    return res.status(422).json({
+      message: "Validation Failed",
+      details: err?.fields,
+    });
+  }
+  if (err instanceof Error) {
+    return res.status(500).json({
+      message: "Internal Server Error",
+    });
+  }
+  next();
+});
+
 
 // Schedule cron job to run every 5 minutes
 // TODO this literally drops everything if it fails
@@ -51,35 +77,35 @@ cron.schedule('*/5 * * * *', async () => {
     }
 
     // Add item to the Sparse Merkle Tree
-    const insert_witness = await smt.insert(item.ticketKey);
-    const { proof: smt_insert_proof, public_signals: smt_insert_pub } =
-      await compile_snark(
-        insert_witness,
-        configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-        configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
-      );
+    // const insert_witness = await smt.insert(item.ticketKey);
+    // const { proof: smt_insert_proof, public_signals: smt_insert_pub } =
+    //   await compile_snark(
+    //     insert_witness,
+    //     configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
+    //     configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    //   );
 
-    // TODO: create SNARK proof via SNARKJS
+    // // TODO: create SNARK proof via SNARKJS
 
-    // check that alice authorized her funds.
-    const erc20Contract = new Contract(item.erc20ID, erc20Abi, provider);
-    const aliceAuthorized = await erc20Contract.allowance(
-      item.alice,
-      process.env.CONTRACT_ADDRESS
-    );
-    if (aliceAuthorized < item.amount) {
-      console.log(
-        "dropping item: alice didn't authorize sufficient funds",
-        item
-      );
-      continue;
-    }
+    // // check that alice authorized her funds.
+    // const erc20Contract = new Contract(item.erc20ID, erc20Abi, provider);
+    // const aliceAuthorized = await erc20Contract.allowance(
+    //   item.alice,
+    //   process.env.CONTRACT_ADDRESS
+    // );
+    // if (aliceAuthorized < item.amount) {
+    //   console.log(
+    //     "dropping item: alice didn't authorize sufficient funds",
+    //     item
+    //   );
+    //   continue;
+    // }
 
     // build a transaction to call our thing on chain, push the proofs, update the SMT, do transfer.
     // TODO :)
 
     // put the ticketkey into the new batch in redis
-    await redis.rpush(new_list_name, JSON.stringify(item.ticketKey));
+    // await redis.rpush(new_list_name, JSON.stringify(item.ticketKey));
   }
 
   // run the transactions
