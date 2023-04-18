@@ -8,6 +8,8 @@ tmp
 # dependencies
 node_modules
 
+*.ptau
+
 # IDEs and editors
 /.idea
 .project
