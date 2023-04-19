@@ -68,8 +68,7 @@ export const sequencerDeposit = async (
   const { proof: smt_update_proof, public_signals: smt_update_pub } =
     await compile_snark(
       smt_update_witness,
-      configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-      configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+      configs.circuits.SMT_PROCESSOR,
     );
   const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
   const tx = await p1nchcontract.deposit(
@@ -101,8 +100,7 @@ export const sequencerWithdraw = async (
   const { proof: smt_update_proof, public_signals: smt_update_pub } =
     await compile_snark(
       smt_update_witness,
-      configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-      configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+      configs.circuits.SMT_PROCESSOR,
     );
   const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
   const tx = await p1nchcontract.withdraw(
@@ -151,8 +149,7 @@ export const sequencerMerge = async (
     public_signals: smt_update_deactivator_pub_1,
   } = await compile_snark(
     smt_root_after_adding_deactivator_1,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    configs.circuits.SMT_PROCESSOR
   );
   // update with second deactivator
   const smt_root_after_adding_deactivator_2 = await smt.insert(
@@ -164,8 +161,7 @@ export const sequencerMerge = async (
     public_signals: smt_update_deactivator_pub_2,
   } = await compile_snark(
     smt_root_after_adding_deactivator_2,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    configs.circuits.SMT_PROCESSOR
   );
   // update with new p2skh ticket
   const smt_root_after_adding_new_p2skh_ticket = await smt.insert(
@@ -177,8 +173,7 @@ export const sequencerMerge = async (
     public_signals: smt_update_new_p2skh_ticket_pub,
   } = await compile_snark(
     smt_root_after_adding_new_p2skh_ticket,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    configs.circuits.SMT_PROCESSOR
   );
   // build transaction
   const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
@@ -222,8 +217,7 @@ export const sequencerSplit = async (
     public_signals: smt_update_deactivator_pub,
   } = await compile_snark(
     smt_root_after_adding_deactivator,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    configs.circuits.SMT_PROCESSOR
   );
   // update smt with new p2skh tickets
   const smt_root_after_adding_new_p2skh_ticket_1 = await smt.insert(
@@ -235,8 +229,7 @@ export const sequencerSplit = async (
     public_signals: smt_update_new_p2skh_ticket_1_pub,
   } = await compile_snark(
     smt_root_after_adding_new_p2skh_ticket_1,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    configs.circuits.SMT_PROCESSOR
   );
   const smt_root_after_adding_new_p2skh_ticket_2 = await smt.insert(
     data.new_p2skh_ticket_2
@@ -247,8 +240,7 @@ export const sequencerSplit = async (
     public_signals: smt_update_new_p2skh_ticket_2_pub,
   } = await compile_snark(
     smt_root_after_adding_new_p2skh_ticket_2,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    configs.circuits.SMT_PROCESSOR
   );
 
   const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);

@@ -70,15 +70,11 @@ export const gen_circom_randomness = () => {
   }
 };
 
-export const compile_snark = async (
-  witness: any,
-  wasm_path: string,
-  zkey_path: string
-) => {
+export const compile_snark = async (witness: any, circuit_name: string) => {
   const { proof, publicSignals } = await snarkjs.groth16.fullProve(
     witness,
-    wasm_path,
-    zkey_path
+    get_wasm_path(circuit_name),
+    get_zkey_path(circuit_name)
   );
 
   console.log('Proof: ');

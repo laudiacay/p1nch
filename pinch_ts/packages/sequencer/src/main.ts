@@ -81,8 +81,8 @@ cron.schedule('*/5 * * * *', async () => {
     // const { proof: smt_insert_proof, public_signals: smt_insert_pub } =
     //   await compile_snark(
     //     insert_witness,
-    //     configs.paths.SMT_PROCESSOR_DEPOSIT_WASM_PATH,
-    //     configs.paths.SMT_PROCESSOR_DEPOSIT_ZKEY
+    //     configs.paths.SMT_PROCESSOR_WASM_PATH,
+    //     configs.paths.SMT_PROCESSOR_ZKEY
     //   );
 
     // // TODO: create SNARK proof via SNARKJS

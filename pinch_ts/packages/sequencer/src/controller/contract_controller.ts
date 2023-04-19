@@ -11,10 +11,6 @@ import {
   SuccessResponse,
   TsoaResponse,
 } from 'tsoa';
-import { CircomSMT } from '@pinch-ts/data-layer';
-import { configs } from '@pinch-ts/common';
-import Redis from 'ioredis';
-import { compile_snark } from '@pinch-ts/proof-utils';
 import {
   sequencerDeposit,
   sequencerMerge,

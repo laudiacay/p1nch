@@ -25,15 +25,10 @@ const get_config_addresses = (env: ENV) => {
 // TODO: testnet configs vs mainnet configs
 export const configs = {
   N_LEVELS: 254,
-  paths: {
-    VALID_DEPOSIT_WASM_PATH: 'TODO:',
-    VALID_DEPOSIT_ZKEY: 'TODO:',
-
-    SMT_PROCESSOR_DEPOSIT_WASM_PATH: 'TODO:',
-    SMT_PROCESSOR_DEPOSIT_ZKEY: 'TODO:',
-
-    SMT_VERIFIER_DEPOSIT_WASM_PATH: 'TODO:',
-    SMT_VERIFIER_DEPOSIT_ZKEY: 'TODO:',
+  circuits: {
+    VALID_DEPOSIT: 'TODO:',
+    SMT_PROCESSOR: 'TODO:',
+    SMT_VERIFIER: 'TODO:',
   },
   addresses: get_config_addresses('localnet'),
 };

@@ -23,8 +23,13 @@ describe('Post and P2SKH Basic Actions', () => {
     const seqApi: SequencerApi<unknown> = new SequencerApi<unknown>({
       baseUrl: 'http://localhost:3000',
     });
-    const resp = await seqApi.sequencer.deposit({} as any);
-    const { message } = resp.data;
+    const resp = await seqApi.sequencer.deposit({
+      well_formed_proof: Proof;
+      ticket_hash: BigIntTsoaSerial;
+      token: string;
+      amount: BigIntTsoaSerial;
+      token_sender: string;
+    });
 
     const deposit_randomness = gen_circom_randomness();
     const dep_amount = 1000;
