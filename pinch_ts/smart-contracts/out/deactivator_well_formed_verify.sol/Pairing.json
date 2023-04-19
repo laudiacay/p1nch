@@ -1,20 +1,20 @@
 {
   "abi": [],
   "bytecode": {
-    "object": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea26469706673582212202062a90cfdbc9644c9c32a9654289320651ca9dc6d1746abacfde9cc4f610ab664736f6c63430008110033",
+    "object": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea2646970667358221220997f0039ebef3209e969654284f1ed6c60b64cc593210305155520257898524d64736f6c63430008130033",
     "sourceMap": "1257:5863:1:-:0;;;;;;;;;;;;;;;;;;;;;",
     "linkReferences": {}
   },
   "deployedBytecode": {
-    "object": "0x600080fdfea26469706673582212202062a90cfdbc9644c9c32a9654289320651ca9dc6d1746abacfde9cc4f610ab664736f6c63430008110033",
+    "object": "0x600080fdfea2646970667358221220997f0039ebef3209e969654284f1ed6c60b64cc593210305155520257898524d64736f6c63430008130033",
     "sourceMap": "1257:5863:1:-:0;;",
     "linkReferences": {}
   },
   "methodIdentifiers": {},
-  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"circuit_build/deactivator_well_formed_verify.sol\":\"Pairing\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/\"],\"viaIR\":true},\"sources\":{\"circuit_build/deactivator_well_formed_verify.sol\":{\"keccak256\":\"0xdbbdf961d012f793e74da48cb422e776a45a800eb8c5f528e4a28a3f76635fe4\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://bb9efee569d616ecaa2e6566f7442bdbcb9886fa90784332b81d09c43a7cd435\",\"dweb:/ipfs/QmXWbghJscaheF9jokbhzUwNwDybGUo3CEEknnLFoZd6ty\"]}},\"version\":1}",
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"circuit_build/deactivator_well_formed_verify.sol\":\"Pairing\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"circuit_build/deactivator_well_formed_verify.sol\":{\"keccak256\":\"0xdbbdf961d012f793e74da48cb422e776a45a800eb8c5f528e4a28a3f76635fe4\",\"license\":\"GPL-3.0\",\"urls\":[\"bzz-raw://bb9efee569d616ecaa2e6566f7442bdbcb9886fa90784332b81d09c43a7cd435\",\"dweb:/ipfs/QmXWbghJscaheF9jokbhzUwNwDybGUo3CEEknnLFoZd6ty\"]}},\"version\":1}",
   "metadata": {
     "compiler": {
-      "version": "0.8.17+commit.8df45f5f"
+      "version": "0.8.19+commit.7dd6d404"
     },
     "language": "Solidity",
     "output": {
@@ -39,7 +39,7 @@
         ":ds-test/=lib/forge-std/lib/ds-test/src/",
         ":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
         ":forge-std/=lib/forge-std/src/",
-        ":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/"
+        ":openzeppelin-contracts/=lib/openzeppelin-contracts/"
       ],
       "optimizer": {
         "enabled": true,
@@ -84,6 +84,7 @@
         "id": 1026,
         "nodeType": "PragmaDirective",
         "src": "1232:24:1",
+        "nodes": [],
         "literals": [
           "solidity",
           "^",
@@ -100,6 +101,7 @@
             "id": 1031,
             "nodeType": "StructDefinition",
             "src": "1279:54:1",
+            "nodes": [],
             "canonicalName": "Pairing.G1Point",
             "members": [
               {
@@ -166,6 +168,7 @@
             "id": 1040,
             "nodeType": "StructDefinition",
             "src": "1392:60:1",
+            "nodes": [],
             "canonicalName": "Pairing.G2Point",
             "members": [
               {
@@ -282,10 +285,12 @@
             "id": 1053,
             "nodeType": "FunctionDefinition",
             "src": "1493:90:1",
+            "nodes": [],
             "body": {
               "id": 1052,
               "nodeType": "Block",
               "src": "1546:37:1",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -438,10 +443,12 @@
             "id": 1070,
             "nodeType": "FunctionDefinition",
             "src": "1624:936:1",
+            "nodes": [],
             "body": {
               "id": 1069,
               "nodeType": "Block",
               "src": "1677:883:1",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -658,10 +665,12 @@
             "id": 1112,
             "nodeType": "FunctionDefinition",
             "src": "2646:342:1",
+            "nodes": [],
             "body": {
               "id": 1111,
               "nodeType": "Block",
               "src": "2721:267:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -1231,10 +1240,12 @@
             "id": 1170,
             "nodeType": "FunctionDefinition",
             "src": "3039:578:1",
+            "nodes": [],
             "body": {
               "id": 1169,
               "nodeType": "Block",
               "src": "3136:481:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -2076,10 +2087,12 @@
             "id": 1219,
             "nodeType": "FunctionDefinition",
             "src": "3772:539:1",
+            "nodes": [],
             "body": {
               "id": 1218,
               "nodeType": "Block",
               "src": "3859:452:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -2807,10 +2820,12 @@
             "id": 1385,
             "nodeType": "FunctionDefinition",
             "src": "4522:1036:1",
+            "nodes": [],
             "body": {
               "id": 1384,
               "nodeType": "Block",
               "src": "4610:948:1",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -5146,10 +5161,12 @@
             "id": 1457,
             "nodeType": "FunctionDefinition",
             "src": "5625:342:1",
+            "nodes": [],
             "body": {
               "id": 1456,
               "nodeType": "Block",
               "src": "5752:215:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -5999,10 +6016,12 @@
             "id": 1547,
             "nodeType": "FunctionDefinition",
             "src": "6036:462:1",
+            "nodes": [],
             "body": {
               "id": 1546,
               "nodeType": "Block",
               "src": "6243:255:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -7070,10 +7089,12 @@
             "id": 1655,
             "nodeType": "FunctionDefinition",
             "src": "6566:552:1",
+            "nodes": [],
             "body": {
               "id": 1654,
               "nodeType": "Block",
               "src": "6823:295:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -8379,6 +8400,7 @@
             "id": 1658,
             "nodeType": "UsingForDirective",
             "src": "7145:20:1",
+            "nodes": [],
             "global": false,
             "libraryName": {
               "id": 1657,
@@ -8395,6 +8417,7 @@
             "id": 1675,
             "nodeType": "StructDefinition",
             "src": "7170:183:1",
+            "nodes": [],
             "canonicalName": "Verifier.VerifyingKey",
             "members": [
               {
@@ -8606,6 +8629,7 @@
             "id": 1685,
             "nodeType": "StructDefinition",
             "src": "7358:101:1",
+            "nodes": [],
             "canonicalName": "Verifier.Proof",
             "members": [
               {
@@ -8732,10 +8756,12 @@
             "id": 1791,
             "nodeType": "FunctionDefinition",
             "src": "7464:2423:1",
+            "nodes": [],
             "body": {
               "id": 1790,
               "nodeType": "Block",
               "src": "7535:2352:1",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -10165,10 +10191,12 @@
             "id": 1915,
             "nodeType": "FunctionDefinition",
             "src": "9892:932:1",
+            "nodes": [],
             "body": {
               "id": 1914,
               "nodeType": "Block",
               "src": "9978:846:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -11885,10 +11913,12 @@
             "id": 2048,
             "nodeType": "FunctionDefinition",
             "src": "10876:675:1",
+            "nodes": [],
             "body": {
               "id": 2047,
               "nodeType": "Block",
               "src": "11063:488:1",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [

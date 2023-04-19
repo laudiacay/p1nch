@@ -1,20 +1,20 @@
 {
   "abi": [],
   "bytecode": {
-    "object": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea26469706673582212204240db9edc6a573c48f1dacb20d6613bc51a0f16633630147eea0a879ea2ea7264736f6c63430008110033",
+    "object": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea2646970667358221220f6fd93069f35168824b8ff75bc6878c318149c6d33b8ba1ac49143dc395c2c0664736f6c63430008130033",
     "sourceMap": "202:12582:36:-:0;;;;;;;;;;;;;;;;;;;;;",
     "linkReferences": {}
   },
   "deployedBytecode": {
-    "object": "0x600080fdfea26469706673582212204240db9edc6a573c48f1dacb20d6613bc51a0f16633630147eea0a879ea2ea7264736f6c63430008110033",
+    "object": "0x600080fdfea2646970667358221220f6fd93069f35168824b8ff75bc6878c318149c6d33b8ba1ac49143dc395c2c0664736f6c63430008130033",
     "sourceMap": "202:12582:36:-:0;;",
     "linkReferences": {}
   },
   "methodIdentifiers": {},
-  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"details\":\"Standard math utilities missing in the Solidity language.\",\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/openzeppelin-contracts/contracts/utils/math/Math.sol\":\"Math\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/\"],\"viaIR\":true},\"sources\":{\"lib/openzeppelin-contracts/contracts/utils/math/Math.sol\":{\"keccak256\":\"0xbaf3bd8c64ac943fafde717797ee797c96360586b9448ea25e9872490a6e6858\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bab65b9b5ea0c68e96e1a73460db616042f639d144a6a75595434cfa2a483ed4\",\"dweb:/ipfs/QmUgwEcWXaEu4VSpymiVq8tZYKgA44HPMWZowpg2L8Kiij\"]}},\"version\":1}",
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"details\":\"Standard math utilities missing in the Solidity language.\",\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/openzeppelin-contracts/contracts/utils/math/Math.sol\":\"Math\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"lib/openzeppelin-contracts/contracts/utils/math/Math.sol\":{\"keccak256\":\"0xbaf3bd8c64ac943fafde717797ee797c96360586b9448ea25e9872490a6e6858\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://bab65b9b5ea0c68e96e1a73460db616042f639d144a6a75595434cfa2a483ed4\",\"dweb:/ipfs/QmUgwEcWXaEu4VSpymiVq8tZYKgA44HPMWZowpg2L8Kiij\"]}},\"version\":1}",
   "metadata": {
     "compiler": {
-      "version": "0.8.17+commit.8df45f5f"
+      "version": "0.8.19+commit.7dd6d404"
     },
     "language": "Solidity",
     "output": {
@@ -39,7 +39,7 @@
         ":ds-test/=lib/forge-std/lib/ds-test/src/",
         ":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
         ":forge-std/=lib/forge-std/src/",
-        ":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/"
+        ":openzeppelin-contracts/=lib/openzeppelin-contracts/"
       ],
       "optimizer": {
         "enabled": true,
@@ -81,6 +81,7 @@
         "id": 39771,
         "nodeType": "PragmaDirective",
         "src": "103:23:36",
+        "nodes": [],
         "literals": [
           "solidity",
           "^",
@@ -97,6 +98,7 @@
             "id": 39776,
             "nodeType": "EnumDefinition",
             "src": "221:122:36",
+            "nodes": [],
             "canonicalName": "Math.Rounding",
             "members": [
               {
@@ -128,10 +130,12 @@
             "id": 39794,
             "nodeType": "FunctionDefinition",
             "src": "413:104:36",
+            "nodes": [],
             "body": {
               "id": 39793,
               "nodeType": "Block",
               "src": "480:37:36",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -335,10 +339,12 @@
             "id": 39812,
             "nodeType": "FunctionDefinition",
             "src": "588:104:36",
+            "nodes": [],
             "body": {
               "id": 39811,
               "nodeType": "Block",
               "src": "655:37:36",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -542,10 +548,12 @@
             "id": 39835,
             "nodeType": "FunctionDefinition",
             "src": "805:153:36",
+            "nodes": [],
             "body": {
               "id": 39834,
               "nodeType": "Block",
               "src": "876:82:36",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -838,10 +846,12 @@
             "id": 39860,
             "nodeType": "FunctionDefinition",
             "src": "1157:194:36",
+            "nodes": [],
             "body": {
               "id": 39859,
               "nodeType": "Block",
               "src": "1228:123:36",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -1167,10 +1177,12 @@
             "id": 39983,
             "nodeType": "FunctionDefinition",
             "src": "1667:4213:36",
+            "nodes": [],
             "body": {
               "id": 39982,
               "nodeType": "Block",
               "src": "1765:4115:36",
+              "nodes": [],
               "statements": [
                 {
                   "id": 39981,
@@ -3364,10 +3376,12 @@
             "id": 40027,
             "nodeType": "FunctionDefinition",
             "src": "6012:299:36",
+            "nodes": [],
             "body": {
               "id": 40026,
               "nodeType": "Block",
               "src": "6122:189:36",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -3939,10 +3953,12 @@
             "id": 40139,
             "nodeType": "FunctionDefinition",
             "src": "6530:1642:36",
+            "nodes": [],
             "body": {
               "id": 40138,
               "nodeType": "Block",
               "src": "6587:1585:36",
+              "nodes": [],
               "statements": [
                 {
                   "condition": {
@@ -5466,10 +5482,12 @@
             "id": 40175,
             "nodeType": "FunctionDefinition",
             "src": "8272:237:36",
+            "nodes": [],
             "body": {
               "id": 40174,
               "nodeType": "Block",
               "src": "8348:161:36",
+              "nodes": [],
               "statements": [
                 {
                   "id": 40173,
@@ -5939,10 +5957,12 @@
             "id": 40307,
             "nodeType": "FunctionDefinition",
             "src": "8633:983:36",
+            "nodes": [],
             "body": {
               "id": 40306,
               "nodeType": "Block",
               "src": "8694:922:36",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -7553,10 +7573,12 @@
             "id": 40343,
             "nodeType": "FunctionDefinition",
             "src": "9769:245:36",
+            "nodes": [],
             "body": {
               "id": 40342,
               "nodeType": "Block",
               "src": "9849:165:36",
+              "nodes": [],
               "statements": [
                 {
                   "id": 40341,
@@ -8030,10 +8052,12 @@
             "id": 40472,
             "nodeType": "FunctionDefinition",
             "src": "10139:916:36",
+            "nodes": [],
             "body": {
               "id": 40471,
               "nodeType": "Block",
               "src": "10201:854:36",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -9662,10 +9686,12 @@
             "id": 40508,
             "nodeType": "FunctionDefinition",
             "src": "11209:248:36",
+            "nodes": [],
             "body": {
               "id": 40507,
               "nodeType": "Block",
               "src": "11290:167:36",
+              "nodes": [],
               "statements": [
                 {
                   "id": 40506,
@@ -10139,10 +10165,12 @@
             "id": 40595,
             "nodeType": "FunctionDefinition",
             "src": "11708:663:36",
+            "nodes": [],
             "body": {
               "id": 40594,
               "nodeType": "Block",
               "src": "11771:600:36",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -11195,10 +11223,12 @@
             "id": 40634,
             "nodeType": "FunctionDefinition",
             "src": "12526:256:36",
+            "nodes": [],
             "body": {
               "id": 40633,
               "nodeType": "Block",
               "src": "12608:174:36",
+              "nodes": [],
               "statements": [
                 {
                   "id": 40632,

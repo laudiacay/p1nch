@@ -26,9 +26,9 @@ const get_config_addresses = (env: ENV) => {
 export const configs = {
   N_LEVELS: 254,
   circuits: {
-    VALID_DEPOSIT: 'TODO:',
-    SMT_PROCESSOR: 'TODO:',
-    SMT_VERIFIER: 'TODO:',
+    SMT_PROCESSOR: 'smt_processor',
+    SMT_VERIFIER: 'comm_memb',
+    WELL_FORMED_P2SKH: 'p2skh_well_formed',
   },
   addresses: get_config_addresses('localnet'),
 };

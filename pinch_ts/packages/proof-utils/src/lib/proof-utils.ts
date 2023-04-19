@@ -1,21 +1,48 @@
 //@ts-ignore
-import snarkjs from 'snarkjs';
+import * as snarkjs from 'snarkjs';
+import * as crypto from 'crypto';
 import { readFileSync } from 'fs';
+//@ts-ignore
+import { buildPoseidon } from 'circomlibjs';
 import {
   CircomSMT,
   SMTInclusionArgs,
   SMTInsertArgs,
 } from '@pinch-ts/data-layer';
 import { BigIntish } from '@pinch-ts/common';
+import { BitwiseOperator } from 'typescript';
+import { join } from 'path';
 
 const CIRCOM_PRIME: bigint =
   21888242871839275222246405745257275088548364400416034343698204186575808495617n;
 
 const get_wasm_path = (circuit_name: string) =>
-  `../../../assets/src/${circuit_name}_js/${circuit_name}.wasm`;
+  join(
+    __dirname,
+    `../../../../smart-contracts/circuit_build/${circuit_name}_js/${circuit_name}.wasm`
+  );
+
+const get_verification_key_path = (circuit_name: string) =>
+  join(
+    __dirname,
+    `../../../../smart-contracts/circuit_build/${circuit_name}_verification_key.json`
+  );
 
 const get_zkey_path = (circuit_name: string) =>
-  `../../../assets/src/${circuit_name}.zkey`;
+  join(
+    __dirname,
+    `../../../../smart-contracts/circuit_build/${circuit_name}.zkey`
+  );
+
+let poseidon_inner: any;
+let poseidon: any;
+const get_poseidon = async () => {
+  if (!poseidon || !poseidon_inner) {
+    poseidon_inner = await buildPoseidon();
+    poseidon = (inp: any) => poseidon_inner.F.toString(poseidon_inner(inp));
+  }
+  return poseidon;
+};
 
 // TODO: fill in **after testing**
 // Hmmmm.... now its a question of where to keep zkeys etc...
@@ -39,15 +66,36 @@ export const proveCommitmentSMTInclusion = async (
   return proof;
 };
 
-export const gen_ticket_hash = async () => {
-  // Poseidon that boi
+export const hash_sk = async (sk: BigIntish) => {
+  return (await get_poseidon())([sk]);
+};
+
+export const gen_ticket_hash = async (
+  active: boolean,
+  pk: BigIntish,
+  tok_addr: BigIntish,
+  amount: BigIntish,
+  instr: BigIntish,
+  data: [BigIntish, BigIntish],
+  randomness: BigIntish
+) => {
+  return (await get_poseidon())([
+    active ? 1 : 0,
+    pk,
+    tok_addr,
+    amount,
+    instr,
+    data[0],
+    data[1],
+    randomness,
+  ]);
 };
 
 export const gen_commitment = async (
   ticket: BigIntish,
   randomness: BigIntish
 ) => {
-  // Poseidon that boi
+  return (await get_poseidon())([ticket, randomness]);
 };
 
 /**
@@ -80,7 +128,9 @@ export const compile_snark = async (witness: any, circuit_name: string) => {
   console.log('Proof: ');
   console.log(JSON.stringify(proof, null, 1));
 
-  const vKey = readFileSync('verification_key.json').toJSON();
+  const vKey = JSON.parse(
+    readFileSync(get_verification_key_path(circuit_name)).toString()
+  );
 
   const res = await snarkjs.groth16.verify(vKey, publicSignals, proof);
 

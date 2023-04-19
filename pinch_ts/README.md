@@ -41,4 +41,21 @@ To run the sequencer simply run
 npx nx serve sequencer
 ```
 
-##
+### Running integration tests
+To run integration tests, first make sure to have Redis running. Then, make sure to have a local EVM up and running.
+```
+cd smart-contracts && ./script/run_local_rpc.sh
+```
+Keep this terminal open.
+
+In a separate terminal, run
+```
+cd smart-contracts && ./script/deploy_local.sh
+```
+
+Then, to run the `e2e` test,
+run
+```
+yarn nx run sequencer-e2e:e2e
+```
+

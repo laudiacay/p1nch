@@ -11,10 +11,10 @@
     "linkReferences": {}
   },
   "methodIdentifiers": {},
-  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"notice\":\"StdChains provides information about EVM compatible chains that can be used in scripts/tests. For each chain, the chain's name, chain ID, and a default RPC URL are provided. Chains are identified by their alias, which is the same as the alias in the `[rpc_endpoints]` section of the `foundry.toml` file. For best UX, ensure the alias in the `foundry.toml` file match the alias used in this contract, which can be found as the first argument to the `setChainWithDefaultRpcUrl` call in the `initializeStdChains` function. There are two main ways to use this contract:   1. Set a chain with `setChain(string memory chainAlias, ChainData memory chain)` or      `setChain(string memory chainAlias, Chain memory chain)`   2. Get a chain with `getChain(string memory chainAlias)` or `getChain(uint256 chainId)`. The first time either of those are used, chains are initialized with the default set of RPC URLs. This is done in `initializeStdChains`, which uses `setChainWithDefaultRpcUrl`. Defaults are recorded in `defaultRpcUrls`. The `setChain` function is straightforward, and it simply saves off the given chain data. The `getChain` methods use `getChainWithUpdatedRpcUrl` to return a chain. For example, let's say we want to retrieve `mainnet`'s RPC URL:   - If you haven't set any mainnet chain info with `setChain`, you haven't specified that     chain in `foundry.toml` and no env var is set, the default data and RPC URL will be returned.   - If you have set a mainnet RPC URL in `foundry.toml` it will return that, if valid (e.g. if     a URL is given or if an environment variable is given and that environment variable exists).     Otherwise, the default data is returned.   - If you specified data with `setChain` it will return that. Summarizing the above, the prioritization hierarchy is `setChain` -> `foundry.toml` -> environment variable -> defaults.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/forge-std/src/StdChains.sol\":\"StdChains\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/\"],\"viaIR\":true},\"sources\":{\"lib/forge-std/src/StdChains.sol\":{\"keccak256\":\"0x260965186c4b36030b61bfff44312607b7d9bc03fa8b5e9c2581ffeb17d0053b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4c50e42ec13a54820d77ceb54e16f6efc1e9af2312ed39049ffbd1a5489cd0ee\",\"dweb:/ipfs/Qma1xCsmPhDfAZfDZGoFC7wuCTNXDhsBdFEZKnrZgTUj93\"]},\"lib/forge-std/src/Vm.sol\":{\"keccak256\":\"0x609394b09bc0e0f4a3fb946c769dc75b4d4154b367503190ebd1e3ca12c23ca8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5a57dfea18ea68df6f48cca1ed1c030541a5d0cf1c115725da8ae7c2ad6f41f1\",\"dweb:/ipfs/QmZ5owm2HG4jjTzkimL9zHZHSTHT5o81L3mPA24391PtmT\"]}},\"version\":1}",
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"notice\":\"StdChains provides information about EVM compatible chains that can be used in scripts/tests. For each chain, the chain's name, chain ID, and a default RPC URL are provided. Chains are identified by their alias, which is the same as the alias in the `[rpc_endpoints]` section of the `foundry.toml` file. For best UX, ensure the alias in the `foundry.toml` file match the alias used in this contract, which can be found as the first argument to the `setChainWithDefaultRpcUrl` call in the `initializeStdChains` function. There are two main ways to use this contract:   1. Set a chain with `setChain(string memory chainAlias, ChainData memory chain)` or      `setChain(string memory chainAlias, Chain memory chain)`   2. Get a chain with `getChain(string memory chainAlias)` or `getChain(uint256 chainId)`. The first time either of those are used, chains are initialized with the default set of RPC URLs. This is done in `initializeStdChains`, which uses `setChainWithDefaultRpcUrl`. Defaults are recorded in `defaultRpcUrls`. The `setChain` function is straightforward, and it simply saves off the given chain data. The `getChain` methods use `getChainWithUpdatedRpcUrl` to return a chain. For example, let's say we want to retrieve `mainnet`'s RPC URL:   - If you haven't set any mainnet chain info with `setChain`, you haven't specified that     chain in `foundry.toml` and no env var is set, the default data and RPC URL will be returned.   - If you have set a mainnet RPC URL in `foundry.toml` it will return that, if valid (e.g. if     a URL is given or if an environment variable is given and that environment variable exists).     Otherwise, the default data is returned.   - If you specified data with `setChain` it will return that. Summarizing the above, the prioritization hierarchy is `setChain` -> `foundry.toml` -> environment variable -> defaults.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/forge-std/src/StdChains.sol\":\"StdChains\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"lib/forge-std/src/StdChains.sol\":{\"keccak256\":\"0x260965186c4b36030b61bfff44312607b7d9bc03fa8b5e9c2581ffeb17d0053b\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4c50e42ec13a54820d77ceb54e16f6efc1e9af2312ed39049ffbd1a5489cd0ee\",\"dweb:/ipfs/Qma1xCsmPhDfAZfDZGoFC7wuCTNXDhsBdFEZKnrZgTUj93\"]},\"lib/forge-std/src/Vm.sol\":{\"keccak256\":\"0x609394b09bc0e0f4a3fb946c769dc75b4d4154b367503190ebd1e3ca12c23ca8\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://5a57dfea18ea68df6f48cca1ed1c030541a5d0cf1c115725da8ae7c2ad6f41f1\",\"dweb:/ipfs/QmZ5owm2HG4jjTzkimL9zHZHSTHT5o81L3mPA24391PtmT\"]}},\"version\":1}",
   "metadata": {
     "compiler": {
-      "version": "0.8.17+commit.8df45f5f"
+      "version": "0.8.19+commit.7dd6d404"
     },
     "language": "Solidity",
     "output": {
@@ -39,7 +39,7 @@
         ":ds-test/=lib/forge-std/lib/ds-test/src/",
         ":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
         ":forge-std/=lib/forge-std/src/",
-        ":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/"
+        ":openzeppelin-contracts/=lib/openzeppelin-contracts/"
       ],
       "optimizer": {
         "enabled": true,
@@ -92,6 +92,7 @@
         "id": 13213,
         "nodeType": "PragmaDirective",
         "src": "32:31:13",
+        "nodes": [],
         "literals": [
           "solidity",
           ">=",
@@ -106,6 +107,7 @@
         "id": 13214,
         "nodeType": "PragmaDirective",
         "src": "65:33:13",
+        "nodes": [],
         "literals": [
           "experimental",
           "ABIEncoderV2"
@@ -115,6 +117,7 @@
         "id": 13216,
         "nodeType": "ImportDirective",
         "src": "100:32:13",
+        "nodes": [],
         "absolutePath": "lib/forge-std/src/Vm.sol",
         "file": "./Vm.sol",
         "nameLocation": "-1:-1:-1",
@@ -145,6 +148,7 @@
             "id": 13234,
             "nodeType": "VariableDeclaration",
             "src": "2122:92:13",
+            "nodes": [],
             "constant": true,
             "mutability": "constant",
             "name": "vm",
@@ -407,6 +411,7 @@
             "id": 13236,
             "nodeType": "VariableDeclaration",
             "src": "2221:33:13",
+            "nodes": [],
             "constant": false,
             "mutability": "mutable",
             "name": "stdChainsInitialized",
@@ -434,6 +439,7 @@
             "id": 13243,
             "nodeType": "StructDefinition",
             "src": "2261:93:13",
+            "nodes": [],
             "canonicalName": "StdChains.ChainData",
             "members": [
               {
@@ -527,6 +533,7 @@
             "id": 13252,
             "nodeType": "StructDefinition",
             "src": "2360:598:13",
+            "nodes": [],
             "canonicalName": "StdChains.Chain",
             "members": [
               {
@@ -647,6 +654,7 @@
             "id": 13257,
             "nodeType": "VariableDeclaration",
             "src": "3062:39:13",
+            "nodes": [],
             "constant": false,
             "mutability": "mutable",
             "name": "chains",
@@ -660,6 +668,8 @@
             },
             "typeName": {
               "id": 13256,
+              "keyName": "",
+              "keyNameLocation": "-1:-1:-1",
               "keyType": {
                 "id": 13253,
                 "name": "string",
@@ -676,6 +686,8 @@
                 "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_struct$_Chain_$13252_storage_$",
                 "typeString": "mapping(string => struct StdChains.Chain)"
               },
+              "valueName": "",
+              "valueNameLocation": "-1:-1:-1",
               "valueType": {
                 "id": 13255,
                 "nodeType": "UserDefinedTypeName",
@@ -703,6 +715,7 @@
             "id": 13261,
             "nodeType": "VariableDeclaration",
             "src": "3167:48:13",
+            "nodes": [],
             "constant": false,
             "mutability": "mutable",
             "name": "defaultRpcUrls",
@@ -716,6 +729,8 @@
             },
             "typeName": {
               "id": 13260,
+              "keyName": "",
+              "keyNameLocation": "-1:-1:-1",
               "keyType": {
                 "id": 13258,
                 "name": "string",
@@ -732,6 +747,8 @@
                 "typeIdentifier": "t_mapping$_t_string_memory_ptr_$_t_string_storage_$",
                 "typeString": "mapping(string => string)"
               },
+              "valueName": "",
+              "valueNameLocation": "-1:-1:-1",
               "valueType": {
                 "id": 13259,
                 "name": "string",
@@ -749,6 +766,7 @@
             "id": 13265,
             "nodeType": "VariableDeclaration",
             "src": "3264:44:13",
+            "nodes": [],
             "constant": false,
             "mutability": "mutable",
             "name": "idToAlias",
@@ -762,6 +780,8 @@
             },
             "typeName": {
               "id": 13264,
+              "keyName": "",
+              "keyNameLocation": "-1:-1:-1",
               "keyType": {
                 "id": 13262,
                 "name": "uint256",
@@ -778,6 +798,8 @@
                 "typeIdentifier": "t_mapping$_t_uint256_$_t_string_storage_$",
                 "typeString": "mapping(uint256 => string)"
               },
+              "valueName": "",
+              "valueNameLocation": "-1:-1:-1",
               "valueType": {
                 "id": 13263,
                 "name": "string",
@@ -795,6 +817,7 @@
             "id": 13268,
             "nodeType": "VariableDeclaration",
             "src": "3315:44:13",
+            "nodes": [],
             "constant": false,
             "mutability": "mutable",
             "name": "fallbackToDefaultRpcUrls",
@@ -838,10 +861,12 @@
             "id": 13320,
             "nodeType": "FunctionDefinition",
             "src": "3444:524:13",
+            "nodes": [],
             "body": {
               "id": 13319,
               "nodeType": "Block",
               "src": "3534:434:13",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -1568,10 +1593,12 @@
             "id": 13377,
             "nodeType": "FunctionDefinition",
             "src": "3974:541:13",
+            "nodes": [],
             "body": {
               "id": 13376,
               "nodeType": "Block",
               "src": "4055:460:13",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -2365,10 +2392,12 @@
             "id": 13487,
             "nodeType": "FunctionDefinition",
             "src": "4586:1173:13",
+            "nodes": [],
             "body": {
               "id": 13486,
               "nodeType": "Block",
               "src": "4671:1088:13",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -3962,10 +3991,12 @@
             "id": 13508,
             "nodeType": "FunctionDefinition",
             "src": "5830:195:13",
+            "nodes": [],
             "body": {
               "id": 13507,
               "nodeType": "Block",
               "src": "5911:114:13",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -4258,10 +4289,12 @@
             "id": 13585,
             "nodeType": "FunctionDefinition",
             "src": "6031:451:13",
+            "nodes": [],
             "body": {
               "id": 13584,
               "nodeType": "Block",
               "src": "6105:377:13",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -5233,10 +5266,12 @@
             "id": 13702,
             "nodeType": "FunctionDefinition",
             "src": "6618:1218:13",
+            "nodes": [],
             "body": {
               "id": 13701,
               "nodeType": "Block",
               "src": "6730:1106:13",
+              "nodes": [],
               "statements": [
                 {
                   "condition": {
@@ -6834,10 +6869,12 @@
             "id": 13712,
             "nodeType": "FunctionDefinition",
             "src": "7842:117:13",
+            "nodes": [],
             "body": {
               "id": 13711,
               "nodeType": "Block",
               "src": "7905:54:13",
+              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -6938,10 +6975,12 @@
             "id": 13867,
             "nodeType": "FunctionDefinition",
             "src": "7965:2377:13",
+            "nodes": [],
             "body": {
               "id": 13866,
               "nodeType": "Block",
               "src": "8004:2338:13",
+              "nodes": [],
               "statements": [
                 {
                   "condition": {
@@ -9521,10 +9560,12 @@
             "id": 13904,
             "nodeType": "FunctionDefinition",
             "src": "10424:305:13",
+            "nodes": [],
             "body": {
               "id": 13903,
               "nodeType": "Block",
               "src": "10517:212:13",
+              "nodes": [],
               "statements": [
                 {
                   "assignments": [
