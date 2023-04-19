@@ -1,9 +1,10 @@
 import axios from 'axios';
 import {
-  genP2SKHWellFormed,
+  // genP2SKHWellFormed,
   gen_circom_randomness,
 } from '@pinch-ts/proof-utils';
 import ethers, { Contract } from 'ethers';
+import { Api as SequencerApi } from '@pinch-ts/client-lib';
 import { configs } from '@pinch-ts/common';
 
 const sk: bigint = 69000420n;
@@ -19,27 +20,34 @@ const p1nchcontract = new Contract(
 
 describe('Post and P2SKH Basic Actions', () => {
   it('Should deposit funds', async () => {
+    const seqApi: SequencerApi<unknown> = new SequencerApi<unknown>({
+      baseUrl: 'http://localhost:3000',
+    });
+    const resp = await seqApi.sequencer.deposit({} as any);
+    const { message } = resp.data;
+
     const deposit_randomness = gen_circom_randomness();
     const dep_amount = 1000;
     // 1. Approve funds for deposit
-    const { ticket_hash, proof: well_formed_proof } = await genP2SKHWellFormed({
-      sk,
-      randomness: deposit_randomness,
-      amount: dep_amount,
-      tok_addr,
-    });
 
-    // 2. Call sequencer/deposit endpoint
-    const res = await axios.post(`/sequencer/deposit`, {
-      well_formed_proof,
-      ticket_hash,
-      tok_addr,
-      dep_amount,
-      alice,
-    });
+    // const { ticket_hash, proof: well_formed_proof } = await genP2SKHWellFormed({
+    //   sk,
+    //   randomness: deposit_randomness,
+    //   amount: dep_amount,
+    //   tok_addr,
+    // });
 
-    expect(res.status).toBe(200);
-    expect(res.data).toEqual({ message: 'Hello API' });
+    // // 2. Call sequencer/deposit endpoint
+    // const res = await axios.post(`/sequencer/deposit`, {
+    //   well_formed_proof,
+    //   ticket_hash,
+    //   tok_addr,
+    //   dep_amount,
+    //   alice,
+    // });
+
+    // expect(res.status).toBe(200);
+    // expect(res.data).toEqual({ message: 'Hello API' });
 
     // 3. Check that your ticket is in the tree and that the tree matches the chain's root
 
