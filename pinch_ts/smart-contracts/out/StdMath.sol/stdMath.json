@@ -1,20 +1,20 @@
 {
   "abi": [],
   "bytecode": {
-    "object": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea26469706673582212208abd8ce282e36ce77f8b205f52aca5045aae8c64249d23efaf1c51c93a9dbc6964736f6c63430008130033",
+    "object": "0x60808060405234601757603a9081601d823930815050f35b600080fdfe600080fdfea26469706673582212209aff098ccd6e6569b4dc10d919637607c37cb387f2051d25671095dedc9385fc64736f6c63430008110033",
     "sourceMap": "65:1294:18:-:0;;;;;;;;;;;;;;;;;;;;;",
     "linkReferences": {}
   },
   "deployedBytecode": {
-    "object": "0x600080fdfea26469706673582212208abd8ce282e36ce77f8b205f52aca5045aae8c64249d23efaf1c51c93a9dbc6964736f6c63430008130033",
+    "object": "0x600080fdfea26469706673582212209aff098ccd6e6569b4dc10d919637607c37cb387f2051d25671095dedc9385fc64736f6c63430008110033",
     "sourceMap": "65:1294:18:-:0;;",
     "linkReferences": {}
   },
   "methodIdentifiers": {},
-  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.19+commit.7dd6d404\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/forge-std/src/StdMath.sol\":\"stdMath\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/\"],\"viaIR\":true},\"sources\":{\"lib/forge-std/src/StdMath.sol\":{\"keccak256\":\"0xd90ad4fd8aeaeb8929964e686e769fdedd5eded3fc3815df194a0ab9f91a3fb2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7919b70f636c7b805223992f28ad1ad0145d6c1385b5931a3589aface5fe6c92\",\"dweb:/ipfs/QmY7FRaULwoGgFteF8GawjQJRfasNgpWnU2aiMsFrYpuTC\"]}},\"version\":1}",
+  "rawMetadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"lib/forge-std/src/StdMath.sol\":\"stdMath\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[\":@circuits/=circuit_build/\",\":@forge-std/=lib/forge-std/\",\":@openzeppelin/=lib/openzeppelin-contracts/\",\":@uniswap/=node_modules/@uniswap/\",\":ds-test/=lib/forge-std/lib/ds-test/src/\",\":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/\",\":forge-std/=lib/forge-std/src/\",\":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/\"],\"viaIR\":true},\"sources\":{\"lib/forge-std/src/StdMath.sol\":{\"keccak256\":\"0xd90ad4fd8aeaeb8929964e686e769fdedd5eded3fc3815df194a0ab9f91a3fb2\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://7919b70f636c7b805223992f28ad1ad0145d6c1385b5931a3589aface5fe6c92\",\"dweb:/ipfs/QmY7FRaULwoGgFteF8GawjQJRfasNgpWnU2aiMsFrYpuTC\"]}},\"version\":1}",
   "metadata": {
     "compiler": {
-      "version": "0.8.19+commit.7dd6d404"
+      "version": "0.8.17+commit.8df45f5f"
     },
     "language": "Solidity",
     "output": {
@@ -39,7 +39,7 @@
         ":ds-test/=lib/forge-std/lib/ds-test/src/",
         ":erc4626-tests/=lib/openzeppelin-contracts/lib/erc4626-tests/",
         ":forge-std/=lib/forge-std/src/",
-        ":openzeppelin-contracts/=lib/openzeppelin-contracts/"
+        ":openzeppelin-contracts/=lib/openzeppelin-contracts/contracts/"
       ],
       "optimizer": {
         "enabled": true,
@@ -81,7 +81,6 @@
         "id": 17049,
         "nodeType": "PragmaDirective",
         "src": "32:31:18",
-        "nodes": [],
         "literals": [
           "solidity",
           ">=",
@@ -101,7 +100,6 @@
             "id": 17053,
             "nodeType": "VariableDeclaration",
             "src": "87:115:18",
-            "nodes": [],
             "constant": true,
             "mutability": "constant",
             "name": "INT256_MIN",
@@ -160,12 +158,10 @@
             "id": 17079,
             "nodeType": "FunctionDefinition",
             "src": "209:306:18",
-            "nodes": [],
             "body": {
               "id": 17078,
               "nodeType": "Block",
               "src": "264:251:18",
-              "nodes": [],
               "statements": [
                 {
                   "condition": {
@@ -476,12 +472,10 @@
             "id": 17100,
             "nodeType": "FunctionDefinition",
             "src": "521:114:18",
-            "nodes": [],
             "body": {
               "id": 17099,
               "nodeType": "Block",
               "src": "590:45:18",
-              "nodes": [],
               "statements": [
                 {
                   "expression": {
@@ -739,12 +733,10 @@
             "id": 17136,
             "nodeType": "FunctionDefinition",
             "src": "641:352:18",
-            "nodes": [],
             "body": {
               "id": 17135,
               "nodeType": "Block",
               "src": "708:285:18",
-              "nodes": [],
               "statements": [
                 {
                   "condition": {
@@ -1246,12 +1238,10 @@
             "id": 17159,
             "nodeType": "FunctionDefinition",
             "src": "999:160:18",
-            "nodes": [],
             "body": {
               "id": 17158,
               "nodeType": "Block",
               "src": "1075:84:18",
-              "nodes": [],
               "statements": [
                 {
                   "assignments": [
@@ -1551,12 +1541,10 @@
             "id": 17188,
             "nodeType": "FunctionDefinition",
             "src": "1165:192:18",
-            "nodes": [],
             "body": {
               "id": 17187,
               "nodeType": "Block",
               "src": "1239:118:18",
-              "nodes": [],
               "statements": [
                 {
                   "assignments": [
