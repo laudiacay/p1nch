@@ -180,6 +180,7 @@ contract Swapper is AccessControl, PinchSwapProxy {
     // todo this is a rough one
     function updateRoot(
         SwapProofVerifier.Proof[] calldata updateProofs,
+        SwapProofVerifier.Proof[] calldata swapWellFormedProofs,
         uint256[] calldata newRoots,
         uint256[] calldata swap_event_hashes
     ) public onlyRole(BOT_ROLE) {
@@ -191,11 +192,12 @@ contract Swapper is AccessControl, PinchSwapProxy {
         // check lengths of proofs and newRoots
         require(
             updateProofs.length ==
-                last_and_needs_entry_to_root.swap_tokens.length * 2 &&
+                last_and_needs_entry_to_root.swap_tokens.length &&
                 newRoots.length ==
                 last_and_needs_entry_to_root.swap_tokens.length &&
-                swap_event_hashes.length == newRoots.length,
-            "updateProofs and newRoots must be 2*the same length as num of swap pairs"
+                swap_event_hashes.length == newRoots.length &&
+                swapWellFormedProofs.length == newRoots.length,
+            "updateProofs and newRoots must be the same length as num of swap pairs"
         );
         uint256 lastRoot = 0;
 
@@ -210,12 +212,12 @@ contract Swapper is AccessControl, PinchSwapProxy {
             PairTokenAmount memory prices = last_and_needs_entry_to_root.prices[
                 pairid
             ];
-            // validate that it's a valid proof
-            lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[2 * i];
+            // validate that it's a valid update proof
+            lastRoot = i == 0 ? batch_swap_root.getCurrent() : newRoots[i];
             require(
                 SwapProofVerifier.updateProof(
-                    updateProofs[i * 2],
-                    updateProofs[i * 2 + 1],
+                    updateProofs[i],
+                    swapWellFormedProofs[i],
                     swap_event_hashes[i],
                     lastRoot,
                     newRoots[i],
@@ -229,20 +231,6 @@ contract Swapper is AccessControl, PinchSwapProxy {
             );
 
             lastRoot = newRoots[i];
-            // @laudiacay I am a little confused by the below
-            // require(
-            //     SwapProofVerifier.updateProof(
-            //         updateProofs[2 * i + 1],
-            //         lastRoot,
-            //         newRoots[2 * i + 1],
-            //         last_and_needs_entry_to_root.batchNumber,
-            //         pair.token_src,
-            //         pair.token_dest,
-            //         prices.token_src_amount_in,
-            //         prices.token_dest_amount_out
-            //     ),
-            //     "you did not update the prices right :(, check your proofs"
-            // );
         }
 
         emptySwapData(last_and_needs_entry_to_root);
