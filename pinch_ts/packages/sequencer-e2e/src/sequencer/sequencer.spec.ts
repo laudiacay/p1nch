@@ -6,7 +6,7 @@ import {
   gen_ticket_hash,
   hash_sk,
 } from '@pinch-ts/proof-utils';
-import {ethers, Contract } from 'ethers';
+import { ethers, Contract } from 'ethers';
 import { Api as SequencerApi } from '@pinch-ts/client-lib';
 import { configs } from '@pinch-ts/common';
 import tokAddress from '@pinch-ts/assets/src/deploy_token_addresses.json';
@@ -38,8 +38,8 @@ describe('Post and P2SKH Basic Actions', () => {
     });
     const p2skh_rand = gen_circom_randomness();
     const amount_init_dep = 1_000;
-    
-    const pk = await hash_sk(sk)
+
+    const pk = await hash_sk(sk);
 
     const proof = (
       await compile_snark(

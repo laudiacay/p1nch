@@ -20,11 +20,22 @@ import {
 
 type BigIntTsoaSerial = string;
 // TODO:
-type Proof = string;
+
+export interface GrothPoof {
+  pi_a: [BigIntTsoaSerial, BigIntTsoaSerial, BigIntTsoaSerial];
+  pi_b: [
+    [BigIntTsoaSerial, BigIntTsoaSerial],
+    [BigIntTsoaSerial, BigIntTsoaSerial],
+    [BigIntTsoaSerial, BigIntTsoaSerial]
+  ];
+  pi_c: [BigIntTsoaSerial, BigIntTsoaSerial, BigIntTsoaSerial];
+  protocol: 'groth16';
+  curve: 'bn128';
+}
 
 // types for the data we expect to receive
 export interface DepositData {
-  well_formed_proof: Proof;
+  well_formed_proof: GrothPoof;
   ticket_hash: BigIntTsoaSerial;
   token: string;
   amount: BigIntTsoaSerial;
