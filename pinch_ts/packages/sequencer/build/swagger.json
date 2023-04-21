@@ -6,11 +6,59 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"Proof": {
-				"type": "string"
-			},
 			"BigIntTsoaSerial": {
 				"type": "string"
+			},
+			"GrothPoof": {
+				"properties": {
+					"pi_a": {
+						"items": {
+							"$ref": "#/components/schemas/BigIntTsoaSerial"
+						},
+						"type": "array"
+					},
+					"pi_b": {
+						"items": {
+							"items": {
+								"$ref": "#/components/schemas/BigIntTsoaSerial"
+							},
+							"type": "array"
+						},
+						"type": "array"
+					},
+					"pi_c": {
+						"items": {
+							"$ref": "#/components/schemas/BigIntTsoaSerial"
+						},
+						"type": "array"
+					},
+					"protocol": {
+						"type": "string",
+						"enum": [
+							"groth16"
+						],
+						"nullable": false
+					},
+					"curve": {
+						"type": "string",
+						"enum": [
+							"bn128"
+						],
+						"nullable": false
+					}
+				},
+				"required": [
+					"pi_a",
+					"pi_b",
+					"pi_c",
+					"protocol",
+					"curve"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Proof": {
+				"$ref": "#/components/schemas/GrothPoof"
 			},
 			"DepositData": {
 				"properties": {

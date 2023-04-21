@@ -62,7 +62,7 @@ contract Pinch is AccessControl {
         uint256 ticket_hash,
         SMTMembershipVerifier.Proof calldata smt_update_proof,
         uint256 new_root,
-        IERC20 token,
+        address token,
         uint256 amount,
         address alice
     )
@@ -88,7 +88,7 @@ contract Pinch is AccessControl {
         );
 
         // Perform ERC 20 Approved Transfer
-        require(token.transferFrom(alice, address(this), amount), "ERC20 transfer failed");
+        require(IERC20(token).transferFrom(alice, address(this), amount), "ERC20 transfer failed");
 
         // Update the root
         utxo_root.setRoot(new_root);

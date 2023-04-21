@@ -27,7 +27,6 @@
   },
   "homepage": "https://github.com/laudiacay/p1ich#readme",
   "dependencies": {
-    "@cedoor/smt": "^0.1.7",
     "circom_tester": "^0.0.19",
     "circomlib": "^2.0.5",
     "circomlib-matrix": "^1.0.2",

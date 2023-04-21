@@ -8,7 +8,9 @@ yarn
 ```
 
 Then, for development, you need to run a local redis server. Any method works.
-Our preferred method is to use docker:
+Our preferred method is to use docker.
+
+To get started run:
 ```sh
 docker run -d --name redis-stack-server -p 6379:6379 redis/redis-stack-server:latest
 ```

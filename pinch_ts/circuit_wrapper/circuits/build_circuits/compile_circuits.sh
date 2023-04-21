@@ -30,7 +30,7 @@ circom circuit_wrapper/circuits/build_circuits/swap_event_format_verifier.circom
 
 # # Set up the zkeys
 POT_FINAL=$BUILD_PATH/pot18_final.ptau
-# snarkjs powersoftau prepare phase2 $BUILD_PATH/$POT_START $POT_FINAL -v
+snarkjs powersoftau prepare phase2 $BUILD_PATH/$POT_START $POT_FINAL -v
 # # TODO: phase 2 cermony for trust if we are using groth 16...
 snarkjs groth16 setup $BUILD_PATH/comm_memb.r1cs $POT_FINAL $BUILD_PATH/comm_memb.zkey
 snarkjs groth16 setup $BUILD_PATH/p2skh_merge.r1cs $POT_FINAL $BUILD_PATH/p2skh_merge.zkey

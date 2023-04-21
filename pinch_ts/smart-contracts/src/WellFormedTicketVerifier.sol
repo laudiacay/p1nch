@@ -10,9 +10,9 @@ import {Verifier as SplitWellFormedVerify} from "@circuits/p2skh_split_verify.so
 library WellFormedTicketVerifier {
     // types
     struct Proof {
-        uint256[2] a;
-        uint256[2][2] b;
-        uint256[2] c;
+        uint256[2] pi_a;
+        uint256[2][2] pi_b;
+        uint256[2] pi_c;
     }
 
     // public functions
@@ -26,9 +26,9 @@ library WellFormedTicketVerifier {
         P2SKHWellFormedVerify verif = new P2SKHWellFormedVerify();
         return
             verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
+                proof.pi_a,
+                proof.pi_b,
+                proof.pi_c,
                 [amount, uint160(token), ticket_hash]
             );
     }
@@ -46,9 +46,9 @@ library WellFormedTicketVerifier {
         DeactivatorWellFormedVerify verif = new DeactivatorWellFormedVerify();
         return
             verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
+                proof.pi_a,
+                proof.pi_b,
+                proof.pi_c,
                 [cancelling_hash, commitment_to_old_key]
             );
     }
@@ -65,9 +65,9 @@ library WellFormedTicketVerifier {
         SplitWellFormedVerify verif = new SplitWellFormedVerify();
         return
             verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
+                proof.pi_a,
+                proof.pi_b,
+                proof.pi_c,
                 [
                     old_p2skh_ticket_commitment,
                     new_p2skh_ticket_1,
@@ -88,9 +88,9 @@ library WellFormedTicketVerifier {
         MergeWellFormedVerify verif = new MergeWellFormedVerify();
         return
             verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
+                proof.pi_a,
+                proof.pi_b,
+                proof.pi_c,
                 [
                     old_p2skh_ticket_commitment_1,
                     old_p2skh_ticket_commitment_2,

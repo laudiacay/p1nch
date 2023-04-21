@@ -10,10 +10,13 @@ import { ethers, Contract } from 'ethers';
 import { Api as SequencerApi } from '@pinch-ts/client-lib';
 import { configs } from '@pinch-ts/common';
 import tokAddress from '@pinch-ts/assets/src/deploy_token_addresses.json';
+import contractAddr from '@pinch-ts/assets/src/deploy_addresses.json';
+import { erc20Abi } from '@pinch-ts/assets';
 // import deployAddresses from '@pinch-ts/assets/src/deploy_addresses.json';
 
 const sk: bigint = 69000420n;
-
+let erc20ContractA: Contract;
+let erc20ContractB: Contract;
 const eth_sk =
   '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80';
 const eth_addr = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
@@ -25,6 +28,17 @@ let wallet: ethers.Wallet;
 const load_ethers = async () => {
   const provider = new ethers.JsonRpcProvider('http://localhost:8545');
   wallet = new ethers.Wallet(eth_sk, provider);
+  erc20ContractA = new Contract(
+    tokAddress.localnet.DummyTokenA,
+    erc20Abi,
+    wallet
+  );
+
+  erc20ContractB = new Contract(
+    tokAddress.localnet.DummyTokenB,
+    erc20Abi,
+    wallet
+  );
 };
 
 describe('Post and P2SKH Basic Actions', () => {
@@ -41,6 +55,15 @@ describe('Post and P2SKH Basic Actions', () => {
 
     const pk = await hash_sk(sk);
 
+    const item_hash = await gen_ticket_hash(
+      true,
+      await hash_sk(sk),
+      tok_addr_a,
+      amount_init_dep,
+      0,
+      [0, 0],
+      p2skh_rand
+    );
     const proof = (
       await compile_snark(
         {
@@ -48,26 +71,25 @@ describe('Post and P2SKH Basic Actions', () => {
           randomness: p2skh_rand,
           amount: amount_init_dep,
           tok_addr: tok_addr_a,
-          item_hash: await gen_ticket_hash(
-            true,
-            await hash_sk(sk),
-            tok_addr_a,
-            amount_init_dep,
-            0,
-            [0, 0],
-            p2skh_rand
-          ),
+          item_hash,
         },
         configs.circuits.WELL_FORMED_P2SKH
       )
     ).proof;
+    // Approve the TX
+    const tx = await erc20ContractA.approve(
+      contractAddr.localnet.Pinch,
+      amount_init_dep
+    );
+    await tx.wait();
     const resp = await seqApi.sequencer.deposit({
       well_formed_proof: proof,
-      ticket_hash: 'TODO',
+      ticket_hash: item_hash,
       token: tok_addr_a,
-      amount: '100',
-      token_sender: 'TODO',
+      amount: amount_init_dep.toString(),
+      token_sender: eth_addr,
     });
+    expect(resp.status).toBe(200);
 
     const deposit_randomness = gen_circom_randomness();
     const dep_amount = 1000;

@@ -9,14 +9,26 @@ import type { RequestHandler, Router } from 'express';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "Proof": {
+    "BigIntTsoaSerial": {
         "dataType": "refAlias",
         "type": {"dataType":"string","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "BigIntTsoaSerial": {
+    "GrothPoof": {
+        "dataType": "refObject",
+        "properties": {
+            "pi_a": {"dataType":"array","array":{"dataType":"refAlias","ref":"BigIntTsoaSerial"},"required":true},
+            "pi_b": {"dataType":"array","array":{"dataType":"array","array":{"dataType":"refAlias","ref":"BigIntTsoaSerial"}},"required":true},
+            "pi_c": {"dataType":"array","array":{"dataType":"refAlias","ref":"BigIntTsoaSerial"},"required":true},
+            "protocol": {"dataType":"enum","enums":["groth16"],"required":true},
+            "curve": {"dataType":"enum","enums":["bn128"],"required":true},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Proof": {
         "dataType": "refAlias",
-        "type": {"dataType":"string","validators":{}},
+        "type": {"ref":"GrothPoof","validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "DepositData": {

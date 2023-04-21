@@ -95,7 +95,6 @@ export class CircomSMT {
       oldRoot: this._smt.F.toObject(tree_insert.oldRoot),
       siblings: siblings,
       newKey: this._smt.F.toObject(tree_insert.key),
-      newValue: this._smt.F.toObject(0),
     };
   }
 
@@ -104,7 +103,7 @@ export class CircomSMT {
    * Find the path to a key. If it is not in the tree, return null
    */
   public async inclusion(inp_key: BigIntish) {
-    const res: TreeFindRes = await this._smt.inclusion(inp_key);
+    const res: TreeFindRes = await this._smt.find(inp_key);
     const siblings = res.siblings;
     for (let i = 0; i < siblings.length; i++)
       siblings[i] = this._smt.F.toObject(siblings[i]);
@@ -114,11 +113,12 @@ export class CircomSMT {
     res.key = inp_key;
     res.siblings = siblings;
     const tree_find = res;
-    if (tree_find.found) return null;
+    if (!tree_find.found) return null;
+
     return {
       root: this._smt.F.toObject(this._smt.root),
       siblings: tree_find.siblings,
-      key: this._smt.toObject(tree_find.key),
+      key: BigInt(inp_key).valueOf(),
     };
   }
 }

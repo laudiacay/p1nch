@@ -9,9 +9,17 @@
  * ---------------------------------------------------------------
  */
 
-export type Proof = string;
-
 export type BigIntTsoaSerial = string;
+
+export interface GrothPoof {
+  pi_a: BigIntTsoaSerial[];
+  pi_b: BigIntTsoaSerial[][];
+  pi_c: BigIntTsoaSerial[];
+  protocol: 'groth16';
+  curve: 'bn128';
+}
+
+export type Proof = GrothPoof;
 
 export interface DepositData {
   well_formed_proof: Proof;

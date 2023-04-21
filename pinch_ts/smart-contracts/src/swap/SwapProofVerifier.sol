@@ -20,9 +20,9 @@ library SwapProofVerifier {
     // types
     // TODO SHAME! SHAME!. there should be separate types for each proof. SHAME!!
     struct Proof {
-        uint256[2] a;
-        uint256[2][2] b;
-        uint256[2] c;
+        uint256[2] pi_a;
+        uint256[2][2] pi_b;
+        uint256[2] pi_c;
     }
 
     // public functions
@@ -42,14 +42,14 @@ library SwapProofVerifier {
     ) public returns (bool r) {
         // TODO: should this be public
         bool smt_verified = SMTMembershipVerifier.updateProof(
-            SMTMembershipVerifier.Proof(proof_smt.a, proof_smt.b, proof_smt.c),
+            SMTMembershipVerifier.Proof(proof_smt.pi_a, proof_smt.pi_b, proof_smt.pi_c),
             old_root,
             new_root,
             event_hash
         );
         if (!smt_verified) return false;
         SwapEventFormatVerify verif = new SwapEventFormatVerify();
-        return verif.verifyProof(proof_well_formed.a, proof_well_formed.b, proof_well_formed.c, [
+        return verif.verifyProof(proof_well_formed.pi_a, proof_well_formed.pi_b, proof_well_formed.pi_c, [
             swap_batch_number,
             uint256(uint160(token_a)),
             uint256(uint160(token_b)),
@@ -73,9 +73,9 @@ library SwapProofVerifier {
         SwapResolveVerif verif = new SwapResolveVerif();
         return
             verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
+                proof.pi_a,
+                proof.pi_b,
+                proof.pi_c,
                 [swap_event_comm, p2skh_hash, swap_utxo_hash_comm]
             );
     }
@@ -96,9 +96,9 @@ library SwapProofVerifier {
         SwapWellFormedVerify verif = new SwapWellFormedVerify();
         return
             verif.verifyProof(
-                proof.a,
-                proof.b,
-                proof.c,
+                proof.pi_a,
+                proof.pi_b,
+                proof.pi_c,
                 [
                     uint160(source),
                     uint160(dest),

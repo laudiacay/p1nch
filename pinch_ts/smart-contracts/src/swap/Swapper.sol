@@ -26,9 +26,9 @@ contract Swapper is AccessControl, PinchSwapProxy {
 
     // batch swap update proof
     struct Proof {
-        uint256[2] a;
-        uint256[2][2] b;
-        uint256[2] c;
+        uint256[2] pi_a;
+        uint256[2][2] pi_b;
+        uint256[2] pi_c;
     }
 
     // this contains the swap batch info. it is an SMT that contains:

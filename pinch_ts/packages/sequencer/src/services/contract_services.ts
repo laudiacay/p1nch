@@ -15,15 +15,18 @@ import { compile_snark } from '@pinch-ts/proof-utils';
 
 // Initialize the SMT from Redis batches
 let smt: CircomSMT;
-const provider = ethers.getDefaultProvider('goerli');
+const provider = new ethers.JsonRpcProvider(configs.endpoint.PROVIDER_ENDPOINT);
+const wallet = new ethers.Wallet(configs.private_keys.SEQUENCER_SK, provider);
 // pinch address const
 const p1nchAddress = '0xAAAAAAAABABBBBABABABABABBABABBABABAB';
 
 // TODO: not convinced about this...
 const redis = new Redis();
-CircomSMT.new_tree_from_redis(configs.N_LEVELS, redis).then((smt_) => {
-  smt = smt_;
-});
+CircomSMT.new_tree_from_redis(configs.N_LEVELS, redis, 'pinch_smt').then(
+  (smt_) => {
+    smt = smt_;
+  }
+);
 
 export const sequencerDeposit = async (
   illFormedResponse: TsoaResponse<500, { message: string }>,
@@ -46,14 +49,15 @@ export const sequencerDeposit = async (
 
   // check that the ticketKey is not in the SMT currently
   if ((await smt.inclusion(data.ticket_hash)) !== null) {
+    console.log("ticket failed", data.ticket_hash, await smt.inclusion(data.ticket_hash))
     return illFormedResponse(500, { message: 'ticketKey already in SMT' });
   }
 
   // check that alice authorized her funds.
-  const erc20Contract = new Contract(data.token, erc20Abi, provider);
+  const erc20Contract = new Contract(data.token, erc20Abi, wallet);
   const sender_authorized = await erc20Contract.allowance(
     data.token_sender,
-    process.env.CONTRACT_ADDRESS
+    configs.addresses.PINCH_CONTRACT_ADDR
   );
   if (sender_authorized < data.amount) {
     console.log("dropping item: alice didn't authorize sufficient funds", data);
@@ -66,15 +70,13 @@ export const sequencerDeposit = async (
   const smt_update_witness = await smt.insert(data.ticket_hash);
   const smt_new_root = smt.get_root();
   const { proof: smt_update_proof, public_signals: smt_update_pub } =
-    await compile_snark(
-      smt_update_witness,
-      configs.circuits.SMT_PROCESSOR,
-    );
-  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
+    await compile_snark(smt_update_witness, configs.circuits.SMT_PROCESSOR);
+  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, wallet);
+  console.log("AAAAA, got it", smt_update_proof, data)
   const tx = await p1nchcontract.deposit(
     data.well_formed_proof,
     data.ticket_hash,
-    [smt_update_proof, smt_update_pub],
+    smt_update_proof,
     smt_new_root,
     data.token,
     data.amount,
@@ -98,11 +100,8 @@ export const sequencerWithdraw = async (
   const smt_update_witness = await smt.insert(data.new_deactivator_ticket_hash);
   const smt_new_root = smt.get_root();
   const { proof: smt_update_proof, public_signals: smt_update_pub } =
-    await compile_snark(
-      smt_update_witness,
-      configs.circuits.SMT_PROCESSOR,
-    );
-  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
+    await compile_snark(smt_update_witness, configs.circuits.SMT_PROCESSOR);
+  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, wallet);
   const tx = await p1nchcontract.withdraw(
     data.well_formed_deactivator_proof,
     data.new_deactivator_ticket_hash,
@@ -176,7 +175,7 @@ export const sequencerMerge = async (
     configs.circuits.SMT_PROCESSOR
   );
   // build transaction
-  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
+  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, wallet);
   const tx = await p1nchcontract.merge(
     data.well_formed_deactivator_for_p2skh_1,
     data.well_formed_deactivator_for_p2skh_2,
@@ -203,9 +202,9 @@ export const sequencerSplit = async (
   success: TsoaResponse<200, { message: string }>,
   data: SplitData
 ) => {
-	 /****************************** TODO ******************************/
+  /****************************** TODO ******************************/
   // TODO validate provided proofs!
-	// @laudiacay
+  // @laudiacay
 
   // update smt with deactivator
   const smt_root_after_adding_deactivator = await smt.insert(
@@ -243,7 +242,7 @@ export const sequencerSplit = async (
     configs.circuits.SMT_PROCESSOR
   );
 
-  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, provider);
+  const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, wallet);
   const tx = await p1nchcontract.split(
     data.well_formed_deactivator_for_p2skh,
     [smt_update_deactivator_proof, smt_update_deactivator_pub],

@@ -1,21 +1,19 @@
 import express, { NextFunction, Request, Response } from 'express';
 //@ts-ignore
 import * as cron from 'node-cron';
-import * as swaggerUI from "swagger-ui-express";
+import * as swaggerUI from 'swagger-ui-express';
 import { ethers, Contract } from 'ethers';
 
 import Redis from 'ioredis';
 const redis = new Redis();
 
 // Import TSOA
-import { RegisterRoutes } from "../build/routes";
-import swaggerJson from "../build/swagger.json";
+import { RegisterRoutes } from '../build/routes';
+import swaggerJson from '../build/swagger.json';
 import { ValidateError } from 'tsoa';
 
 const app = express();
 const port = process.env.PORT || 3000;
-
-const provider = ethers.getDefaultProvider('goerli');
 
 app.use(express.json());
 
@@ -36,20 +34,20 @@ app.use(function errorHandler(
   if (err instanceof ValidateError) {
     console.warn(`Caught Validation Error for ${req.path}:`, err.fields);
     return res.status(422).json({
-      message: "Validation Failed",
+      message: 'Validation Failed',
       details: err?.fields,
     });
   }
   if (err instanceof Error) {
+    console.error('ERROR', err);
     return res.status(500).json({
-      message: "Internal Server Error",
+      message: 'Internal Server Error',
     });
   }
   next();
 });
 
-app.use("/docs", swaggerUI.serve, swaggerUI.setup(swaggerJson));
-
+app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerJson));
 
 // Schedule cron job to run every 5 minutes
 // TODO this literally drops everything if it fails

@@ -11,28 +11,28 @@ import {
 } from '@pinch-ts/data-layer';
 import { BigIntish } from '@pinch-ts/common';
 import { BitwiseOperator } from 'typescript';
-import { join } from 'path';
+import { dirname, join } from 'path';
 
 const CIRCOM_PRIME: bigint =
   21888242871839275222246405745257275088548364400416034343698204186575808495617n;
 
-const get_wasm_path = (circuit_name: string) =>
-  join(
+const build_path_base = '../../../../smart-contracts/circuit_build';
+
+const get_wasm_path = (circuit_name: string) => {
+  return `smart-contracts/circuit_build/${circuit_name}_js/${circuit_name}.wasm`;
+  return join(
     __dirname,
-    `../../../../smart-contracts/circuit_build/${circuit_name}_js/${circuit_name}.wasm`
+    `${build_path_base}/${circuit_name}_js/${circuit_name}.wasm`
   );
+};
 
 const get_verification_key_path = (circuit_name: string) =>
-  join(
-    __dirname,
-    `../../../../smart-contracts/circuit_build/${circuit_name}_verification_key.json`
-  );
+  `smart-contracts/circuit_build/${circuit_name}_verification_key.json`;
+// join(__dirname, `${build_path_base}/${circuit_name}_verification_key.json`);
 
 const get_zkey_path = (circuit_name: string) =>
-  join(
-    __dirname,
-    `../../../../smart-contracts/circuit_build/${circuit_name}.zkey`
-  );
+  `smart-contracts/circuit_build/${circuit_name}.zkey`;
+// join(__dirname, `${build_path_base}/${circuit_name}.zkey`);
 
 let poseidon_inner: any;
 let poseidon: any;
@@ -126,7 +126,6 @@ export const compile_snark = async (witness: any, circuit_name: string) => {
   );
 
   console.log('Proof: ');
-  console.log(JSON.stringify(proof, null, 1));
 
   const vKey = JSON.parse(
     readFileSync(get_verification_key_path(circuit_name)).toString()
@@ -139,5 +138,9 @@ export const compile_snark = async (witness: any, circuit_name: string) => {
   } else {
     console.log('Invalid proof');
   }
+  proof.pi_a = (proof.pi_a as any[]).slice(0, 2);
+  proof.pi_b = (proof.pi_b as any[]).slice(0, 2);
+  proof.pi_c = (proof.pi_c as any[]).slice(0, 2);
+  // const proof_ret = { pi_a: proof.pi_a, pi_b: proof.pi_b, pi_c: proof.pi_c };
   return { proof, public_signals: publicSignals };
 };
