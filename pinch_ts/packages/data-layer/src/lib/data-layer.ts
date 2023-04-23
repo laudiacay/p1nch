@@ -90,7 +90,6 @@ export class CircomSMT {
     const _key = this._smt.F.e(inp_key);
 
     const tree_insert = await this._smt.insert(_key, 0);
-    console.log('Input key', inp_key, 'and new', tree_insert.key);
     const siblings = tree_insert.siblings;
     for (let i = 0; i < siblings.length; i++)
       siblings[i] = this._smt.F.toObject(siblings[i]);

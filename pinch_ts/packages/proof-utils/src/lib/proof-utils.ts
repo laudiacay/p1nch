@@ -125,8 +125,6 @@ export const compile_snark = async (witness: any, circuit_name: string) => {
     get_zkey_path(circuit_name)
   );
 
-  console.log('Proof: ');
-
   const vKey = JSON.parse(
     readFileSync(get_verification_key_path(circuit_name)).toString()
   );
@@ -137,8 +135,6 @@ export const compile_snark = async (witness: any, circuit_name: string) => {
     publicSignals
   );
   const call_data_parsed = JSON.parse(`[${call_data}]`);
-
-  console.log('AAAAAAAAAAAAAA', call_data_parsed);
 
   if (res === true) {
     console.log('Verification OK');

@@ -46,11 +46,12 @@ describe('Post and P2SKH Basic Actions', () => {
     await load_ethers();
   });
 
-  it('Should deposit funds', async () => {
+  it('Should deposit funds and go through a basic flow', async () => {
     const seqApi: SequencerApi<unknown> = new SequencerApi<unknown>({
       baseUrl: 'http://localhost:3000',
     });
     const balanceStart: BigNumberish = await erc20ContractA.balanceOf(eth_addr);
+    const balanceContractStart: BigNumberish = await erc20ContractA.balanceOf(contractAddr);
     const p2skh_rand = gen_circom_randomness();
     const amount_init_dep = 1_000;
 
@@ -85,14 +86,23 @@ describe('Post and P2SKH Basic Actions', () => {
       well_formed_proof: proof,
       ticket_hash: public_signals[2],
       token: tok_addr_a,
-      amount: public_signals[0],
+      amount: amount_init_dep.toString(),
       token_sender: eth_addr,
     });
     expect(resp.status).toBe(200);
     const balanceEnd: BigNumberish = await erc20ContractA.balanceOf(eth_addr);
-    expect(BigInt(balanceEnd).valueOf() - BigInt(balanceStart).valueOf()).toBe(
+    const balanceContractEnd: BigNumberish = await erc20ContractA.balanceOf(contractAddr);
+    expect(BigInt(balanceStart).valueOf() - BigInt(balanceEnd).valueOf()).toBe(
       BigInt(amount_init_dep)
     );
+    expect(BigInt(balanceContractEnd).valueOf() - BigInt(balanceContractStart).valueOf()).toBe(
+      BigInt(amount_init_dep)
+    );
+
+    /************** Do a Split **************/
+
+    /************** Do a Swap Setup **************/
+    /************** Call Swap?? **************/
 
     // Check your ERC20 balance
 

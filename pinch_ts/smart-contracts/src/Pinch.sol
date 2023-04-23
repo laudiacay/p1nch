@@ -80,7 +80,6 @@ contract Pinch is AccessControl {
             "Well-formed proof failed"
         );
 
-		console.log(utxo_root.getCurrent(), new_root, ticket_hash);
         // Check the smt update proof
         // assert!(ticket_hash \not\in utxo_hash_smt_root)
         // assert!(ticket_hash \in new_root (and update is done correctly))
@@ -88,6 +87,8 @@ contract Pinch is AccessControl {
             SMTMembershipVerifier.updateProof(smt_update_proof, utxo_root.getCurrent(), new_root, ticket_hash),
             "SMT update proof failed"
         );
+
+		console.log(amount, IERC20(token).allowance(alice, address(this)), address(this));
 
         // Perform ERC 20 Approved Transfer
         require(IERC20(token).transferFrom(alice, address(this), amount), "ERC20 transfer failed");

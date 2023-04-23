@@ -25,8 +25,8 @@ library SMTMembershipVerifier {
         // TODO: should this be a
         SMTProcessorVerifier smt_proc_verifier = new SMTProcessorVerifier();
         uint256[3] memory inputValues = [
-            root_before,
             root_after,
+            root_before,
             ticket_hash
         ];
 
