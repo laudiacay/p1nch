@@ -54,7 +54,7 @@ export class CircomSMT {
   static async new_tree_from_redis(
     n_levels: number,
     redis: Redis,
-    tree_name: string,
+    tree_name: string
   ): Promise<CircomSMT> {
     const babyjub = await buildBabyjub();
     const t = new CircomSMT(await newMemEmptyTrie(), n_levels, babyjub);
@@ -63,13 +63,17 @@ export class CircomSMT {
   }
 
   public get_root(): BigIntish {
-    return this._smt.root;
+    return this._smt.F.toObject(this._smt.root);
   }
 
   private async insert_from_redis(redis: Redis, tree_name: string) {
     // Fetch all the batches from Redis
     const batchSize = await redis.zcard('${tree_name}.ticket_batches');
-    const batchData = await redis.zrange('${tree_name}.ticket_batches', 0, batchSize - 1);
+    const batchData = await redis.zrange(
+      '${tree_name}.ticket_batches',
+      0,
+      batchSize - 1
+    );
     console.log('batchsize', batchSize);
 
     const proms_nested: Promise<void>[][] = batchData.map((ticket_batch_str) =>
@@ -83,7 +87,10 @@ export class CircomSMT {
 
   // TODO ruh roh! you are not maintaining the redis at all
   public async insert(inp_key: BigIntish) {
-    const tree_insert = await this._smt.insert(inp_key, 0);
+    const _key = this._smt.F.e(inp_key);
+
+    const tree_insert = await this._smt.insert(_key, 0);
+    console.log('Input key', inp_key, 'and new', tree_insert.key);
     const siblings = tree_insert.siblings;
     for (let i = 0; i < siblings.length; i++)
       siblings[i] = this._smt.F.toObject(siblings[i]);
@@ -94,7 +101,7 @@ export class CircomSMT {
     return {
       oldRoot: this._smt.F.toObject(tree_insert.oldRoot),
       siblings: siblings,
-      newKey: this._smt.F.toObject(tree_insert.key),
+      newKey: this._smt.F.toObject(_key),
     };
   }
 

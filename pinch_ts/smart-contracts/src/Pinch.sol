@@ -3,6 +3,7 @@ pragma solidity ^0.8.13;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
+import "forge-std/console.sol";
 
 import "./SMTMembershipVerifier.sol";
 import "./WellFormedTicketVerifier.sol";
@@ -75,10 +76,11 @@ contract Pinch is AccessControl {
         // assert!(ticket_hash = hash(token, amount, "p2skh" ...some other fields...))
         // assert!(ticket.token == token && ticket.amount == amount && ticket.instr == "p2skh")
         require(
-            WellFormedTicketVerifier.wellFormedP2SKHproof(well_formed_proof, address(token), amount, ticket_hash),
+            WellFormedTicketVerifier.wellFormedP2SKHproof(well_formed_proof, token, amount, ticket_hash),
             "Well-formed proof failed"
         );
 
+		console.log(utxo_root.getCurrent(), new_root, ticket_hash);
         // Check the smt update proof
         // assert!(ticket_hash \not\in utxo_hash_smt_root)
         // assert!(ticket_hash \in new_root (and update is done correctly))

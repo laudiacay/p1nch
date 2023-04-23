@@ -18,7 +18,7 @@ let smt: CircomSMT;
 const provider = new ethers.JsonRpcProvider(configs.endpoint.PROVIDER_ENDPOINT);
 const wallet = new ethers.Wallet(configs.private_keys.SEQUENCER_SK, provider);
 // pinch address const
-const p1nchAddress = '0xAAAAAAAABABBBBABABABABABBABABBABABAB';
+const p1nchAddress = configs.addresses.PINCH_CONTRACT_ADDR;
 
 // TODO: not convinced about this...
 const redis = new Redis();
@@ -49,7 +49,11 @@ export const sequencerDeposit = async (
 
   // check that the ticketKey is not in the SMT currently
   if ((await smt.inclusion(data.ticket_hash)) !== null) {
-    console.log("ticket failed", data.ticket_hash, await smt.inclusion(data.ticket_hash))
+    console.log(
+      'ticket failed',
+      data.ticket_hash,
+      await smt.inclusion(data.ticket_hash)
+    );
     return illFormedResponse(500, { message: 'ticketKey already in SMT' });
   }
 
@@ -72,7 +76,13 @@ export const sequencerDeposit = async (
   const { proof: smt_update_proof, public_signals: smt_update_pub } =
     await compile_snark(smt_update_witness, configs.circuits.SMT_PROCESSOR);
   const p1nchcontract = new Contract(p1nchAddress, p1nchAbi.abi, wallet);
-  console.log("AAAAA, got it", smt_update_proof, data)
+  console.log(
+    'AAAAA, got it',
+    smt_new_root,
+    data.ticket_hash,
+    smt_update_witness,
+    smt_update_pub
+  );
   const tx = await p1nchcontract.deposit(
     data.well_formed_proof,
     data.ticket_hash,

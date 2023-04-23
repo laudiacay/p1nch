@@ -6,7 +6,7 @@ import {
   gen_ticket_hash,
   hash_sk,
 } from '@pinch-ts/proof-utils';
-import { ethers, Contract } from 'ethers';
+import { ethers, Contract, BigNumberish } from 'ethers';
 import { Api as SequencerApi } from '@pinch-ts/client-lib';
 import { configs } from '@pinch-ts/common';
 import tokAddress from '@pinch-ts/assets/src/deploy_token_addresses.json';
@@ -50,6 +50,7 @@ describe('Post and P2SKH Basic Actions', () => {
     const seqApi: SequencerApi<unknown> = new SequencerApi<unknown>({
       baseUrl: 'http://localhost:3000',
     });
+    const balanceStart: BigNumberish = await erc20ContractA.balanceOf(eth_addr);
     const p2skh_rand = gen_circom_randomness();
     const amount_init_dep = 1_000;
 
@@ -57,25 +58,23 @@ describe('Post and P2SKH Basic Actions', () => {
 
     const item_hash = await gen_ticket_hash(
       true,
-      await hash_sk(sk),
+      pk,
       tok_addr_a,
       amount_init_dep,
       0,
       [0, 0],
       p2skh_rand
     );
-    const proof = (
-      await compile_snark(
-        {
-          sk,
-          randomness: p2skh_rand,
-          amount: amount_init_dep,
-          tok_addr: tok_addr_a,
-          item_hash,
-        },
-        configs.circuits.WELL_FORMED_P2SKH
-      )
-    ).proof;
+    const { proof, public_signals } = await compile_snark(
+      {
+        sk,
+        randomness: p2skh_rand,
+        amount: amount_init_dep,
+        tok_addr: tok_addr_a,
+        item_hash,
+      },
+      configs.circuits.WELL_FORMED_P2SKH
+    );
     // Approve the TX
     const tx = await erc20ContractA.approve(
       contractAddr.localnet.Pinch,
@@ -84,15 +83,19 @@ describe('Post and P2SKH Basic Actions', () => {
     await tx.wait();
     const resp = await seqApi.sequencer.deposit({
       well_formed_proof: proof,
-      ticket_hash: item_hash,
+      ticket_hash: public_signals[2],
       token: tok_addr_a,
-      amount: amount_init_dep.toString(),
+      amount: public_signals[0],
       token_sender: eth_addr,
     });
     expect(resp.status).toBe(200);
+    const balanceEnd: BigNumberish = await erc20ContractA.balanceOf(eth_addr);
+    expect(BigInt(balanceEnd).valueOf() - BigInt(balanceStart).valueOf()).toBe(
+      BigInt(amount_init_dep)
+    );
 
-    const deposit_randomness = gen_circom_randomness();
-    const dep_amount = 1000;
+    // Check your ERC20 balance
+
     // 1. Approve funds for deposit
 
     // const { ticket_hash, proof: well_formed_proof } = await genP2SKHWellFormed({

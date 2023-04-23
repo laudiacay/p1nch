@@ -132,15 +132,21 @@ export const compile_snark = async (witness: any, circuit_name: string) => {
   );
 
   const res = await snarkjs.groth16.verify(vKey, publicSignals, proof);
+  const call_data = await snarkjs.groth16.exportSolidityCallData(
+    proof,
+    publicSignals
+  );
+  const call_data_parsed = JSON.parse(`[${call_data}]`);
+
+  console.log('AAAAAAAAAAAAAA', call_data_parsed);
 
   if (res === true) {
     console.log('Verification OK');
   } else {
-    console.log('Invalid proof');
+    throw 'Invalid proof';
   }
-  proof.pi_a = (proof.pi_a as any[]).slice(0, 2);
-  proof.pi_b = (proof.pi_b as any[]).slice(0, 2);
-  proof.pi_c = (proof.pi_c as any[]).slice(0, 2);
-  // const proof_ret = { pi_a: proof.pi_a, pi_b: proof.pi_b, pi_c: proof.pi_c };
+  proof.pi_a = call_data_parsed[0];
+  proof.pi_b = call_data_parsed[1];
+  proof.pi_c = call_data_parsed[2];
   return { proof, public_signals: publicSignals };
 };
