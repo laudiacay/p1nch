@@ -44,6 +44,10 @@ contract Pinch is AccessControl {
         utxo_root = new HistoricalRoots();
     }
 
+    function swapper() view returns (address) {
+        return address(swapper);
+    }
+
     /**
      * User facing functions **************
      */

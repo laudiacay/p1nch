@@ -91,6 +91,22 @@ export const gen_ticket_hash = async (
   ]);
 };
 
+export const gen_price_hash = async (
+  batch_index: BigIntish,
+  tok_in: BigIntish,
+  tok_out: BigIntish,
+  swap_total_in: BigIntish,
+  swap_total_out: BigIntish,
+) => {
+  return (await get_poseidon())([
+    batch_index,
+    tok_in,
+    tok_out,
+    swap_total_in,
+    swap_total_out,
+  ]);
+};
+
 export const gen_commitment = async (
   ticket: BigIntish,
   randomness: BigIntish

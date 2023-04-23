@@ -29,10 +29,15 @@ export const configs = {
     SMT_PROCESSOR: 'smt_processor',
     SMT_VERIFIER: 'comm_memb',
     WELL_FORMED_P2SKH: 'p2skh_well_formed',
+    // so it looks like you have this swap_event_format_verifier in circom
+    // and then 
+   WELL_FORMED_SWAP_EVENT: 'swap_event_format_verifier',
   },
   addresses: get_config_addresses('localnet'),
   private_keys: {
     SEQUENCER_SK:
+      '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a',
+    BOT_SK:
       '0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a',
     // TODO: use .env file!
   },
